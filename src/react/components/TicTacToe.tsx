@@ -28,8 +28,12 @@ const TicTacToe: React.FC = () => {
     return null;
   }, []);
 
+  const shouldPreventClick = useCallback((index: number) => {
+    return !!(board[index] || winner || isDraw);
+  }, [board, winner, isDraw]);
+
   const handleCellClick = useCallback((index: number) => {
-    if (board[index] || winner || isDraw) return;
+    if (shouldPreventClick(index)) return;
 
     const newBoard = [...board];
     newBoard[index] = currentPlayer;
@@ -43,7 +47,7 @@ const TicTacToe: React.FC = () => {
     } else {
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
-  }, [board, currentPlayer, winner, isDraw, checkWinner]);
+  }, [board, currentPlayer, winner, isDraw, checkWinner, shouldPreventClick]);
 
   const resetGame = useCallback(() => {
     setBoard(Array(9).fill(null));
@@ -58,6 +62,15 @@ const TicTacToe: React.FC = () => {
     return `Player ${currentPlayer}'s turn`;
   };
 
+  const getStatusMessageClass = () => {
+    return `text-xl font-semibold ${winner || isDraw ? 'text-2xl' : ''}`;
+  };
+
+  const shouldRenderXIcon = (value: Player) => value === 'X';
+  const shouldRenderOIcon = (value: Player) => value === 'O';
+
+  const isCellDisabled = (value: Player) => !!value || !!winner || isDraw;
+
   const renderCell = (index: number) => {
     const value = board[index];
     return (
@@ -65,10 +78,10 @@ const TicTacToe: React.FC = () => {
         variant="outline"
         className="h-20 w-20 sm:h-24 sm:w-24 text-3xl sm:text-4xl font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         onClick={() => handleCellClick(index)}
-        disabled={!!value || !!winner || isDraw}
+        disabled={isCellDisabled(value)}
       >
-        {value === 'X' && <X className="h-10 w-10 sm:h-12 sm:w-12 text-blue-500" />}
-        {value === 'O' && <Circle className="h-10 w-10 sm:h-12 sm:w-12 text-red-500" />}
+        {shouldRenderXIcon(value) && <X className="h-10 w-10 sm:h-12 sm:w-12 text-blue-500" />}
+        {shouldRenderOIcon(value) && <Circle className="h-10 w-10 sm:h-12 sm:w-12 text-red-500" />}
       </Button>
     );
   };
@@ -82,7 +95,7 @@ const TicTacToe: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-center">
-          <p className={`text-xl font-semibold ${winner || isDraw ? 'text-2xl' : ''}`}>
+          <p className={getStatusMessageClass()}>
             {getStatusMessage()}
           </p>
         </div>
