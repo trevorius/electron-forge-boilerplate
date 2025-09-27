@@ -1,0 +1,16 @@
+{
+  "game": {
+    "title": "Morpion",
+    "playerWins": "Le joueur {{player}} gagne !",
+    "draw": "C'est un match nul !",
+    "playerTurn": "Tour du joueur {{player}}",
+    "newGame": "Nouvelle partie",
+    "playerX": "Joueur X",
+    "playerO": "Joueur O"
+  },
+  "language": {
+    "switch": "Changer de langue",
+    "english": "Anglais",
+    "french": "Français"
+  }
+}

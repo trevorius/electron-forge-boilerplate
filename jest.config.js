@@ -21,7 +21,8 @@ module.exports = {
     '!src/react/**/*.d.ts',
     '!src/react/components/ui/**/*',
     '!src/react/__mocks__/**/*',
-    '!src/react/index.tsx'
+    '!src/react/index.tsx',
+    '!src/react/i18n.ts'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

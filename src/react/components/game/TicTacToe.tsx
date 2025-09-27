@@ -1,12 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { useTranslation } from 'react-i18next';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { RotateCcw, X, Circle } from 'lucide-react';
+import LanguageSelector from '../common/LanguageSelector';
 
 type Player = 'X' | 'O' | null;
 type Board = Player[];
 
 const TicTacToe: React.FC = () => {
+  const { t } = useTranslation();
   const [board, setBoard] = useState<Board>(Array(9).fill(null));
   const [currentPlayer, setCurrentPlayer] = useState<Player>('X');
   const [winner, setWinner] = useState<Player>(null);
@@ -52,9 +55,9 @@ const TicTacToe: React.FC = () => {
   }, []);
 
   const getStatusMessage = () => {
-    if (winner) return `Player ${winner} wins!`;
-    if (isDraw) return "It's a draw!";
-    return `Player ${currentPlayer}'s turn`;
+    if (winner) return t('game.playerWins', { player: winner });
+    if (isDraw) return t('game.draw');
+    return t('game.playerTurn', { player: currentPlayer });
   };
 
   const getStatusMessageClass = () => {
@@ -83,9 +86,12 @@ const TicTacToe: React.FC = () => {
 
   return (
     <Card className="w-full max-w-lg mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur">
-      <CardHeader className="text-center">
+      <CardHeader className="text-center space-y-4">
+        <div className="flex justify-end">
+          <LanguageSelector />
+        </div>
         <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-red-500 bg-clip-text text-transparent">
-          Tic Tac Toe
+          {t('game.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -110,18 +116,18 @@ const TicTacToe: React.FC = () => {
             className="gap-2"
           >
             <RotateCcw className="h-4 w-4" />
-            New Game
+            {t('game.newGame')}
           </Button>
         </div>
 
         <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
             <X className="h-4 w-4 text-blue-500" />
-            <span>Player X</span>
+            <span>{t('game.playerX')}</span>
           </div>
           <div className="flex items-center gap-2">
             <Circle className="h-4 w-4 text-red-500" />
-            <span>Player O</span>
+            <span>{t('game.playerO')}</span>
           </div>
         </div>
       </CardContent>

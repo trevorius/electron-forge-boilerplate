@@ -3,8 +3,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TicTacToe from './TicTacToe';
 
+// Mock react-i18next
+const mockUseTranslation = jest.fn();
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => mockUseTranslation()
+}));
+
+// Mock LanguageSelector
+jest.mock('../common/LanguageSelector', () => {
+  return {
+    __esModule: true,
+    default: function MockLanguageSelector() {
+      return <div data-testid="mock-language-selector">Language Selector</div>;
+    }
+  };
+});
+
 // Mock the UI components
-jest.mock('./ui/button', () => {
+jest.mock('../ui/button', () => {
   const React = require('react');
   return {
     Button: React.forwardRef<HTMLButtonElement, any>(({ children, onClick, disabled, className, variant, ...props }, ref) => (
@@ -23,7 +40,7 @@ jest.mock('./ui/button', () => {
   };
 });
 
-jest.mock('./ui/card', () => ({
+jest.mock('../ui/card', () => ({
   Card: ({ children, className, ...props }: any) => (
     <div className={className} data-testid="mock-card" {...props}>{children}</div>
   ),
@@ -53,6 +70,20 @@ jest.mock('lucide-react', () => ({
 describe('TicTacToe', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseTranslation.mockReturnValue({
+      t: (key: string, options?: { player?: string }) => {
+        const translations: { [key: string]: string } = {
+          'game.title': 'Tic Tac Toe',
+          'game.playerWins': `Player ${options?.player} wins!`,
+          'game.draw': "It's a draw!",
+          'game.playerTurn': `Player ${options?.player}'s turn`,
+          'game.newGame': 'New Game',
+          'game.playerX': 'Player X',
+          'game.playerO': 'Player O'
+        };
+        return translations[key] || key;
+      }
+    });
   });
 
   it('should render the game board correctly', () => {
@@ -63,6 +94,7 @@ describe('TicTacToe', () => {
     expect(screen.getByTestId('mock-card-title')).toBeInTheDocument();
     expect(screen.getByTestId('mock-card-content')).toBeInTheDocument();
     expect(screen.getByText('Tic Tac Toe')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-language-selector')).toBeInTheDocument();
   });
 
   it('should display initial game status', () => {

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 
 // Mock the TicTacToe component
-jest.mock('./components/TicTacToe', () => {
+jest.mock('./components/game/TicTacToe', () => {
   return {
     __esModule: true,
     default: function MockTicTacToe() {

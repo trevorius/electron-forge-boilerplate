@@ -1,0 +1,16 @@
+{
+  "game": {
+    "title": "Tic Tac Toe",
+    "playerWins": "Player {{player}} wins!",
+    "draw": "It's a draw!",
+    "playerTurn": "Player {{player}}'s turn",
+    "newGame": "New Game",
+    "playerX": "Player X",
+    "playerO": "Player O"
+  },
+  "language": {
+    "switch": "Switch Language",
+    "english": "English",
+    "french": "French"
+  }
+}
