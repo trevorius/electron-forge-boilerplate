@@ -1,0 +1,58 @@
+{
+  "recommendations": [
+    // Core Development
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+
+    // React & JSX
+    "ms-vscode.vscode-json",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-css-peek",
+
+    // Electron Development
+    "ms-vscode.vscode-js-debug",
+    "ms-vscode.vscode-js-debug-nightly",
+
+    // UI & Styling
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    "ms-vscode.vscode-css-peek",
+    "zignd.html-css-class-completion",
+
+    // Git & Version Control
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+
+    // Productivity
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    "ms-vscode.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // shadcn/ui specific
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+
+    // Additional helpful extensions
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    "ms-vscode.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-css-peek",
+    "zignd.html-css-class-completion",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify"
+  ]
+}
