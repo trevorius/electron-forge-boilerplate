@@ -2,6 +2,25 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
+// Mock routes
+jest.mock('./routes', () => ({
+  routes: [
+    {
+      path: '/',
+      component: () => <div data-testid="mock-game">Game Page</div>,
+      title: 'navigation.home',
+      icon: () => null,
+      exact: true
+    },
+    {
+      path: '/about',
+      component: () => <div data-testid="mock-about">About Page</div>,
+      title: 'navigation.about',
+      icon: () => null
+    }
+  ]
+}));
+
 // Mock BrowserRouter to use MemoryRouter instead
 jest.mock('react-router-dom', () => {
   const actual = jest.requireActual('react-router-dom');
@@ -20,30 +39,12 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => mockUseTranslation()
 }));
 
-// Mock the components
+// Mock the Navigation component
 jest.mock('./components/common/Navigation', () => {
   return {
     __esModule: true,
     default: function MockNavigation() {
       return <div data-testid="mock-navigation">Navigation</div>;
-    }
-  };
-});
-
-jest.mock('./components/layout/Game', () => {
-  return {
-    __esModule: true,
-    default: function MockGame() {
-      return <div data-testid="mock-game">Game Page</div>;
-    }
-  };
-});
-
-jest.mock('./components/layout/About', () => {
-  return {
-    __esModule: true,
-    default: function MockAbout() {
-      return <div data-testid="mock-about">About Page</div>;
     }
   };
 });

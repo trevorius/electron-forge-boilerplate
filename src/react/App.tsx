@@ -1,8 +1,6 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navigation from './components/common/Navigation';
-import Game from './components/layout/Game';
-import About from './components/layout/About';
+import { routes } from './routes';
 
 function App() {
   return (
@@ -10,8 +8,16 @@ function App() {
       <div className="relative">
         <Navigation />
         <Routes>
-          <Route path="/" element={<Game />} />
-          <Route path="/about" element={<About />} />
+          {routes.map((route) => {
+            const Component = route.component;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<Component />}
+              />
+            );
+          })}
         </Routes>
       </div>
     </Router>

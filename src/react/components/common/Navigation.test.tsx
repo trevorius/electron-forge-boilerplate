@@ -4,6 +4,25 @@ import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import Navigation from './Navigation';
 
+// Mock routes
+jest.mock('../../routes', () => ({
+  routes: [
+    {
+      path: '/',
+      component: () => <div>Game</div>,
+      title: 'navigation.home',
+      icon: ({ className, ...props }: any) => <svg className={className} data-testid="mock-home-icon" {...props} />,
+      exact: true
+    },
+    {
+      path: '/about',
+      component: () => <div>About</div>,
+      title: 'navigation.about',
+      icon: ({ className, ...props }: any) => <svg className={className} data-testid="mock-info-icon" {...props} />
+    }
+  ]
+}));
+
 // Mock react-i18next
 const mockUseTranslation = jest.fn();
 jest.mock('react-i18next', () => ({
@@ -29,14 +48,6 @@ jest.mock('../ui/button', () => {
   };
 });
 
-jest.mock('lucide-react', () => ({
-  Home: ({ className, ...props }: any) => (
-    <svg className={className} data-testid="mock-home-icon" {...props} />
-  ),
-  Info: ({ className, ...props }: any) => (
-    <svg className={className} data-testid="mock-info-icon" {...props} />
-  )
-}));
 
 const renderWithRouter = (initialEntries = ['/']) => {
   return render(
