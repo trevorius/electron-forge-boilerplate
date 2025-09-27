@@ -2,59 +2,90 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-// Mock the TicTacToe component
-jest.mock('./components/game/TicTacToe', () => {
+// Mock BrowserRouter to use MemoryRouter instead
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual('react-router-dom');
   return {
-    __esModule: true,
-    default: function MockTicTacToe() {
-      return <div data-testid="mock-tic-tac-toe">TicTacToe Game</div>;
+    ...actual,
+    BrowserRouter: ({ children }: { children: React.ReactNode }) => {
+      const { MemoryRouter } = actual;
+      return <MemoryRouter>{children}</MemoryRouter>;
     }
   };
 });
 
+// Mock react-i18next
+const mockUseTranslation = jest.fn();
+jest.mock('react-i18next', () => ({
+  useTranslation: () => mockUseTranslation()
+}));
+
+// Mock the components
+jest.mock('./components/common/Navigation', () => {
+  return {
+    __esModule: true,
+    default: function MockNavigation() {
+      return <div data-testid="mock-navigation">Navigation</div>;
+    }
+  };
+});
+
+jest.mock('./components/layout/Game', () => {
+  return {
+    __esModule: true,
+    default: function MockGame() {
+      return <div data-testid="mock-game">Game Page</div>;
+    }
+  };
+});
+
+jest.mock('./components/layout/About', () => {
+  return {
+    __esModule: true,
+    default: function MockAbout() {
+      return <div data-testid="mock-about">About Page</div>;
+    }
+  };
+});
+
+const renderApp = () => {
+  return render(<App />);
+};
+
 describe('App', () => {
-  it('should render the main container with correct classes', () => {
-    const { container } = render(<App />);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseTranslation.mockReturnValue({
+      t: (key: string) => key,
+      i18n: { language: 'en' }
+    });
+  });
+
+  it('should render navigation and router container', () => {
+    renderApp();
+
+    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument();
+    const container = screen.getByTestId('mock-navigation').parentElement;
+    expect(container).toHaveClass('relative');
+  });
+
+  it('should render Game component on home route by default', () => {
+    renderApp();
+
+    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-game')).toBeInTheDocument();
+  });
+
+  it('should have router structure', () => {
+    const { container } = renderApp();
 
     const mainDiv = container.firstChild as HTMLElement;
     expect(mainDiv).toBeInTheDocument();
-    expect(mainDiv).toHaveClass(
-      'min-h-screen',
-      'bg-gradient-to-br',
-      'from-slate-900',
-      'to-slate-800',
-      'flex',
-      'items-center',
-      'justify-center',
-      'p-4'
-    );
-  });
-
-  it('should render the TicTacToe component', () => {
-    render(<App />);
-
-    const ticTacToe = screen.getByTestId('mock-tic-tac-toe');
-    expect(ticTacToe).toBeInTheDocument();
-    expect(ticTacToe).toHaveTextContent('TicTacToe Game');
+    expect(mainDiv).toHaveClass('relative');
   });
 
   it('should be a functional component that returns JSX', () => {
-    const result = App();
-    expect(result).toBeDefined();
-    expect(result.type).toBe('div');
-    expect(typeof result).toBe('object');
-    expect(result.props).toBeDefined();
-  });
-
-  it('should have correct structure', () => {
-    const result = App();
-    expect(result.props.className).toContain('min-h-screen');
-    expect(result.props.className).toContain('bg-gradient-to-br');
-    expect(result.props.className).toContain('from-slate-900');
-    expect(result.props.className).toContain('to-slate-800');
-    expect(result.props.className).toContain('flex');
-    expect(result.props.className).toContain('items-center');
-    expect(result.props.className).toContain('justify-center');
-    expect(result.props.className).toContain('p-4');
+    const { container } = renderApp();
+    expect(container.firstChild).toBeInTheDocument();
   });
 });

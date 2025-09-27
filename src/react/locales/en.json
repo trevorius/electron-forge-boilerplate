@@ -12,5 +12,16 @@
     "switch": "Switch Language",
     "english": "English",
     "french": "French"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About"
+  },
+  "about": {
+    "title": "About",
+    "description": "A boilerplate React Electron app with ShadcnUI and Tailwind integrated. TypeScript, Jest tested.",
+    "version": "Version",
+    "author": "Author",
+    "license": "License"
   }
 }

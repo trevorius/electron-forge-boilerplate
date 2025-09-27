@@ -1,7 +1,7 @@
+import { Languages } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
-import { Languages } from 'lucide-react';
 
 const LanguageSelector: React.FC = () => {
   const { i18n, t } = useTranslation();

@@ -1,10 +1,20 @@
-import TicTacToe from './components/game/TicTacToe';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './components/common/Navigation';
+import Game from './components/layout/Game';
+import About from './components/layout/About';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
-      <TicTacToe />
-    </div>
+    <Router>
+      <div className="relative">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Game />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

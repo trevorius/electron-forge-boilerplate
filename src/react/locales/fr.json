@@ -12,5 +12,16 @@
     "switch": "Changer de langue",
     "english": "Anglais",
     "french": "Français"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos"
+  },
+  "about": {
+    "title": "À propos",
+    "description": "Une application React Electron avec ShadcnUI et Tailwind intégrés. TypeScript, testé avec Jest.",
+    "version": "Version",
+    "author": "Auteur",
+    "license": "Licence"
   }
 }
