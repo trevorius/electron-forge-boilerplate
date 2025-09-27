@@ -21,9 +21,16 @@ function createWindow() {
 	});
 
 	// Load the app
-	const startUrl = isDev
-		? 'http://localhost:5173'
-		: `file://${path.join(__dirname, '../dist/index.html')}`;
+	let startUrl;
+	if (isDev) {
+		startUrl = 'http://localhost:5173';
+	} else {
+		// In production, try to find the dist-react folder
+		const distPath = app.isPackaged
+			? path.join(process.resourcesPath, 'dist-react', 'index.html')
+			: path.join(__dirname, '../dist-react/index.html');
+		startUrl = `file://${distPath}`;
+	}
 
 	mainWindow.loadURL(startUrl);
 

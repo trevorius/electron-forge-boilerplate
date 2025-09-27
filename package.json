@@ -21,7 +21,10 @@
 	"config": {
 		"forge": {
 			"packagerConfig": {
-				"asar": true
+				"asar": true,
+				"extraResource": [
+					"dist-react"
+				]
 			},
 			"makers": [
 				{
