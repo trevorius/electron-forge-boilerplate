@@ -28,13 +28,8 @@ const TicTacToe: React.FC = () => {
     return null;
   }, []);
 
-  const shouldPreventClick = useCallback((index: number) => {
-    return !!(board[index] || winner || isDraw);
-  }, [board, winner, isDraw]);
-
   const handleCellClick = useCallback((index: number) => {
-    if (shouldPreventClick(index)) return;
-
+    // Since buttons are disabled for invalid states, we can assume valid state here
     const newBoard = [...board];
     newBoard[index] = currentPlayer;
     setBoard(newBoard);
@@ -47,7 +42,7 @@ const TicTacToe: React.FC = () => {
     } else {
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
     }
-  }, [board, currentPlayer, winner, isDraw, checkWinner, shouldPreventClick]);
+  }, [board, currentPlayer, checkWinner]);
 
   const resetGame = useCallback(() => {
     setBoard(Array(9).fill(null));

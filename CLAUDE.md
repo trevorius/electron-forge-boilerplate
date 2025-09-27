@@ -1,0 +1,1 @@
+- less than 100% coverage is not acceptable
