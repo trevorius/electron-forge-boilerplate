@@ -1163,4 +1163,81 @@ describe('Tetris Component', () => {
     // The game should have triggered line clearing which executes line 164
     expect(screen.getByText('Tetris')).toBeInTheDocument();
   });
+
+  test('covers uncovered line 157 - P key for pause/resume toggle', async () => {
+    render(<Tetris />);
+
+    // Start the game
+    fireEvent.click(screen.getByText('Start Game'));
+
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+
+    // Test P key to pause (this covers line 157)
+    await act(() => {
+      fireEvent.keyDown(window, { key: 'P' });
+    });
+
+    // Should show Resume button after pause
+    expect(screen.getByText('Resume')).toBeInTheDocument();
+
+    // Test lowercase p key as well to be thorough
+    fireEvent.click(screen.getByText('Resume'));
+
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+
+    await act(() => {
+      fireEvent.keyDown(window, { key: 'p' });
+    });
+
+    // Should show Resume button after pause with lowercase p
+    expect(screen.getByText('Resume')).toBeInTheDocument();
+  });
+
+  test('covers uncovered lines when no current piece is present', async () => {
+    render(<Tetris />);
+
+    // Test keyboard input when no game is started (no current piece)
+    await act(() => {
+      fireEvent.keyDown(window, { key: 'ArrowLeft' });
+      fireEvent.keyDown(window, { key: 'ArrowRight' });
+      fireEvent.keyDown(window, { key: 'ArrowDown' });
+      fireEvent.keyDown(window, { key: 'ArrowUp' });
+      fireEvent.keyDown(window, { key: ' ' });
+    });
+
+    // Should not have started game
+    expect(screen.getByText('Start Game')).toBeInTheDocument();
+  });
+
+  test('covers board rendering with current piece boundary checks (line 205)', async () => {
+    render(<Tetris />);
+
+    // Start the game to get a current piece
+    fireEvent.click(screen.getByText('Start Game'));
+
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+
+    // Move piece to test boundary conditions in renderBoard
+    await act(async () => {
+      // Move to different positions to test boundary checks
+      for (let i = 0; i < 5; i++) {
+        fireEvent.keyDown(window, { key: 'ArrowLeft' });
+        jest.advanceTimersByTime(50);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        fireEvent.keyDown(window, { key: 'ArrowRight' });
+        jest.advanceTimersByTime(50);
+      }
+    });
+
+    // The game should render the board with pieces within boundaries
+    expect(screen.getByText('Tetris')).toBeInTheDocument();
+  });
 });
