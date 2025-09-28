@@ -152,8 +152,7 @@ describe('Navbar', () => {
   it('should render navbar with all main elements', () => {
     renderNavbar();
 
-    // Check main navbar structure
-    expect(screen.getByText('Electron Games')).toBeInTheDocument();
+    // Check main navbar structure (app title was removed per user request)
     expect(screen.getByTestId('navigation-menu')).toBeInTheDocument();
     expect(screen.getByTestId('mock-language-selector')).toBeInTheDocument();
     expect(screen.getByTestId('mock-window-controls')).toBeInTheDocument();
@@ -171,10 +170,9 @@ describe('Navbar', () => {
   it('should render app branding with icons', () => {
     renderNavbar();
 
-    // Check branding elements - use getAllBy since gamepad icon appears multiple times
+    // Check branding elements - only icon shown (text removed per user request)
     const gamepadIcons = screen.getAllByTestId('gamepad-icon');
     expect(gamepadIcons.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Electron Games')).toBeInTheDocument();
   });
 
   it('should render navigation icons', () => {

@@ -1,28 +1,30 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+
+// Import before any other imports that might use mocks
 import App from './App';
 
-// Mock routes
+// Mock routes with proper TypeScript types
 jest.mock('./routes', () => ({
   routes: [
     {
       path: '/',
       component: () => <div data-testid="mock-game">Game Page</div>,
       title: 'nav.home',
-      icon: () => null,
+      icon: (): null => null,
       exact: true
     },
     {
       path: '/game',
       component: () => <div data-testid="mock-games">Games Page</div>,
       title: 'nav.games',
-      icon: () => null,
+      icon: (): null => null,
       children: [
         {
           path: '/game/tetris',
           component: () => <div data-testid="mock-tetris">Tetris Page</div>,
           title: 'nav.games_menu.tetris',
-          icon: () => null
+          icon: (): null => null
         }
       ]
     },
@@ -30,7 +32,7 @@ jest.mock('./routes', () => ({
       path: '/about',
       component: () => <div data-testid="mock-about">About Page</div>,
       title: 'nav.about',
-      icon: () => null
+      icon: (): null => null
     }
   ]
 }));
@@ -98,8 +100,8 @@ describe('App', () => {
     expect(mainDiv).toBeInTheDocument();
     expect(mainDiv).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
 
-    // Check for the content wrapper with flex and overflow
-    const contentWrapper = mainDiv.querySelector('.flex-1.overflow-auto');
+    // Check for the content wrapper with flex, overflow and padding
+    const contentWrapper = mainDiv.querySelector('.flex-1.overflow-auto.p-4');
     expect(contentWrapper).toBeInTheDocument();
   });
 

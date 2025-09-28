@@ -133,11 +133,11 @@ describe('LanguageSelector', () => {
     expect(mockChangeLanguage).toHaveBeenCalledWith('fr');
   });
 
-  it('should render with correct variant and gap classes', () => {
+  it('should render with correct variant and classes', () => {
     render(<LanguageSelector />);
 
     const button = screen.getByTestId('mock-button');
-    expect(button).toHaveAttribute('data-variant', 'outline');
-    expect(button).toHaveClass('gap-2');
+    expect(button).toHaveAttribute('data-variant', 'ghost');
+    expect(button).toHaveClass('h-8', 'px-2', 'text-xs', 'font-medium');
   });
 });

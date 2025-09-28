@@ -18,3 +18,7 @@ const createMockIcon = (name: string) => {
 export const RotateCcw = createMockIcon('RotateCcw');
 export const X = createMockIcon('X');
 export const Circle = createMockIcon('Circle');
+export const Home = createMockIcon('Home');
+export const Info = createMockIcon('Info');
+export const Gamepad2 = createMockIcon('Gamepad2');
+export const LucideIcon = createMockIcon('LucideIcon');
