@@ -60,6 +60,32 @@
     "pause": "Pause",
     "resume": "Reprendre",
     "gameOver": "Jeu terminé !",
-    "finalScore": "Score final : {{score}}"
+    "finalScore": "Score final : {{score}}",
+    "newHighScore": "Nouveau meilleur score !",
+    "congratulations": "Félicitations ! Vous avez marqué {{score}} points !",
+    "enterName": "Entrez votre nom :",
+    "nameInputPlaceholder": "Votre nom",
+    "saveScore": "Sauvegarder le score",
+    "skip": "Ignorer"
+  },
+  "highScores": {
+    "gameTitle": "Meilleurs scores {{game}}",
+    "allGamesTitle": "Meilleurs scores tous jeux",
+    "loading": "Chargement...",
+    "loadError": "Échec du chargement des meilleurs scores",
+    "clearError": "Échec de la suppression des scores",
+    "deleteError": "Échec de la suppression du score",
+    "retry": "Réessayer",
+    "refresh": "Actualiser",
+    "clear": "Effacer tout",
+    "clearConfirm": "Êtes-vous sûr de vouloir effacer tous les scores ? Cette action ne peut pas être annulée.",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce score ?",
+    "noScores": "Aucun meilleur score pour le moment. Jouez à un jeu pour commencer !",
+    "rank": "Rang",
+    "name": "Nom",
+    "score": "Score",
+    "date": "Date",
+    "actions": "Actions",
+    "delete": "Supprimer"
   }
 }

@@ -48,3 +48,5 @@ electron-builder.yml
 *.snap
 *.pacman
 
+
+/src/electron/generated/prisma

@@ -22,6 +22,8 @@ import {
   shouldShowWindow,
   valueOrUndefined
 } from './main.helpers';
+import { highScoreService } from './services/highScore.service';
+import { HighScoreController } from './controllers/highScore.controller';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
 
@@ -42,6 +44,9 @@ function createWindow(): void {
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
+			webSecurity: true,
+			allowRunningInsecureContent: false,
+			experimentalFeatures: false,
 			preload: path.join(__dirname, 'preload.js')
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
@@ -99,6 +104,9 @@ function createLicenseWindow(): void {
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
+			webSecurity: true,
+			allowRunningInsecureContent: false,
+			experimentalFeatures: false,
 			preload: path.join(__dirname, 'preload.js')
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
@@ -127,7 +135,15 @@ function createLicenseWindow(): void {
 	});
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+	// Initialize high score service and register IPC handlers
+	try {
+		await highScoreService.initialize();
+		HighScoreController.registerHandlers();
+	} catch (error) {
+		console.error('Failed to initialize high score service:', error);
+	}
+
 	createWindow();
 
 	app.on('activate', () => {
@@ -143,8 +159,9 @@ app.whenReady().then(() => {
 	}
 });
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
 	if (shouldQuitApp(process.platform)) {
+		await highScoreService.close();
 		app.quit();
 	}
 });
@@ -189,3 +206,4 @@ ipcMain.handle('close-license-window', () => {
 		licenseWindow!.close();
 	}
 });
+

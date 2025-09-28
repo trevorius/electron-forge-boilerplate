@@ -18,6 +18,21 @@ jest.mock('./main.helpers', () => {
 	};
 });
 
+// Mock the high score service
+jest.mock('./services/highScore.service', () => ({
+	highScoreService: {
+		initialize: jest.fn().mockResolvedValue(undefined),
+		close: jest.fn().mockResolvedValue(undefined),
+	},
+}));
+
+// Mock the high score controller
+jest.mock('./controllers/highScore.controller', () => ({
+	HighScoreController: {
+		registerHandlers: jest.fn(),
+	},
+}));
+
 // Import the actual helpers for testing
 import * as helpers from './main.helpers';
 
@@ -45,10 +60,8 @@ const createMockWindow = () => ({
 		}
 	}),
 	on: jest.fn((event: string, handler: any) => {
-		// Store handlers for later execution
-		if (event === 'closed') {
-			setTimeout(() => handler(), 0);
-		}
+		// Store handlers but don't auto-execute them
+		// The closed event was causing mainWindow to be set to null
 	}),
 	webContents: mockWebContents,
 	show: jest.fn(),
@@ -148,6 +161,12 @@ describe('main.ts', () => {
 	it('should initialize app and create main window', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(mockApp.whenReady).toHaveBeenCalled();
 		expect(mockBrowserWindow).toHaveBeenCalled();
 		expect(mainWindowInstance.loadURL).toHaveBeenCalled();
@@ -162,6 +181,12 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(mockMenu.buildFromTemplate).toHaveBeenCalled();
 		expect(mockMenu.setApplicationMenu).toHaveBeenCalled();
 	});
@@ -175,6 +200,12 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(mockMenu.buildFromTemplate).not.toHaveBeenCalled();
 		expect(mockMenu.setApplicationMenu).not.toHaveBeenCalled();
 	});
@@ -183,6 +214,12 @@ describe('main.ts', () => {
 		(mockBrowserWindow as any).getAllWindows.mockReturnValue([]);
 
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Execute the activate handler
 		expect(appHandlers['activate']).toBeDefined();
@@ -196,6 +233,12 @@ describe('main.ts', () => {
 		(mockBrowserWindow as any).getAllWindows.mockReturnValue([mainWindowInstance]);
 
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Execute the activate handler
 		expect(appHandlers['activate']).toBeDefined();
@@ -214,9 +257,12 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Execute the window-all-closed handler
 		expect(appHandlers['window-all-closed']).toBeDefined();
-		appHandlers['window-all-closed']();
+		await appHandlers['window-all-closed']();
 
 		expect(mockApp.quit).toHaveBeenCalled();
 	});
@@ -230,6 +276,9 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Execute the window-all-closed handler
 		expect(appHandlers['window-all-closed']).toBeDefined();
 		appHandlers['window-all-closed']();
@@ -239,6 +288,9 @@ describe('main.ts', () => {
 
 	it('should handle web-contents-created event and setup new-window handler', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		const mockContents = {
 			on: jest.fn()
@@ -262,6 +314,9 @@ describe('main.ts', () => {
 	it('should handle window-minimize IPC', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(ipcHandlers['window-minimize']).toBeDefined();
 		ipcHandlers['window-minimize']();
 
@@ -270,6 +325,9 @@ describe('main.ts', () => {
 
 	it('should handle window-maximize IPC', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		expect(ipcHandlers['window-maximize']).toBeDefined();
 
@@ -287,6 +345,9 @@ describe('main.ts', () => {
 	it('should handle window-close IPC', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(ipcHandlers['window-close']).toBeDefined();
 		ipcHandlers['window-close']();
 
@@ -295,6 +356,9 @@ describe('main.ts', () => {
 
 	it('should handle window-is-maximized IPC', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		mainWindowInstance.isMaximized.mockReturnValue(true);
 
@@ -307,6 +371,9 @@ describe('main.ts', () => {
 	it('should handle get-main-app-locale IPC', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		expect(ipcHandlers['get-main-app-locale']).toBeDefined();
 		const result = await ipcHandlers['get-main-app-locale']();
 
@@ -316,6 +383,9 @@ describe('main.ts', () => {
 
 	it('should handle open-license-window IPC and create license window', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		expect(ipcHandlers['open-license-window']).toBeDefined();
 		ipcHandlers['open-license-window']();
@@ -327,6 +397,9 @@ describe('main.ts', () => {
 
 	it('should handle open-license-window IPC and focus existing license window', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Create license window first
 		ipcHandlers['open-license-window']();
@@ -343,6 +416,9 @@ describe('main.ts', () => {
 	it('should handle close-license-window IPC', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Create license window first
 		ipcHandlers['open-license-window']();
 
@@ -354,6 +430,9 @@ describe('main.ts', () => {
 
 	it('should handle window maximize and unmaximize events', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Get the window event handlers
 		const onCalls = mainWindowInstance.on.mock.calls;
@@ -375,13 +454,27 @@ describe('main.ts', () => {
 	it('should handle window closed event', async () => {
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// The closed handler should have been set and executed
 		// This is handled automatically in our mock setup
 		expect(mainWindowInstance.on).toHaveBeenCalledWith('closed', expect.any(Function));
+
+		// Test the closed handler
+		const onCalls = mainWindowInstance.on.mock.calls;
+		const closedHandler = onCalls.find((call: any) => call[0] === 'closed')?.[1];
+		expect(closedHandler).toBeDefined();
+
+		// Execute the closed handler to test the mainWindow = null line
+		closedHandler();
 	});
 
 	it('should handle license window ready-to-show event', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Create license window
 		ipcHandlers['open-license-window']();
@@ -399,6 +492,9 @@ describe('main.ts', () => {
 		shouldShowWindowValue = false;
 
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Create license window
 		ipcHandlers['open-license-window']();
@@ -419,6 +515,9 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Dev tools should be opened in development mode
 		await new Promise(resolve => setTimeout(resolve, 10)); // Wait for ready-to-show
 		expect(mockWebContents.openDevTools).toHaveBeenCalled();
@@ -430,6 +529,9 @@ describe('main.ts', () => {
 		jest.resetModules();
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Dev tools should not be opened in production mode
 		await new Promise(resolve => setTimeout(resolve, 10)); // Wait for ready-to-show
 		expect(mockWebContents.openDevTools).not.toHaveBeenCalled();
@@ -437,6 +539,9 @@ describe('main.ts', () => {
 
 	it('should handle setWindowOpenHandler and open external URLs', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Get the setWindowOpenHandler call
 		expect(mockWebContents.setWindowOpenHandler).toHaveBeenCalled();
@@ -452,6 +557,9 @@ describe('main.ts', () => {
 
 	it('should test additional coverage scenarios', async () => {
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// The main coverage has been achieved through the other tests
 		// These additional scenarios ensure all branches are covered
@@ -472,6 +580,9 @@ describe('main.ts', () => {
 
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Try to minimize window
 		ipcHandlers['window-minimize']();
 
@@ -489,6 +600,9 @@ describe('main.ts', () => {
 
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Try to close window
 		ipcHandlers['window-close']();
 
@@ -505,6 +619,9 @@ describe('main.ts', () => {
 		shouldReturnMainWindowStatusValue = false;
 
 		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
 
 		// Check window maximized status
 		const result = ipcHandlers['window-is-maximized']();
@@ -525,6 +642,9 @@ describe('main.ts', () => {
 
 		await import('./main');
 
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
 		// Create license window first
 		ipcHandlers['open-license-window']();
 
@@ -537,4 +657,23 @@ describe('main.ts', () => {
 		// Reset the value back to true
 		shouldCloseWindowValue = true;
 	});
+
+	it('should handle license window closed event', async () => {
+		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Create license window first
+		ipcHandlers['open-license-window']();
+
+		// Test the closed handler
+		const onCalls = licenseWindowInstance.on.mock.calls;
+		const closedHandler = onCalls.find((call: any) => call[0] === 'closed')?.[1];
+		expect(closedHandler).toBeDefined();
+
+		// Execute the closed handler to test the licenseWindow = null line
+		closedHandler();
+	});
+
 });

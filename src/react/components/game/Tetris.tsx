@@ -25,6 +25,7 @@ import {
   type GamePiece,
   type Tetromino
 } from './Tetris.helpers';
+import HighScores from './HighScores';
 
 const CELL_SIZE = 30;
 
@@ -40,10 +41,12 @@ const Tetris: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [dropTime, setDropTime] = useState(1000);
   const [showGameOverDialog, setShowGameOverDialog] = useState(false);
+  const [showHighScoreDialog, setShowHighScoreDialog] = useState(false);
+  const [playerName, setPlayerName] = useState('');
 
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
 
-  const spawnNewPiece = useCallback(() => {
+  const spawnNewPiece = useCallback(async () => {
     const newPiece: GamePiece = {
       tetromino: nextPiece,
       position: { x: Math.floor(BOARD_WIDTH / 2) - 1, y: 0 }
@@ -54,11 +57,23 @@ const Tetris: React.FC = () => {
     if (shouldGameEnd(board, newPiece)) {
       setGameOver(true);
       setIsPlaying(false);
-      setShowGameOverDialog(true);
+
+      // Check if this is a high score
+      try {
+        const isHighScore = await window.electronAPI.isHighScore('tetris', score);
+        if (isHighScore) {
+          setShowHighScoreDialog(true);
+        } else {
+          setShowGameOverDialog(true);
+        }
+      } catch (error) {
+        console.error('Failed to check high score:', error);
+        setShowGameOverDialog(true);
+      }
     } else {
       setCurrentPiece(newPiece);
     }
-  }, [board, nextPiece]);
+  }, [board, nextPiece, score]);
 
   const movePiece = useCallback((direction: 'left' | 'right' | 'down') => {
     if (!canPieceMove(currentPiece, gameOver)) return;
@@ -109,6 +124,23 @@ const Tetris: React.FC = () => {
     setCurrentPiece(null);
   }, [currentPiece, board, gameOver, level, score]);
 
+  const saveHighScore = async () => {
+    if (!playerName.trim()) return;
+
+    try {
+      await window.electronAPI.saveScore({
+        name: playerName.trim(),
+        score: score,
+        game: 'tetris'
+      });
+      setShowHighScoreDialog(false);
+      setShowGameOverDialog(true);
+      setPlayerName('');
+    } catch (error) {
+      console.error('Failed to save high score:', error);
+    }
+  };
+
   const startGame = () => {
     const gameState = createGameState();
     setBoard(gameState.board);
@@ -121,6 +153,8 @@ const Tetris: React.FC = () => {
     setCurrentPiece(gameState.currentPiece);
     setNextPiece(gameState.nextPiece);
     setShowGameOverDialog(false);
+    setShowHighScoreDialog(false);
+    setPlayerName('');
   };
 
   const pauseGame = () => {
@@ -321,6 +355,55 @@ const Tetris: React.FC = () => {
           </Button>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showHighScoreDialog} onOpenChange={() => {}}>
+        <DialogContent className="bg-yellow-600 border-yellow-400 text-white text-center">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.newHighScore')}</DialogTitle>
+          </DialogHeader>
+          <p className="text-lg mb-4">{t('tetris.congratulations', { score })}</p>
+          <div className="mb-4">
+            <label htmlFor="playerName" className="block text-sm font-medium mb-2">
+              {t('tetris.enterName')}
+            </label>
+            <input
+              id="playerName"
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && saveHighScore()}
+              className="w-full px-3 py-2 text-black rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              placeholder={t('tetris.nameInputPlaceholder')}
+              maxLength={20}
+              autoFocus
+            />
+          </div>
+          <div className="flex space-x-2 justify-center">
+            <Button
+              onClick={saveHighScore}
+              disabled={!playerName.trim()}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-500"
+            >
+              {t('tetris.saveScore')}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowHighScoreDialog(false);
+                setShowGameOverDialog(true);
+                setPlayerName('');
+              }}
+              className="bg-gray-600 hover:bg-gray-700"
+            >
+              {t('tetris.skip')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* High Scores Section */}
+      <div className="mt-8 w-full max-w-4xl">
+        <HighScores game="tetris" limit={10} />
+      </div>
 
 </div>
   );

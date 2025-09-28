@@ -90,15 +90,18 @@ const Navbar: React.FC = () => {
                   // Simple route - render as link
                   return (
                     <NavigationMenuItem key={route.path}>
-                      <Link to={route.path}>
-                        <NavigationMenuLink className={cn(
-                          navigationMenuTriggerStyle(),
-                          isActive(route.path) && 'bg-accent text-accent-foreground'
-                        )}>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          to={route.path}
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            isActive(route.path) && 'bg-accent text-accent-foreground'
+                          )}
+                        >
                           <Icon className="h-4 w-4 mr-2" />
                           {t(route.title)}
-                        </NavigationMenuLink>
-                      </Link>
+                        </Link>
+                      </NavigationMenuLink>
                     </NavigationMenuItem>
                   );
                 }
