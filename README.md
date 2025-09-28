@@ -230,6 +230,7 @@ MIT License - see LICENSE file for details
 ## 🔗 Links
 
 - [Repository](https://github.com/trev-z-dev/electron-boilerplate)
+- [Navbar Implementation Documentation](src/react/components/common/Navbar.doc.md)
 - [Tetris Game Documentation](src/react/components/game/Tetris.doc.md)
 - [ShadcnUI Documentation](https://ui.shadcn.com/)
 - [Electron Documentation](https://electronjs.org/)
