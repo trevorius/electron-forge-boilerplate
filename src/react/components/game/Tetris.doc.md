@@ -1,5 +1,7 @@
 # Tetris Game Developer Documentation
 
+[back to README](/README.md#tetris)
+
 ## Overview
 
 This is a complete React-based Tetris implementation with TypeScript, featuring full game mechanics, comprehensive test coverage, and a clean separation of concerns between UI and game logic.
@@ -379,6 +381,7 @@ Move complex logic to helper functions:
 ### Test Flags
 
 Set these on `window` object for testing:
+
 ```typescript
 window.testForceCollision = true;    // Force collision detection
 window.testForceClearLines = true;   // Force line clearing
