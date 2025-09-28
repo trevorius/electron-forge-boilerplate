@@ -25,7 +25,8 @@ const mockHelpers = {
 	handleWindowAction: jest.fn(),
 	handleWindowShow: jest.fn(),
 	handleWindowMaximizeToggle: jest.fn(),
-	getLocaleOrDefault: jest.fn(() => Promise.resolve('en'))
+	getLocaleOrDefault: jest.fn(() => Promise.resolve('en')),
+	getParentWindow: jest.fn((mainWindow) => mainWindow || undefined)
 };
 
 // Mock Electron modules with full functionality

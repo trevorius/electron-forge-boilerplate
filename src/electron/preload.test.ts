@@ -128,4 +128,136 @@ describe('preload.ts', () => {
 		expect(nodeAPICall).toBeDefined();
 		expect(nodeAPICall![1]).toHaveProperty('env');
 	});
+
+	describe('electronAPI functions', () => {
+		let electronAPI: any;
+
+		beforeEach(async () => {
+			// Import preload to trigger execution
+			await import('./preload');
+
+			// Get the electronAPI from the mock call
+			const electronAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
+				call => call[0] === 'electronAPI'
+			);
+			electronAPI = electronAPICall![1];
+		});
+
+		it('should call sendMessage with correct parameters', async () => {
+			await electronAPI.sendMessage('test message');
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('send-message', 'test message');
+		});
+
+		it('should call getVersion with correct parameters', async () => {
+			await electronAPI.getVersion();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-version');
+		});
+
+		it('should return platform from process.platform', () => {
+			const originalPlatform = process.platform;
+			Object.defineProperty(process, 'platform', { value: 'linux' });
+
+			const result = electronAPI.getPlatform();
+			expect(result).toBe('linux');
+
+			Object.defineProperty(process, 'platform', { value: originalPlatform });
+		});
+
+		it('should call openExternal with correct parameters', async () => {
+			await electronAPI.openExternal('https://example.com');
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('open-external', 'https://example.com');
+		});
+
+		it('should call minimizeWindow with correct parameters', async () => {
+			await electronAPI.minimizeWindow();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('window-minimize');
+		});
+
+		it('should call maximizeWindow with correct parameters', async () => {
+			await electronAPI.maximizeWindow();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('window-maximize');
+		});
+
+		it('should call closeWindow with correct parameters', async () => {
+			await electronAPI.closeWindow();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('window-close');
+		});
+
+		it('should call isMaximized with correct parameters', async () => {
+			await electronAPI.isMaximized();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('window-is-maximized');
+		});
+
+		it('should register onMaximize callback', () => {
+			const callback = jest.fn();
+			electronAPI.onMaximize(callback);
+			expect(mockIpcRenderer.on).toHaveBeenCalledWith('window-maximized', callback);
+		});
+
+		it('should register onUnmaximize callback', () => {
+			const callback = jest.fn();
+			electronAPI.onUnmaximize(callback);
+			expect(mockIpcRenderer.on).toHaveBeenCalledWith('window-unmaximized', callback);
+		});
+
+		it('should remove all listeners for channel', () => {
+			electronAPI.removeAllListeners('test-channel');
+			expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith('test-channel');
+		});
+
+		it('should call openLicenseWindow with correct parameters', async () => {
+			await electronAPI.openLicenseWindow();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('open-license-window');
+		});
+
+		it('should call closeLicenseWindow with correct parameters', async () => {
+			await electronAPI.closeLicenseWindow();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('close-license-window');
+		});
+
+		it('should call getMainAppLocale with correct parameters', async () => {
+			await electronAPI.getMainAppLocale();
+			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-main-app-locale');
+		});
+	});
+
+	describe('nodeAPI', () => {
+		it('should expose NODE_ENV from process.env', async () => {
+			const originalEnv = process.env.NODE_ENV;
+			process.env.NODE_ENV = 'test-environment';
+
+			// Reset modules to get fresh import
+			jest.resetModules();
+			await import('./preload');
+
+			const nodeAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
+				call => call[0] === 'nodeAPI'
+			);
+
+			expect(nodeAPICall![1]).toEqual({
+				env: 'test-environment'
+			});
+
+			process.env.NODE_ENV = originalEnv;
+		});
+
+		it('should handle undefined NODE_ENV', async () => {
+			const originalEnv = process.env.NODE_ENV;
+			delete process.env.NODE_ENV;
+
+			// Reset modules to get fresh import
+			jest.resetModules();
+			await import('./preload');
+
+			const nodeAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
+				call => call[0] === 'nodeAPI'
+			);
+
+			expect(nodeAPICall![1]).toEqual({
+				env: undefined
+			});
+
+			process.env.NODE_ENV = originalEnv;
+		});
+	});
 });
