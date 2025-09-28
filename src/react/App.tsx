@@ -1,4 +1,4 @@
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 import styles from './App.module.css';
 import Navbar from './components/common/Navbar';
 import { routes } from './routes';
