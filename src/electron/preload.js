@@ -24,7 +24,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
 	// Window state events
 	onMaximize: (callback) => ipcRenderer.on('window-maximized', callback),
 	onUnmaximize: (callback) => ipcRenderer.on('window-unmaximized', callback),
-	removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)
+	removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
+
+	// License window controls
+	openLicenseWindow: () => ipcRenderer.invoke('open-license-window'),
+	closeLicenseWindow: () => ipcRenderer.invoke('close-license-window'),
+	getMainAppLocale: () => ipcRenderer.invoke('get-main-app-locale')
 });
 
 // Expose a limited set of Node.js APIs

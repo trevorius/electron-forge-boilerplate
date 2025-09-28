@@ -12,6 +12,9 @@ declare global {
       onUnmaximize: (callback: () => void) => void;
       removeAllListeners: (channel: string) => void;
       getPlatform: () => string;
+      openLicenseWindow: () => Promise<void>;
+      closeLicenseWindow: () => Promise<void>;
+      getMainAppLocale: () => Promise<string>;
     };
   }
 }

@@ -3,6 +3,7 @@ const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
+let licenseWindow;
 
 function createWindow() {
 	// Create the browser window
@@ -17,9 +18,7 @@ function createWindow() {
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
 		show: false, // Don't show until ready
-		frame: false, // Remove default frame for custom titlebar
-		titleBarStyle: 'hiddenInset', // macOS specific
-		trafficLightPosition: { x: 20, y: 32 }, // macOS traffic light position
+		titleBarStyle: 'default', // Standard draggable titlebar
 		minWidth: 800,
 		minHeight: 600
 	});
@@ -66,6 +65,57 @@ function createWindow() {
 
 	mainWindow.on('unmaximize', () => {
 		mainWindow.webContents.send('window-unmaximized');
+	});
+}
+
+function createLicenseWindow() {
+	// Don't create multiple license windows
+	if (licenseWindow) {
+		licenseWindow.focus();
+		return;
+	}
+
+	// Create the license window
+	licenseWindow = new BrowserWindow({
+		width: 500,
+		height: 700,
+		webPreferences: {
+			nodeIntegration: false,
+			contextIsolation: true,
+			enableRemoteModule: false,
+			preload: path.join(__dirname, 'preload.js')
+		},
+		icon: path.join(__dirname, '../assets/icon.png'),
+		show: false,
+		titleBarStyle: 'default',
+		resizable: true,
+		minimizable: true,
+		maximizable: false,
+		parent: mainWindow,
+		modal: false
+	});
+
+	// Load the license app
+	let licenseUrl;
+	if (isDev) {
+		licenseUrl = 'http://localhost:5173/license.html';
+	} else {
+		const distPath = app.isPackaged
+			? path.join(process.resourcesPath, 'dist-react', 'license.html')
+			: path.join(__dirname, '../dist-react/license.html');
+		licenseUrl = `file://${distPath}`;
+	}
+
+	licenseWindow.loadURL(licenseUrl);
+
+	// Show window when ready
+	licenseWindow.once('ready-to-show', () => {
+		licenseWindow.show();
+	});
+
+	// Handle window closed
+	licenseWindow.on('closed', () => {
+		licenseWindow = null;
 	});
 }
 
@@ -174,5 +224,24 @@ ipcMain.handle('window-close', () => {
 
 ipcMain.handle('window-is-maximized', () => {
 	return mainWindow ? mainWindow.isMaximized() : false;
+});
+
+// License window IPC handlers
+ipcMain.handle('open-license-window', () => {
+	createLicenseWindow();
+});
+
+ipcMain.handle('get-main-app-locale', () => {
+	// Return the locale from main window if available
+	if (mainWindow && mainWindow.webContents) {
+		return mainWindow.webContents.executeJavaScript('localStorage.getItem("i18nextLng")').catch(() => 'en');
+	}
+	return 'en';
+});
+
+ipcMain.handle('close-license-window', () => {
+	if (licenseWindow) {
+		licenseWindow.close();
+	}
 });
 

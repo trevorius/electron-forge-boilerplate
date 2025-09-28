@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import LanguageSelector from '../common/LanguageSelector';
-import LicenseModal from '../common/LicenseModal';
 import packageInfo from '../../../../package.json';
 
 const About: React.FC = () => {
   const { t } = useTranslation();
-  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
+
+  const handleOpenLicense = async () => {
+    try {
+      await window.electronAPI.openLicenseWindow();
+    } catch (error) {
+      console.error('Failed to open license window:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
@@ -58,7 +64,7 @@ const About: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setIsLicenseModalOpen(true)}
+                  onClick={handleOpenLicense}
                   className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   {t('about.viewLicense')}
@@ -68,11 +74,6 @@ const About: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      <LicenseModal
-        isOpen={isLicenseModalOpen}
-        onClose={() => setIsLicenseModalOpen(false)}
-      />
     </div>
   );
 };

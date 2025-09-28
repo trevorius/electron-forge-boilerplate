@@ -9,6 +9,12 @@ export default defineConfig({
   build: {
     outDir: '../../dist-react',
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'src/react/index.html'),
+        license: path.resolve(__dirname, 'src/react/license.html')
+      }
+    }
   },
   server: {
     port: 5173,
