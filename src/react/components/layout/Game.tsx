@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import TicTacToe from '../game/TicTacToe';
 import Tetris from '../game/Tetris';
+import TicTacToe from '../game/TicTacToe';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 
@@ -11,16 +11,7 @@ const Game: React.FC = () => {
 
   if (selectedGame === 'tictactoe') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-4">
-        <div className="mb-4">
-          <Button
-            onClick={() => setSelectedGame(null)}
-            variant="outline"
-            className="text-white border-white hover:bg-white hover:text-black"
-          >
-            ← Back to Game Selection
-          </Button>
-        </div>
+      <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-4">
         <TicTacToe />
       </div>
     );
@@ -28,23 +19,14 @@ const Game: React.FC = () => {
 
   if (selectedGame === 'tetris') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center p-4">
-        <div className="mb-4">
-          <Button
-            onClick={() => setSelectedGame(null)}
-            variant="outline"
-            className="text-white border-white hover:bg-white hover:text-black"
-          >
-            ← Back to Game Selection
-          </Button>
-        </div>
+      <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 items-center  min-w-screen justify-center p-4">
         <Tetris />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+    <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
       <Card className="p-8 bg-gray-800 border-gray-600 text-center">
         <h1 className="text-4xl font-bold text-white mb-8">Choose a Game</h1>
         <div className="flex flex-col space-y-4 w-64">

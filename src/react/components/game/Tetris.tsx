@@ -3,26 +3,24 @@ import { Button } from '../ui/button';
 import { Card } from '../ui/card';
 import {
   BOARD_WIDTH,
-  BOARD_HEIGHT,
-  createEmptyBoard,
-  getRandomTetromino,
-  rotateTetromino,
-  isValidMove,
-  handlePiecePlacement,
   calculateDropPosition,
-  shouldGameEnd,
-  canPieceMove,
-  handlePauseResume,
-  isPositionInBounds,
   calculateMovementDelta,
-  handleFailedMovement,
   canPerformAction,
+  canPieceMove,
+  createEmptyBoard,
   createGameState,
   createPauseState,
   createResumeState,
+  getRandomTetromino,
+  handleFailedMovement,
+  handlePauseResume,
+  handlePiecePlacement,
+  isValidMove,
   renderPieceOnBoard,
-  type Tetromino,
-  type GamePiece
+  rotateTetromino,
+  shouldGameEnd,
+  type GamePiece,
+  type Tetromino
 } from './Tetris.helpers';
 
 const CELL_SIZE = 30;
@@ -236,7 +234,7 @@ const Tetris: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center space-y-4 p-4">
+    <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center space-y-4 p-4">
       <h1 className="text-3xl font-bold text-white mb-4">Tetris</h1>
 
       <div className="flex space-x-8">
@@ -268,6 +266,14 @@ const Tetris: React.FC = () => {
               {renderNextPiece()}
             </div>
           </Card>
+          <Card className="p-4 bg-gray-800 border-gray-600 text-white text-sm">
+        <h3 className="font-semibold mb-2">Controls:</h3>
+        <p>← → : Move left/right</p>
+        <p>↓ : Soft drop</p>
+        <p>↑ : Rotate</p>
+        <p>Space : Hard drop</p>
+        <p>P : Pause/Resume</p>
+      </Card>
         </div>
       </div>
 
@@ -304,15 +310,7 @@ const Tetris: React.FC = () => {
         </Card>
       )}
 
-      <Card className="p-4 bg-gray-800 border-gray-600 text-white text-sm">
-        <h3 className="font-semibold mb-2">Controls:</h3>
-        <p>← → : Move left/right</p>
-        <p>↓ : Soft drop</p>
-        <p>↑ : Rotate</p>
-        <p>Space : Hard drop</p>
-        <p>P : Pause/Resume</p>
-      </Card>
-    </div>
+</div>
   );
 };
 
