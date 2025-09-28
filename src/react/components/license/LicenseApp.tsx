@@ -7,18 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 // Removed styles import to eliminate CSS module dependency in tests
 import {
   License,
-  initializeLocale,
   closeLicenseWindow,
-  createLicenses,
-  getCurrentLicense,
-  shouldShowNavigation,
-  generateTitle,
-  validateLicenseSelection,
-  formatLocaleError,
-  formatCloseError,
-  createLoadingState,
+  createCloseButtonClasses,
   createHeaderClasses,
-  createCloseButtonClasses
+  createLicenses,
+  createLoadingState,
+  formatCloseError,
+  formatLocaleError,
+  generateTitle,
+  getCurrentLicense,
+  initializeLocale,
+  shouldShowNavigation,
+  validateLicenseSelection
 } from './LicenseApp.helpers';
 
 const LicenseApp: React.FC = () => {
@@ -77,7 +77,7 @@ const LicenseApp: React.FC = () => {
 
   return (
     <div className="fixed inset-2 rounded-xl overflow-hidden bg-transparent">
-      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col rounded-xl">
+      <Card className="w-full h-full bg-white dark:bg-slate-900 backdrop-blur flex flex-col rounded-xl">
         <CardHeader className={createHeaderClasses('drag')}>
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600" />
@@ -96,7 +96,7 @@ const LicenseApp: React.FC = () => {
           </Button>
         </CardHeader>
 
-        <CardContent className="flex-1 flex flex-col p-6 min-h-0">
+        <CardContent className="flex-1 flex flex-col p-6 min-h-0 justify-between align-middle">
           {/* Navigation for multiple licenses */}
           {showNavigation && (
             <div className="flex gap-2 mb-4 border-b pb-4">
@@ -115,8 +115,8 @@ const LicenseApp: React.FC = () => {
           )}
 
           {/* License content */}
-          <div className="flex-1 overflow-auto min-h-0">
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border">
+          <div className="flex-1 overflow-auto min-h-0 flex justify-center items-center">
+            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border min-h-7/8">
               <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-200">
                 {currentLicense.name}
               </h3>

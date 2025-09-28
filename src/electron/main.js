@@ -4,12 +4,25 @@ const isDev = process.env.NODE_ENV === 'development';
 
 let mainWindow;
 let licenseWindow;
+const maxMainWindowHeight = 1200;
+const maxMainWindowWidth = 2300;
+let MainWindowHeight, MainWindowWidth;
+
 
 function createWindow() {
+
+  const { screen } = require('electron');
+	const primaryDisplay = screen.getPrimaryDisplay();
+	const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+  const maxHeight = maxMainWindowHeight;
+  const maxWidth = maxMainWindowWidth;
+	MainWindowHeight = Math.min(maxHeight, screenHeight - 100);
+	MainWindowWidth = Math.min(maxWidth, screenWidth - 100);
+
 	// Create the browser window
 	mainWindow = new BrowserWindow({
-		width: 1200,
-		height: 800,
+		width: MainWindowWidth,
+		height: MainWindowHeight,
 		frame: false,
 		webPreferences: {
 			nodeIntegration: false,
@@ -77,10 +90,26 @@ function createLicenseWindow() {
 		return;
 	}
 
-	// Create the license window
+	// Create the license window with screen-aware sizing
+	// const { screen } = require('electron');
+	// const primaryDisplay = screen.getPrimaryDisplay();
+	// const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
+	// // Calculate appropriate dimensions
+	// const maxHeight = 1200;
+  // const maxWidth = 1200;
+	// const windowHeight = Math.min(maxHeight, screenHeight - 100); // Leave 100px margin
+	// const windowWidth = Math.min(maxWidth, screenWidth - 100);
+
+  // set window to be 75% of the main window
+
+  const windowWidth = MainWindowWidth * 0.75;
+  const windowHeight = MainWindowHeight * 0.75;
+
 	licenseWindow = new BrowserWindow({
-		width: 800,
-		height: 700,
+		width: windowWidth,
+		height: windowHeight,
+		maxHeight: windowHeight,
     frame: false,
     transparent: true,
 		webPreferences: {
