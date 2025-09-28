@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ES2020"],
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "outDir": "./dist-electron",
+    "rootDir": "./src/electron",
+    "sourceMap": true,
+    "declaration": false,
+    "removeComments": false,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/electron/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist-electron",
+    "src/react",
+    "src/electron/**/*.test.ts",
+    "src/electron/**/*.test.tsx",
+    "src/electron/**/*.spec.ts",
+    "src/electron/**/*.spec.tsx"
+  ]
+}
