@@ -1,6 +1,6 @@
 {
 	"name": "electron_boilerplate",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "boilerplate react electron app. with shadcnUI and tailwind integrated. typscript, jest tested.",
 	"main": "src/electron/main.js",
 	"scripts": {
