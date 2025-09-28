@@ -1,14 +1,20 @@
 import { jest } from '@jest/globals';
 
-// Create a variable to control shouldShowWindow behavior
+// Create variables to control helper function behaviors
 let shouldShowWindowValue = true;
+let shouldSendWindowEventValue = true;
+let shouldCloseWindowValue = true;
+let shouldReturnMainWindowStatusValue = true;
 
 // Mock the main.helpers module
 jest.mock('./main.helpers', () => {
 	const actual = jest.requireActual('./main.helpers');
 	return {
 		...actual,
-		shouldShowWindow: jest.fn(() => shouldShowWindowValue)
+		shouldShowWindow: jest.fn(() => shouldShowWindowValue),
+		shouldSendWindowEvent: jest.fn(() => shouldSendWindowEventValue),
+		shouldCloseWindow: jest.fn(() => shouldCloseWindowValue),
+		shouldReturnMainWindowStatus: jest.fn(() => shouldReturnMainWindowStatusValue)
 	};
 });
 
@@ -122,7 +128,11 @@ describe('main.ts', () => {
 		appHandlers = {};
 		ipcHandlers = {};
 		process.env.NODE_ENV = 'development';
-		shouldShowWindowValue = true; // Reset to default value
+		// Reset all mock control values to defaults
+		shouldShowWindowValue = true;
+		shouldSendWindowEventValue = true;
+		shouldCloseWindowValue = true;
+		shouldReturnMainWindowStatusValue = true;
 
 		// Reset platform for each test
 		Object.defineProperty(process, 'platform', {
@@ -453,5 +463,78 @@ describe('main.ts', () => {
 		expect(helpers.shouldCreateNewWindow).toBeDefined();
 		expect(helpers.shouldSetupMacOSMenu).toBeDefined();
 		expect(helpers.shouldQuitApp).toBeDefined();
+	});
+
+	it('should not minimize window when shouldSendWindowEvent returns false', async () => {
+		// Reset modules and set shouldSendWindowEvent to return false
+		jest.resetModules();
+		shouldSendWindowEventValue = false;
+
+		await import('./main');
+
+		// Try to minimize window
+		ipcHandlers['window-minimize']();
+
+		// The minimize method should NOT have been called
+		expect(mainWindowInstance.minimize).not.toHaveBeenCalled();
+
+		// Reset the value back to true
+		shouldSendWindowEventValue = true;
+	});
+
+	it('should not close main window when shouldCloseWindow returns false', async () => {
+		// Reset modules and set shouldCloseWindow to return false
+		jest.resetModules();
+		shouldCloseWindowValue = false;
+
+		await import('./main');
+
+		// Try to close window
+		ipcHandlers['window-close']();
+
+		// The close method should NOT have been called
+		expect(mainWindowInstance.close).not.toHaveBeenCalled();
+
+		// Reset the value back to true
+		shouldCloseWindowValue = true;
+	});
+
+	it('should return false when shouldReturnMainWindowStatus returns false', async () => {
+		// Reset modules and set shouldReturnMainWindowStatus to return false
+		jest.resetModules();
+		shouldReturnMainWindowStatusValue = false;
+
+		await import('./main');
+
+		// Check window maximized status
+		const result = ipcHandlers['window-is-maximized']();
+
+		// Should return false because shouldReturnMainWindowStatus returns false
+		expect(result).toBe(false);
+		// isMaximized should not have been called
+		expect(mainWindowInstance.isMaximized).not.toHaveBeenCalled();
+
+		// Reset the value back to true
+		shouldReturnMainWindowStatusValue = true;
+	});
+
+	it('should not close license window when shouldCloseWindow returns false', async () => {
+		// Reset modules and set shouldCloseWindow to return false
+		jest.resetModules();
+		shouldCloseWindowValue = false;
+
+		await import('./main');
+
+		// Create license window first
+		ipcHandlers['open-license-window']();
+
+		// Try to close license window
+		ipcHandlers['close-license-window']();
+
+		// The close method should NOT have been called
+		expect(licenseWindowInstance.close).not.toHaveBeenCalled();
+
+		// Reset the value back to true
+		shouldCloseWindowValue = true;
 	});
 });
