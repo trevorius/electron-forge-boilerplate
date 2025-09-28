@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import About from './About';
 
 // Mock react-i18next
@@ -33,12 +34,47 @@ jest.mock('../ui/card', () => ({
   )
 }));
 
+// Mock Button component
+jest.mock('../ui/button', () => ({
+  Button: ({ children, onClick, variant, size, className, ...props }: any) => (
+    <button
+      onClick={onClick}
+      className={className}
+      data-testid="mock-button"
+      data-variant={variant}
+      data-size={size}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}));
+
 // Mock LanguageSelector
 jest.mock('../common/LanguageSelector', () => {
   return {
     __esModule: true,
     default: function MockLanguageSelector() {
       return <div data-testid="mock-language-selector">Language Selector</div>;
+    }
+  };
+});
+
+// Mock LicenseModal
+jest.mock('../common/LicenseModal', () => {
+  return {
+    __esModule: true,
+    default: function MockLicenseModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+      return (
+        <div data-testid="mock-license-modal" data-open={isOpen}>
+          {isOpen && (
+            <>
+              <div>License Modal Content</div>
+              <button onClick={onClose} data-testid="modal-close-button">Close</button>
+            </>
+          )}
+        </div>
+      );
     }
   };
 });
@@ -53,7 +89,8 @@ describe('About', () => {
           'about.description': 'A boilerplate React Electron app with ShadcnUI and Tailwind integrated. TypeScript, Jest tested.',
           'about.version': 'Version',
           'about.author': 'Author',
-          'about.license': 'License'
+          'about.license': 'License',
+          'about.viewLicense': 'View License'
         };
         return translations[key] || key;
       }
@@ -146,5 +183,71 @@ describe('About', () => {
     const languageSelector = screen.getByTestId('mock-language-selector');
 
     expect(header).toContainElement(languageSelector);
+  });
+
+  it('should render view license button', () => {
+    render(<About />);
+
+    expect(screen.getByText('View License')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-button')).toBeInTheDocument();
+  });
+
+  it('should open license modal when view license button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<About />);
+
+    // Initially modal should be closed
+    const modal = screen.getByTestId('mock-license-modal');
+    expect(modal).toHaveAttribute('data-open', 'false');
+
+    // Click the view license button
+    const viewLicenseButton = screen.getByText('View License');
+    await user.click(viewLicenseButton);
+
+    // Modal should now be open
+    expect(modal).toHaveAttribute('data-open', 'true');
+    expect(screen.getByText('License Modal Content')).toBeInTheDocument();
+  });
+
+  it('should close license modal when close button is clicked', async () => {
+    const user = userEvent.setup();
+    render(<About />);
+
+    // Open the modal first
+    const viewLicenseButton = screen.getByText('View License');
+    await user.click(viewLicenseButton);
+
+    // Verify modal is open
+    const modal = screen.getByTestId('mock-license-modal');
+    expect(modal).toHaveAttribute('data-open', 'true');
+
+    // Close the modal
+    const closeButton = screen.getByTestId('modal-close-button');
+    await user.click(closeButton);
+
+    // Modal should now be closed
+    expect(modal).toHaveAttribute('data-open', 'false');
+  });
+
+  it('should handle license modal state correctly with fireEvent', () => {
+    render(<About />);
+
+    // Initially modal should be closed
+    const modal = screen.getByTestId('mock-license-modal');
+    expect(modal).toHaveAttribute('data-open', 'false');
+
+    // Click the view license button
+    const viewLicenseButton = screen.getByText('View License');
+    fireEvent.click(viewLicenseButton);
+
+    // Modal should now be open
+    expect(modal).toHaveAttribute('data-open', 'true');
+
+    // Close the modal
+    const closeButton = screen.getByTestId('modal-close-button');
+    fireEvent.click(closeButton);
+
+    // Modal should now be closed
+    expect(modal).toHaveAttribute('data-open', 'false');
   });
 });

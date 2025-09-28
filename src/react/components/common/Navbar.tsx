@@ -33,10 +33,7 @@ const Navbar: React.FC = () => {
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
       {/* Titlebar with draggable area */}
-      <div
-        className="h-12 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b flex items-center justify-between px-3"
-        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-      >
+      <div className="h-12 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b flex items-center justify-between px-3">
         {/* Left side - App icon only */}
         <div className="flex items-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <div className="flex items-center gap-2 px-2">
@@ -44,8 +41,13 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Center section - Navigation */}
-        <div className="flex-1 flex justify-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+        {/* Center section - Navigation with drag areas on sides */}
+        <div className="flex-1 flex items-center">
+          {/* Left drag area */}
+          <div className="flex-1 h-12" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}></div>
+
+          {/* Navigation menu (no-drag) */}
+          <div className="flex justify-center" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <NavigationMenu>
             <NavigationMenuList>
               {navbarRoutes.map((route) => {
@@ -103,6 +105,10 @@ const Navbar: React.FC = () => {
               })}
             </NavigationMenuList>
           </NavigationMenu>
+          </div>
+
+          {/* Right drag area */}
+          <div className="flex-1 h-12" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}></div>
         </div>
 
         {/* Right side - Language selector and window controls */}

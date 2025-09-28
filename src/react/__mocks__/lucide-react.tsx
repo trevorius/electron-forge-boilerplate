@@ -1,16 +1,13 @@
-import React from 'react';
+const React = require('react');
 
 const createMockIcon = (name: string) => {
-  const MockIcon = React.forwardRef<
-    SVGSVGElement,
-    React.SVGProps<SVGSVGElement>
-  >((props, ref) => (
-    <svg
-      ref={ref}
-      data-testid={`mock-${name.toLowerCase()}-icon`}
-      {...props}
-    />
-  ));
+  const MockIcon = React.forwardRef((props: any, ref: any) =>
+    React.createElement('svg', {
+      ref,
+      'data-testid': `mock-${name.toLowerCase()}-icon`,
+      ...props
+    })
+  );
   MockIcon.displayName = name;
   return MockIcon;
 };
@@ -22,3 +19,6 @@ export const Home = createMockIcon('Home');
 export const Info = createMockIcon('Info');
 export const Gamepad2 = createMockIcon('Gamepad2');
 export const LucideIcon = createMockIcon('LucideIcon');
+
+// Type export for LucideIcon
+export type { LucideIcon as LucideIconType } from 'lucide-react';

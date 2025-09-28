@@ -7,10 +7,10 @@ import './styles/globals.css';
 function App() {
   return (
     <Router>
-      <div className="fixed inset-0 flex flex-col bg-background">
+      <div className="fixed inset-0 flex flex-col bg-background" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
         <Navbar />
         {/* Main content area with proper margin and scrolling */}
-        <div className={`flex-1 overflow-auto ${styles['main-container']}`}>
+        <div className={`flex-1 overflow-auto ${styles['main-container']}`} style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <Routes>
             {routes.map((route) => {
               const Component = route.component;

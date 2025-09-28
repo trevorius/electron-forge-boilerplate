@@ -9,10 +9,12 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/react/$1',
     '^\\./styles/globals\\.css$': '<rootDir>/src/react/__mocks__/styles/globals.css',
-    '^\\./App\\.module\\.css$': 'identity-obj-proxy',
+    '^\\./App\\.module\\.css$': '<rootDir>/src/react/__mocks__/App.module.css',
+    '\\.module\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^./components/ui/button$': '<rootDir>/src/react/__mocks__/components/ui/button',
     '^./components/ui/card$': '<rootDir>/src/react/__mocks__/components/ui/card',
+    '^./components/ui/dialog$': '<rootDir>/src/react/__mocks__/components/ui/dialog',
     '^lucide-react$': '<rootDir>/src/react/__mocks__/lucide-react',
     '^./components/TicTacToe$': '<rootDir>/src/react/__mocks__/components/TicTacToe'
   },

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
 import LanguageSelector from '../common/LanguageSelector';
+import LicenseModal from '../common/LicenseModal';
 import packageInfo from '../../../../package.json';
 
 const About: React.FC = () => {
   const { t } = useTranslation();
+  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
@@ -48,13 +51,28 @@ const About: React.FC = () => {
               <span className="font-semibold text-gray-700 dark:text-gray-300">
                 {t('about.license')}:
               </span>
-              <span className="text-gray-600 dark:text-gray-400">
-                {packageInfo?.license || 'MIT'}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600 dark:text-gray-400">
+                  {packageInfo?.license || 'MIT'}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsLicenseModalOpen(true)}
+                  className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {t('about.viewLicense')}
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      <LicenseModal
+        isOpen={isLicenseModalOpen}
+        onClose={() => setIsLicenseModalOpen(false)}
+      />
     </div>
   );
 };
