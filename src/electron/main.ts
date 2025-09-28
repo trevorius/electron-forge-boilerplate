@@ -19,7 +19,14 @@ import {
 	handleWindowAction,
 	handleWindowShow,
 	handleWindowMaximizeToggle,
-	getLocaleOrDefault
+	getLocaleOrDefault,
+	getParentWindow,
+	shouldPerformWindowMinimize,
+	shouldPerformWindowClose,
+	shouldPerformLicenseWindowClose,
+	getWindowMaximizedStatus,
+	shouldPerformLicenseWindowShow,
+	handleLicenseWindowShow
 } from './main.helpers';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
@@ -106,7 +113,7 @@ function createLicenseWindow(): void {
 		resizable: false,
 		minimizable: true,
 		maximizable: false,
-		parent: mainWindow || undefined,
+		parent: getParentWindow(mainWindow),
 		modal: false
 	});
 
@@ -116,9 +123,7 @@ function createLicenseWindow(): void {
 	licenseWindow.loadURL(licenseUrl);
 
 	licenseWindow.once('ready-to-show', () => {
-		if (shouldShowWindow(licenseWindow)) {
-			licenseWindow!.show();
-		}
+		handleLicenseWindowShow(licenseWindow);
 	});
 
 	licenseWindow.on('closed', () => {
@@ -156,7 +161,7 @@ app.on('web-contents-created', (_event, contents) => {
 });
 
 ipcMain.handle('window-minimize', () => {
-	if (shouldSendWindowEvent(mainWindow)) {
+	if (shouldPerformWindowMinimize(mainWindow)) {
 		mainWindow!.minimize();
 	}
 });
@@ -166,13 +171,13 @@ ipcMain.handle('window-maximize', () => {
 });
 
 ipcMain.handle('window-close', () => {
-	if (shouldCloseWindow(mainWindow)) {
+	if (shouldPerformWindowClose(mainWindow)) {
 		mainWindow!.close();
 	}
 });
 
 ipcMain.handle('window-is-maximized', () => {
-	return shouldReturnMainWindowStatus(mainWindow) ? mainWindow!.isMaximized() : false;
+	return getWindowMaximizedStatus(mainWindow);
 });
 
 ipcMain.handle('open-license-window', () => {
@@ -184,7 +189,7 @@ ipcMain.handle('get-main-app-locale', async () => {
 });
 
 ipcMain.handle('close-license-window', () => {
-	if (shouldCloseWindow(licenseWindow)) {
+	if (shouldPerformLicenseWindowClose(licenseWindow)) {
 		licenseWindow!.close();
 	}
 });

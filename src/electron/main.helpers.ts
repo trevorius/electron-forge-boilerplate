@@ -191,3 +191,33 @@ export async function getLocaleOrDefault(window: any): Promise<string> {
 	}
 	return 'en';
 }
+
+export function getParentWindow(mainWindow: any): any {
+	return mainWindow || undefined;
+}
+
+export function shouldPerformWindowMinimize(window: any): boolean {
+	return shouldSendWindowEvent(window);
+}
+
+export function shouldPerformWindowClose(window: any): boolean {
+	return shouldCloseWindow(window);
+}
+
+export function shouldPerformLicenseWindowClose(window: any): boolean {
+	return shouldCloseWindow(window);
+}
+
+export function getWindowMaximizedStatus(window: any): boolean {
+	return shouldReturnMainWindowStatus(window) ? window!.isMaximized() : false;
+}
+
+export function shouldPerformLicenseWindowShow(window: any): boolean {
+	return shouldShowWindow(window);
+}
+
+export function handleLicenseWindowShow(window: any): void {
+	if (shouldPerformLicenseWindowShow(window)) {
+		window!.show();
+	}
+}

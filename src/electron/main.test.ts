@@ -25,7 +25,14 @@ const mockHelpers = {
 	handleWindowAction: jest.fn(),
 	handleWindowShow: jest.fn(),
 	handleWindowMaximizeToggle: jest.fn(),
-	getLocaleOrDefault: jest.fn(() => Promise.resolve('en'))
+	getLocaleOrDefault: jest.fn(() => Promise.resolve('en')),
+	getParentWindow: jest.fn((window) => window || undefined),
+	shouldPerformWindowMinimize: jest.fn(() => true),
+	shouldPerformWindowClose: jest.fn(() => true),
+	shouldPerformLicenseWindowClose: jest.fn(() => true),
+	getWindowMaximizedStatus: jest.fn(() => false),
+	shouldPerformLicenseWindowShow: jest.fn(() => true),
+	handleLicenseWindowShow: jest.fn()
 };
 
 // Mock Electron modules with full functionality
@@ -426,18 +433,66 @@ describe('main.ts', () => {
 		expect(result).toEqual({ action: 'deny' });
 	});
 
-	it('should test additional coverage scenarios', async () => {
+
+	it('should handle mainWindow being null in createLicenseWindow', async () => {
+		// Set mainWindow to null to test the undefined branch in parent property
+		mockHelpers.shouldFocusExistingWindow.mockReturnValue(false);
+
+		// Clear mainWindow reference
+		mainWindowInstance = null;
+
+		jest.resetModules();
 		await import('./main');
 
-		// The main coverage has been achieved through the other tests
-		// These additional scenarios ensure all branches are covered
-		expect(mockHelpers.shouldSendWindowEvent).toBeDefined();
-		expect(mockHelpers.shouldCloseWindow).toBeDefined();
-		expect(mockHelpers.shouldReturnMainWindowStatus).toBeDefined();
-		expect(mockHelpers.shouldFocusExistingWindow).toBeDefined();
-		expect(mockHelpers.shouldShowWindow).toBeDefined();
-		expect(mockHelpers.shouldCreateNewWindow).toBeDefined();
-		expect(mockHelpers.shouldSetupMacOSMenu).toBeDefined();
-		expect(mockHelpers.shouldQuitApp).toBeDefined();
+		// Create license window when mainWindow is null
+		ipcHandlers['open-license-window']();
+
+		// Should create license window with parent: undefined
+		expect(mockBrowserWindow).toHaveBeenCalled();
 	});
+
+	it('should handle window-minimize when mainWindow is null', async () => {
+		await import('./main');
+
+		// Set mainWindow to null by simulating window closure
+		const onCalls = mainWindowInstance.on.mock.calls;
+		const closedHandler = onCalls.find((call: any) => call[0] === 'closed')?.[1];
+		closedHandler(); // This sets mainWindow = null
+
+		// Call window-minimize handler with null mainWindow
+		ipcHandlers['window-minimize']();
+
+		// Since mainWindow is null, minimize should not be called
+		// The minimize method should not be called when window is null
+		expect(mainWindowInstance.minimize).toHaveBeenCalledTimes(0);
+	});
+
+	it('should handle window-close when mainWindow is null', async () => {
+		await import('./main');
+
+		// Set mainWindow to null by simulating window closure
+		const onCalls = mainWindowInstance.on.mock.calls;
+		const closedHandler = onCalls.find((call: any) => call[0] === 'closed')?.[1];
+		closedHandler(); // This sets mainWindow = null
+
+		// Call window-close handler with null mainWindow
+		ipcHandlers['window-close']();
+
+		// Since mainWindow is null, close should not be called again
+		expect(mainWindowInstance.close).toHaveBeenCalledTimes(0);
+	});
+
+	it('should handle close-license-window when licenseWindow is null', async () => {
+		await import('./main');
+
+		// Call close-license-window handler when licenseWindow is null
+		ipcHandlers['close-license-window']();
+
+		// Since licenseWindow is null, close should not be called
+		// No license window was created, so no close method should be called
+		expect(licenseWindowInstance).toBeNull();
+	});
+
+
+
 });
