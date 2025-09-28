@@ -236,7 +236,7 @@ const Tetris: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center space-y-4 p-4">
       <h1 className="text-3xl font-bold text-white mb-4">Tetris</h1>
 
       <div className="flex space-x-8">

@@ -85,7 +85,8 @@ const TicTacToe: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur">
       <CardHeader className="text-center space-y-4">
         <div className="flex justify-end">
           <LanguageSelector />
@@ -132,6 +133,7 @@ const TicTacToe: React.FC = () => {
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };
 
