@@ -122,6 +122,16 @@
 
 /* Custom styles for Electron window */
 @layer utilities {
+  /* Transparent background for license window */
+  body.license-window {
+    background: transparent !important;
+  }
+
+  html.license-window,
+  html.license-window body {
+    background: transparent !important;
+  }
+
   /* Make the titlebar draggable on macOS/Windows/Linux */
   .-webkit-app-region\:\ drag {
     -webkit-app-region: drag;

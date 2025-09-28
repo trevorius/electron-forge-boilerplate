@@ -76,7 +76,8 @@ const LicenseApp: React.FC = () => {
   }
 
   return (
-      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col">
+    <div className="fixed inset-2 rounded-xl overflow-hidden bg-transparent">
+      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col rounded-xl">
         <CardHeader className={createHeaderClasses('drag')}>
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600" />
@@ -133,6 +134,7 @@ const LicenseApp: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+    </div>
   );
 };
 

@@ -79,9 +79,10 @@ function createLicenseWindow() {
 
 	// Create the license window
 	licenseWindow = new BrowserWindow({
-		width: 500,
+		width: 800,
 		height: 700,
     frame: false,
+    transparent: true,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -91,7 +92,7 @@ function createLicenseWindow() {
 		icon: path.join(__dirname, '../assets/icon.png'),
 		show: false,
 		titleBarStyle: 'hidden',
-		resizable: true,
+		resizable: false,
 		minimizable: true,
 		maximizable: false,
 		parent: mainWindow,
