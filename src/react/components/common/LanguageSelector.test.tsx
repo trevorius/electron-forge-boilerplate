@@ -32,11 +32,7 @@ jest.mock('../ui/button', () => {
   };
 });
 
-jest.mock('lucide-react', () => ({
-  Languages: ({ className, ...props }: any) => (
-    <svg className={className} data-testid="mock-languages-icon" {...props} />
-  )
-}));
+// No longer need to mock lucide-react since we don't use Languages icon
 
 describe('LanguageSelector', () => {
   beforeEach(() => {
@@ -63,16 +59,16 @@ describe('LanguageSelector', () => {
     const button = screen.getByTestId('mock-button');
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute('title', 'Switch Language');
-    expect(screen.getByTestId('mock-languages-icon')).toBeInTheDocument();
+    expect(button).toHaveAttribute('data-variant', 'ghost');
   });
 
-  it('should show French option when current language is English', () => {
+  it('should show Fr contraction when current language is English', () => {
     render(<LanguageSelector />);
 
-    expect(screen.getByText('French')).toBeInTheDocument();
+    expect(screen.getByText('Fr')).toBeInTheDocument();
   });
 
-  it('should show English option when current language is French', () => {
+  it('should show En contraction when current language is French', () => {
     mockUseTranslation.mockReturnValue({
       i18n: {
         language: 'fr',
@@ -90,7 +86,7 @@ describe('LanguageSelector', () => {
 
     render(<LanguageSelector />);
 
-    expect(screen.getByText('Anglais')).toBeInTheDocument();
+    expect(screen.getByText('En')).toBeInTheDocument();
   });
 
   it('should call changeLanguage with French when current language is English', async () => {

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -17,7 +17,11 @@ function createWindow() {
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
 		show: false, // Don't show until ready
-		titleBarStyle: 'default'
+		frame: false, // Remove default frame for custom titlebar
+		titleBarStyle: 'hiddenInset', // macOS specific
+		trafficLightPosition: { x: 20, y: 32 }, // macOS traffic light position
+		minWidth: 800,
+		minHeight: 600
 	});
 
 	// Load the app
@@ -53,6 +57,15 @@ function createWindow() {
 	mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 		require('electron').shell.openExternal(url);
 		return { action: 'deny' };
+	});
+
+	// Send window state changes to renderer
+	mainWindow.on('maximize', () => {
+		mainWindow.webContents.send('window-maximized');
+	});
+
+	mainWindow.on('unmaximize', () => {
+		mainWindow.webContents.send('window-unmaximized');
 	});
 }
 
@@ -139,3 +152,27 @@ app.on('web-contents-created', (event, contents) => {
 		require('electron').shell.openExternal(navigationUrl);
 	});
 });
+
+// IPC handlers for window controls
+ipcMain.handle('window-minimize', () => {
+	if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.handle('window-maximize', () => {
+	if (mainWindow) {
+		if (mainWindow.isMaximized()) {
+			mainWindow.unmaximize();
+		} else {
+			mainWindow.maximize();
+		}
+	}
+});
+
+ipcMain.handle('window-close', () => {
+	if (mainWindow) mainWindow.close();
+});
+
+ipcMain.handle('window-is-maximized', () => {
+	return mainWindow ? mainWindow.isMaximized() : false;
+});
+

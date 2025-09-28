@@ -13,6 +13,18 @@
     "english": "Anglais",
     "french": "Français"
   },
+  "nav": {
+    "home": "Accueil",
+    "games": "Jeux",
+    "about": "À propos",
+    "branding": "Jeux Electron",
+    "games_menu": {
+      "tetris": "Tetris",
+      "tictactoe": "Morpion",
+      "tetris_description": "Jeu de puzzle classique d'empilement de blocs",
+      "tictactoe_description": "Jeu de stratégie classique à deux joueurs"
+    }
+  },
   "navigation": {
     "home": "Accueil",
     "about": "À propos"

@@ -119,3 +119,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom styles for Electron window */
+@layer utilities {
+  /* Make the titlebar draggable on macOS/Windows/Linux */
+  .-webkit-app-region\:\ drag {
+    -webkit-app-region: drag;
+  }
+
+  /* Make buttons and interactive elements in titlebar not draggable */
+  .-webkit-app-region\:\ no-drag {
+    -webkit-app-region: no-drag;
+  }
+
+  /* Disable text selection in the titlebar */
+  .titlebar {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Smooth window control transitions */
+  .window-control {
+    transition: all 0.2s ease;
+  }
+
+  /* Platform-specific styles */
+  .platform-darwin .titlebar {
+    padding-left: 80px; /* Space for macOS traffic lights */
+  }
+
+  .platform-win32 .titlebar,
+  .platform-linux .titlebar {
+    padding-right: 140px; /* Space for Windows/Linux window controls */
+  }
+}

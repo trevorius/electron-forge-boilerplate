@@ -13,6 +13,18 @@
     "english": "English",
     "french": "French"
   },
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "about": "About",
+    "branding": "Electron Games",
+    "games_menu": {
+      "tetris": "Tetris",
+      "tictactoe": "Tic Tac Toe",
+      "tetris_description": "Classic block-stacking puzzle game",
+      "tictactoe_description": "Classic two-player strategy game"
+    }
+  },
   "navigation": {
     "home": "Home",
     "about": "About"

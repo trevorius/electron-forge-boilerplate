@@ -11,15 +11,19 @@ const LanguageSelector: React.FC = () => {
     i18n.changeLanguage(newLanguage);
   };
 
+  const getLanguageDisplay = () => {
+    return i18n.language === 'en' ? 'Fr' : 'En';
+  };
+
   return (
     <Button
       onClick={toggleLanguage}
-      variant="outline"
-      className="gap-2"
+      variant="ghost"
+      size="sm"
+      className="h-8 px-2 text-xs font-medium"
       title={t('language.switch')}
     >
-      <Languages className="h-4 w-4" />
-      {i18n.language === 'en' ? t('language.french') : t('language.english')}
+      {getLanguageDisplay()}
     </Button>
   );
 };

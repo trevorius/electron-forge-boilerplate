@@ -8,14 +8,28 @@ jest.mock('./routes', () => ({
     {
       path: '/',
       component: () => <div data-testid="mock-game">Game Page</div>,
-      title: 'navigation.home',
+      title: 'nav.home',
       icon: () => null,
       exact: true
     },
     {
+      path: '/game',
+      component: () => <div data-testid="mock-games">Games Page</div>,
+      title: 'nav.games',
+      icon: () => null,
+      children: [
+        {
+          path: '/game/tetris',
+          component: () => <div data-testid="mock-tetris">Tetris Page</div>,
+          title: 'nav.games_menu.tetris',
+          icon: () => null
+        }
+      ]
+    },
+    {
       path: '/about',
       component: () => <div data-testid="mock-about">About Page</div>,
-      title: 'navigation.about',
+      title: 'nav.about',
       icon: () => null
     }
   ]
@@ -39,12 +53,12 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => mockUseTranslation()
 }));
 
-// Mock the Navigation component
-jest.mock('./components/common/Navigation', () => {
+// Mock the Navbar component
+jest.mock('./components/common/Navbar', () => {
   return {
     __esModule: true,
-    default: function MockNavigation() {
-      return <div data-testid="mock-navigation">Navigation</div>;
+    default: function MockNavbar() {
+      return <div data-testid="mock-navbar">Navbar</div>;
     }
   };
 });
@@ -62,27 +76,31 @@ describe('App', () => {
     });
   });
 
-  it('should render navigation and router container', () => {
+  it('should render navbar and router container', () => {
     renderApp();
 
-    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument();
-    const container = screen.getByTestId('mock-navigation').parentElement;
-    expect(container).toHaveClass('relative');
+    expect(screen.getByTestId('mock-navbar')).toBeInTheDocument();
+    const container = screen.getByTestId('mock-navbar').parentElement;
+    expect(container).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
   });
 
   it('should render Game component on home route by default', () => {
     renderApp();
 
-    expect(screen.getByTestId('mock-navigation')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-navbar')).toBeInTheDocument();
     expect(screen.getByTestId('mock-game')).toBeInTheDocument();
   });
 
-  it('should have router structure', () => {
+  it('should have router structure with flex layout for scrolling', () => {
     const { container } = renderApp();
 
     const mainDiv = container.firstChild as HTMLElement;
     expect(mainDiv).toBeInTheDocument();
-    expect(mainDiv).toHaveClass('relative');
+    expect(mainDiv).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
+
+    // Check for the content wrapper with flex and overflow
+    const contentWrapper = mainDiv.querySelector('.flex-1.overflow-auto');
+    expect(contentWrapper).toBeInTheDocument();
   });
 
   it('should be a functional component that returns JSX', () => {
