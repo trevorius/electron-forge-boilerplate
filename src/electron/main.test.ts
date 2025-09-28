@@ -177,7 +177,7 @@ describe('main.ts', () => {
 	});
 
 	it('should handle activate event and create new window when no windows exist', async () => {
-		mockBrowserWindow.getAllWindows.mockReturnValue([]);
+		(mockBrowserWindow as any).getAllWindows.mockReturnValue([]);
 
 		await import('./main');
 
@@ -190,7 +190,7 @@ describe('main.ts', () => {
 	});
 
 	it('should handle activate event and not create window when windows exist', async () => {
-		mockBrowserWindow.getAllWindows.mockReturnValue([mainWindowInstance]);
+		(mockBrowserWindow as any).getAllWindows.mockReturnValue([mainWindowInstance]);
 
 		await import('./main');
 

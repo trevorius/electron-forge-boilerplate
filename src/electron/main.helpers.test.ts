@@ -1,29 +1,41 @@
 import {
-	calculateOptimalWindowSize,
-	calculateLicenseWindowSize,
-	buildStartUrl,
-	buildLicenseUrl,
-	buildMacOSMenu,
-	WindowDimensions,
-	ScreenInfo,
-	shouldOpenDevTools,
-	shouldShowWindow,
-	shouldSendWindowEvent,
-	shouldQuitApp,
-	shouldSetupMacOSMenu,
-	shouldCreateNewWindow,
-	shouldFocusExistingWindow,
-	shouldReturnMainWindowStatus,
-	shouldExecuteJavaScript,
-	shouldCloseWindow,
-	getBasePath,
-	handleWindowAction,
-	handleWindowShow,
-	handleWindowMaximizeToggle,
-	getLocaleOrDefault
+  ScreenInfo,
+  WindowDimensions,
+  buildLicenseUrl,
+  buildMacOSMenu,
+  buildStartUrl,
+  calculateLicenseWindowSize,
+  calculateOptimalWindowSize,
+  getBasePath,
+  getLocaleOrDefault,
+  handleWindowAction,
+  handleWindowMaximizeToggle,
+  handleWindowShow,
+  shouldCloseWindow,
+  shouldCreateNewWindow,
+  shouldExecuteJavaScript,
+  shouldFocusExistingWindow,
+  shouldOpenDevTools,
+  shouldQuitApp,
+  shouldReturnMainWindowStatus,
+  shouldSendWindowEvent,
+  shouldSetupMacOSMenu,
+  shouldShowWindow,
+  valueOrUndefined
 } from './main.helpers';
 
 describe('main.helpers', () => {
+
+  describe('valueOrUndefined', () => {
+    it('should return undefined when value is undefined', () => {
+      expect(valueOrUndefined(undefined)).toBe(undefined);
+    });
+
+    it('should return value when value is not undefined', () => {
+      expect(valueOrUndefined(1)).toBe(1);
+    });
+  });
+
 	describe('calculateOptimalWindowSize', () => {
 		it('should return dimensions within screen bounds with default max values', () => {
 			const screenInfo: ScreenInfo = { width: 1920, height: 1080 };

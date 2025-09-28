@@ -1,25 +1,26 @@
-import { app, BrowserWindow, Menu, ipcMain, screen, shell } from 'electron';
+import { BrowserWindow, Menu, app, ipcMain, screen, shell } from 'electron';
 import * as path from 'path';
 import {
-	calculateOptimalWindowSize,
-	calculateLicenseWindowSize,
-	buildStartUrl,
-	buildLicenseUrl,
-	buildMacOSMenu,
-	WindowDimensions,
-	shouldShowWindow,
-	shouldSendWindowEvent,
-	shouldQuitApp,
-	shouldSetupMacOSMenu,
-	shouldCreateNewWindow,
-	shouldFocusExistingWindow,
-	shouldReturnMainWindowStatus,
-	shouldCloseWindow,
-	getBasePath,
-	handleWindowAction,
-	handleWindowShow,
-	handleWindowMaximizeToggle,
-	getLocaleOrDefault
+  WindowDimensions,
+  buildLicenseUrl,
+  buildMacOSMenu,
+  buildStartUrl,
+  calculateLicenseWindowSize,
+  calculateOptimalWindowSize,
+  getBasePath,
+  getLocaleOrDefault,
+  handleWindowAction,
+  handleWindowMaximizeToggle,
+  handleWindowShow,
+  shouldCloseWindow,
+  shouldCreateNewWindow,
+  shouldFocusExistingWindow,
+  shouldQuitApp,
+  shouldReturnMainWindowStatus,
+  shouldSendWindowEvent,
+  shouldSetupMacOSMenu,
+  shouldShowWindow,
+  valueOrUndefined
 } from './main.helpers';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
@@ -106,7 +107,7 @@ function createLicenseWindow(): void {
 		resizable: false,
 		minimizable: true,
 		maximizable: false,
-		parent: mainWindow || undefined,
+		parent: valueOrUndefined<BrowserWindow>(mainWindow ?? undefined),
 		modal: false
 	});
 
