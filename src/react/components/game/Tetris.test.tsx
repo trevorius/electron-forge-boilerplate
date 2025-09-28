@@ -52,87 +52,85 @@ describe('Tetris Component', () => {
 
   test('renders Tetris game title', () => {
     renderWithI18n(<Tetris />);
-    // Debug: log what's actually being rendered
-    screen.debug();
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('renders initial game state', () => {
     renderWithI18n(<Tetris />);
 
-    expect(screen.getByText('Score')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.score'))).toBeInTheDocument();
     expect(screen.getAllByText('0')).toHaveLength(2); // Score and Lines both start at 0
-    expect(screen.getByText('Level')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.level'))).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument(); // Initial level
-    expect(screen.getByText('Lines')).toBeInTheDocument();
-    expect(screen.getByText('Next')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.lines'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.next'))).toBeInTheDocument();
   });
 
   test('shows start game button initially', () => {
     renderWithI18n(<Tetris />);
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('starts game when start button is clicked', () => {
     renderWithI18n(<Tetris />);
 
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
-    expect(screen.getByText('Pause')).toBeInTheDocument();
-    expect(screen.queryByText('Start Game')).not.toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
+    expect(screen.queryByText(testI18n.t('tetris.startGame'))).not.toBeInTheDocument();
   });
 
   test('pauses game when pause button is clicked', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Pause the game
-    const pauseButton = screen.getByText('Pause');
+    const pauseButton = screen.getByText(testI18n.t('tetris.pause'));
     fireEvent.click(pauseButton);
 
-    expect(screen.getByText('Resume')).toBeInTheDocument();
-    expect(screen.queryByText('Pause')).not.toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
+    expect(screen.queryByText(testI18n.t('tetris.pause'))).not.toBeInTheDocument();
   });
 
   test('resumes game when resume button is clicked', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Pause the game
-    const pauseButton = screen.getByText('Pause');
+    const pauseButton = screen.getByText(testI18n.t('tetris.pause'));
     fireEvent.click(pauseButton);
 
     // Resume the game
-    const resumeButton = screen.getByText('Resume');
+    const resumeButton = screen.getByText(testI18n.t('tetris.resume'));
     fireEvent.click(resumeButton);
 
-    expect(screen.getByText('Pause')).toBeInTheDocument();
-    expect(screen.queryByText('Resume')).not.toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
+    expect(screen.queryByText(testI18n.t('tetris.resume'))).not.toBeInTheDocument();
   });
 
   test('renders controls instructions', () => {
     renderWithI18n(<Tetris />);
 
-    expect(screen.getByText('Controls:')).toBeInTheDocument();
-    expect(screen.getByText('← → : Move left/right')).toBeInTheDocument();
-    expect(screen.getByText('↓ : Soft drop')).toBeInTheDocument();
-    expect(screen.getByText('↑ : Rotate')).toBeInTheDocument();
-    expect(screen.getByText('Space : Hard drop')).toBeInTheDocument();
-    expect(screen.getByText('P : Pause/Resume')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controls'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controlMoveLeft'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controlSoftDrop'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controlRotate'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controlHardDrop'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controlPause'))).toBeInTheDocument();
   });
 
   test('handles keyboard input for movement', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Test arrow key presses
@@ -143,14 +141,14 @@ describe('Tetris Component', () => {
     fireEvent.keyDown(window, { key: ' ' }); // Space for hard drop
 
     // Should not throw any errors
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('handles pause/resume with keyboard', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Wait for the game to fully initialize and spawn a piece
@@ -164,7 +162,7 @@ describe('Tetris Component', () => {
     });
 
     // The game should handle the input (even if it doesn't immediately pause due to race conditions)
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('does not respond to keyboard input when not playing', () => {
@@ -175,14 +173,14 @@ describe('Tetris Component', () => {
     fireEvent.keyDown(window, { key: 'ArrowRight' });
 
     // Should still show start button
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('displays game board', () => {
     renderWithI18n(<Tetris />);
 
     // The game board should be rendered (checking for the container)
-    const gameContainer = screen.getByText('Tetris').closest('div');
+    const gameContainer = screen.getByText(testI18n.t('tetris.title')).closest('div');
     expect(gameContainer).toBeInTheDocument();
   });
 
@@ -190,22 +188,22 @@ describe('Tetris Component', () => {
     const { rerender } = renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Simulate game over state by rerendering
     // Note: This is a simplified test since triggering actual game over requires complex state manipulation
-    rerenderWithI18n(<Tetris />);
+    // Test just checks the component renders correctly
 
     // The component should handle game over states
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('prevents default behavior on arrow key presses during gameplay', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     const arrowDownEvent = new KeyboardEvent('keydown', { key: 'ArrowDown' });
@@ -220,7 +218,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Press invalid keys
@@ -229,14 +227,14 @@ describe('Tetris Component', () => {
     fireEvent.keyDown(window, { key: 'Escape' });
 
     // Game should continue normally
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('updates drop time based on level progression', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Advance timers to simulate gameplay
@@ -245,14 +243,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should still be running
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('handles component cleanup properly', () => {
     const { unmount } = renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Unmount should not throw errors
@@ -271,14 +269,14 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Next piece section should be visible
-    expect(screen.getByText('Next')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.next'))).toBeInTheDocument();
   });
 
   test('handles rapid key presses without breaking', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    const startButton = screen.getByText('Start Game');
+    const startButton = screen.getByText(testI18n.t('tetris.startGame'));
     fireEvent.click(startButton);
 
     // Rapid key presses
@@ -288,46 +286,46 @@ describe('Tetris Component', () => {
     }
 
     // Game should still be functional
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('renders all UI sections', () => {
     renderWithI18n(<Tetris />);
 
     // Check that all major UI sections are present
-    expect(screen.getByText('Score')).toBeInTheDocument();
-    expect(screen.getByText('Level')).toBeInTheDocument();
-    expect(screen.getByText('Lines')).toBeInTheDocument();
-    expect(screen.getByText('Next')).toBeInTheDocument();
-    expect(screen.getByText('Controls:')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.score'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.level'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.lines'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.next'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.controls'))).toBeInTheDocument();
   });
 
   test('game state persists during pause/resume cycle', () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Pause
-    fireEvent.click(screen.getByText('Pause'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
 
     // Resume
-    fireEvent.click(screen.getByText('Resume'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
 
     // Should show pause button again
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('starts new game resets all values', () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // The initial values should be displayed
     expect(screen.getByText('1')).toBeInTheDocument(); // Level
     // Score should show 0 (though there might be multiple 0s on screen)
-    const scoreSection = screen.getByText('Score').closest('div');
+    const scoreSection = screen.getByText(testI18n.t('tetris.score')).closest('div');
     expect(scoreSection).toBeInTheDocument();
   });
 
@@ -335,7 +333,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -343,14 +341,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should be running
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('handles hard drop functionality', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -363,14 +361,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should continue
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('handles rotation functionality', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -383,14 +381,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should continue
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('handles piece movement and placement', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -405,14 +403,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should continue
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('automatic piece falling', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Let the game run for a while to test automatic falling
     await act(async () => {
@@ -420,14 +418,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should still be running
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('level progression and speed increase', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Simulate several game cycles
     await act(async () => {
@@ -435,14 +433,14 @@ describe('Tetris Component', () => {
     });
 
     // Level should still be visible
-    expect(screen.getByText('Level')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.level'))).toBeInTheDocument();
   });
 
   test('handles invalid piece placement attempts', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -457,7 +455,7 @@ describe('Tetris Component', () => {
     });
 
     // Game should still be functional
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('displays game over message when game ends', () => {
@@ -465,21 +463,21 @@ describe('Tetris Component', () => {
 
     // This test verifies the game over UI would be shown
     // In a real scenario, game over happens when pieces can't spawn
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('new game button appears after game over', () => {
     renderWithI18n(<Tetris />);
 
     // Start and verify initial state
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('score and lines tracking', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for game initialization
     await act(async () => {
@@ -487,15 +485,15 @@ describe('Tetris Component', () => {
     });
 
     // Verify score elements are present
-    expect(screen.getByText('Score')).toBeInTheDocument();
-    expect(screen.getByText('Lines')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.score'))).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.lines'))).toBeInTheDocument();
   });
 
   test('next piece preview functionality', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for game initialization
     await act(async () => {
@@ -503,14 +501,14 @@ describe('Tetris Component', () => {
     });
 
     // Next piece should be shown
-    expect(screen.getByText('Next')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.next'))).toBeInTheDocument();
   });
 
   test('handles line clearing mechanics', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -526,14 +524,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should continue functioning
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('handles collision detection edge cases', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -551,14 +549,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should handle boundary collisions gracefully
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('simulates game over condition', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Rapidly drop many pieces to potentially trigger game over
     await act(async () => {
@@ -569,14 +567,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should handle the scenario appropriately
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('handles piece rotation at boundaries', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -592,14 +590,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should handle rotation collision gracefully
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('piece placement and line detection', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -614,14 +612,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should continue after piece placement
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('validates piece movements near board boundaries', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -639,14 +637,14 @@ describe('Tetris Component', () => {
     });
 
     // Game should handle all movements
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('covers collision detection with existing pieces on board', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -669,14 +667,14 @@ describe('Tetris Component', () => {
     });
 
     // This should trigger line 118 (collision with existing pieces)
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers line clearing when new board rows are added', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -699,14 +697,14 @@ describe('Tetris Component', () => {
     });
 
     // This should trigger line 149 (adding new empty rows after line clear)
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers game over when new piece cannot spawn', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Fill the board to trigger game over condition
     await act(async () => {
@@ -730,14 +728,14 @@ describe('Tetris Component', () => {
 
     // This should eventually trigger lines 179-180 (game over when piece can't spawn)
     // The game should handle this scenario gracefully
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers piece placement and scoring on collision with bottom', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn
     await act(async () => {
@@ -754,14 +752,14 @@ describe('Tetris Component', () => {
     });
 
     // This should trigger lines 200-207 (piece placement, line clearing, scoring)
-    expect(screen.getByText('Score')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.score'))).toBeInTheDocument();
   });
 
   test('covers all edge cases for collision detection', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for initialization
     await act(async () => {
@@ -786,7 +784,7 @@ describe('Tetris Component', () => {
       }
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force coverage of specific lines with mocking', async () => {
@@ -794,7 +792,7 @@ describe('Tetris Component', () => {
     const component = renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Wait for piece to spawn and become active
     await act(async () => {
@@ -818,14 +816,14 @@ describe('Tetris Component', () => {
     });
 
     // The game should still be functional after this stress test
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('test specific board filling patterns for line clearing', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -851,14 +849,14 @@ describe('Tetris Component', () => {
       }
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('test game over condition with board overflow', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -885,7 +883,7 @@ describe('Tetris Component', () => {
     });
 
     // The game should handle this gracefully, either continuing or ending
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('targeted coverage for specific uncovered lines', async () => {
@@ -896,7 +894,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -945,7 +943,7 @@ describe('Tetris Component', () => {
       Math.random = originalRandom;
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force line clearing for coverage', async () => {
@@ -955,7 +953,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -974,7 +972,7 @@ describe('Tetris Component', () => {
       delete (window as any).testForceClearLines;
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force collision detection for coverage', async () => {
@@ -984,7 +982,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1004,14 +1002,14 @@ describe('Tetris Component', () => {
       delete (window as any).testForceCollision;
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('trigger game over condition for coverage', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1033,14 +1031,14 @@ describe('Tetris Component', () => {
       delete (window as any).testForceCollision;
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('cover final uncovered lines 123 and 164', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1089,7 +1087,7 @@ describe('Tetris Component', () => {
       }
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('achieve 100% coverage by clearing complete rows naturally', async () => {
@@ -1099,7 +1097,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1196,14 +1194,14 @@ describe('Tetris Component', () => {
     }
 
     // The game should have triggered line clearing which executes line 164
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers uncovered line 157 - P key for pause/resume toggle', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1215,10 +1213,10 @@ describe('Tetris Component', () => {
     });
 
     // Should show Resume button after pause
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
 
     // Test lowercase p key as well to be thorough
-    fireEvent.click(screen.getByText('Resume'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1229,7 +1227,7 @@ describe('Tetris Component', () => {
     });
 
     // Should show Resume button after pause with lowercase p
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
   });
 
   test('covers uncovered lines when no current piece is present', async () => {
@@ -1245,14 +1243,14 @@ describe('Tetris Component', () => {
     });
 
     // Should not have started game
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('covers board rendering with current piece boundary checks (line 205)', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game to get a current piece
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1273,7 +1271,7 @@ describe('Tetris Component', () => {
     });
 
     // The game should render the board with pieces within boundaries
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers canPieceMove guard clause in movePiece (line 54)', async () => {
@@ -1287,7 +1285,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1311,28 +1309,28 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
     });
 
     // Pause the game
-    fireEvent.click(screen.getByText('Pause'));
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
 
     // This specifically tests line 117-119: the condition check and setting isPlaying to true
-    fireEvent.click(screen.getByText('Resume'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
 
     // Should now show Pause button, confirming resume worked
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('covers piece placement with game over false scenario', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1356,7 +1354,7 @@ describe('Tetris Component', () => {
       shouldGameEndSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers renderBoard with piece positioned outside bounds (line 198)', async () => {
@@ -1419,21 +1417,21 @@ describe('Tetris Component', () => {
     });
 
     // Should still show start game button since nothing moved
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('covers automatic game loop interval clearing', async () => {
     const { unmount } = renderWithI18n(<Tetris />);
 
     // Start the game to create intervals
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
     });
 
     // Pause the game to test interval cleanup
-    fireEvent.click(screen.getByText('Pause'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
 
     // Unmount to trigger cleanup
     unmount();
@@ -1446,7 +1444,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1473,14 +1471,14 @@ describe('Tetris Component', () => {
       isValidMoveSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers rotatePiece function (lines 73-85)', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1503,14 +1501,14 @@ describe('Tetris Component', () => {
       isValidMoveSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers dropPiece function (lines 87-98)', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1521,32 +1519,32 @@ describe('Tetris Component', () => {
       fireEvent.keyDown(window, { key: ' ' });
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('covers startGame function (lines 100-110)', async () => {
     renderWithI18n(<Tetris />);
 
     // This directly tests the startGame function by clicking the button
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Verify game started
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('covers pauseGame and resumeGame functions (lines 112-120)', async () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     // Test pauseGame function
-    fireEvent.click(screen.getByText('Pause'));
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
 
     // Test resumeGame function with gameOver = false
-    fireEvent.click(screen.getByText('Resume'));
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('covers renderBoard boundary check with piece outside bounds (line 198)', async () => {
@@ -1558,7 +1556,7 @@ describe('Tetris Component', () => {
       renderWithI18n(<Tetris />);
 
       // Start the game
-      fireEvent.click(screen.getByText('Start Game'));
+      fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
       await act(async () => {
         jest.advanceTimersByTime(100);
@@ -1566,7 +1564,7 @@ describe('Tetris Component', () => {
 
       // Create a scenario where the render function processes a piece that might be outside bounds
       // We'll use React's internal state manipulation through refs
-      const tetrisComponent = screen.getByText('Tetris').closest('div');
+      const tetrisComponent = screen.getByText(testI18n.t('tetris.title')).closest('div');
 
       // Force render by triggering a re-render with movement
       await act(async () => {
@@ -1587,7 +1585,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1606,7 +1604,7 @@ describe('Tetris Component', () => {
 
       // Now test resumeGame when gameOver is true (should not resume)
       // First check if there's a Resume button available
-      const resumeButton = screen.queryByText('Resume');
+      const resumeButton = screen.queryByText(testI18n.t('tetris.resume'));
       if (resumeButton) {
         fireEvent.click(resumeButton);
       }
@@ -1614,14 +1612,14 @@ describe('Tetris Component', () => {
       shouldGameEndSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('directly test rotatePiece with game over condition', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1642,7 +1640,7 @@ describe('Tetris Component', () => {
       fireEvent.keyDown(window, { key: 'ArrowUp' });
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force boundary violation in renderBoard', async () => {
@@ -1688,7 +1686,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1710,14 +1708,14 @@ describe('Tetris Component', () => {
       }
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force exact lines 64-74 coverage with precise mocking', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1747,7 +1745,7 @@ describe('Tetris Component', () => {
       isValidMoveSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('force exact lines 88-117 coverage for game controls', async () => {
@@ -1755,7 +1753,7 @@ describe('Tetris Component', () => {
 
     // Test dropPiece function (lines 87-98)
     // Start the game first
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1768,20 +1766,20 @@ describe('Tetris Component', () => {
 
     // Test startGame function (lines 100-110) - already started, but let's restart
     // First cause game over or pause
-    fireEvent.click(screen.getByText('Pause'));
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
 
     // Now start new game to cover startGame function
-    fireEvent.click(screen.getByText('Start Game'));
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
 
     // Test pauseGame function (lines 112-114)
-    fireEvent.click(screen.getByText('Pause'));
-    expect(screen.getByText('Resume')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
+    expect(screen.getByText(testI18n.t('tetris.resume'))).toBeInTheDocument();
 
     // Test resumeGame function (lines 116-120)
-    fireEvent.click(screen.getByText('Resume'));
-    expect(screen.getByText('Pause')).toBeInTheDocument();
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
+    expect(screen.getByText(testI18n.t('tetris.pause'))).toBeInTheDocument();
   });
 
   test('covers dropPiece null check (lines 88-89)', async () => {
@@ -1794,7 +1792,7 @@ describe('Tetris Component', () => {
     });
 
     // Should still show start game button
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('covers rotatePiece null check (lines 74-75)', async () => {
@@ -1807,7 +1805,7 @@ describe('Tetris Component', () => {
     });
 
     // Should still show start game button
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
   });
 
   test('ultimate boundary test for line 198', async () => {
@@ -1815,7 +1813,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start the game to get a piece
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1846,14 +1844,14 @@ describe('Tetris Component', () => {
       isPositionInBoundsSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('trigger resumeGame with gameOver true condition', async () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1872,7 +1870,7 @@ describe('Tetris Component', () => {
 
       // Game should be over now - try to call resumeGame
       // The component might show different buttons based on game state
-      const resumeButton = screen.queryByText('Resume');
+      const resumeButton = screen.queryByText(testI18n.t('tetris.resume'));
       if (resumeButton) {
         // This should test the line: if (!gameOver) { setIsPlaying(true); }
         fireEvent.click(resumeButton);
@@ -1881,7 +1879,7 @@ describe('Tetris Component', () => {
       shouldGameEndSpy.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('FINAL COVERAGE PUSH - Direct code path execution', async () => {
@@ -1889,7 +1887,7 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -1955,10 +1953,10 @@ describe('Tetris Component', () => {
 
     // Test all game control functions explicitly
     // pauseGame (lines 112-114)
-    fireEvent.click(screen.getByText('Pause'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));
 
     // resumeGame (lines 116-120)
-    fireEvent.click(screen.getByText('Resume'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));
 
     // Test game over scenario and newGame button
     // Mock to force game over
@@ -1970,7 +1968,7 @@ describe('Tetris Component', () => {
       });
 
       // Check if New Game button appears and click it to test startGame again
-      const newGameButton = screen.queryByText('New Game');
+      const newGameButton = screen.queryAllByText(testI18n.t('tetris.newGame'))[0];
       if (newGameButton) {
         fireEvent.click(newGameButton);
       }
@@ -1978,7 +1976,7 @@ describe('Tetris Component', () => {
       gameOverScenario.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('BOUNDARY CHECK LINE 198 - Forced execution', () => {
@@ -2024,10 +2022,10 @@ describe('Tetris Component', () => {
     renderWithI18n(<Tetris />);
 
     // Ensure we start fresh
-    expect(screen.getByText('Start Game')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.startGame'))).toBeInTheDocument();
 
     // Click start to begin - this tests startGame function (lines 100-110)
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -2077,8 +2075,8 @@ describe('Tetris Component', () => {
     }
 
     // Test pause/resume cycle (lines 112-120)
-    fireEvent.click(screen.getByText('Pause'));     // pauseGame
-    fireEvent.click(screen.getByText('Resume'));    // resumeGame
+    fireEvent.click(screen.getByText(testI18n.t('tetris.pause')));     // pauseGame
+    fireEvent.click(screen.getByText(testI18n.t('tetris.resume')));    // resumeGame
 
     // Multiple render cycles to hit line 198
     await act(async () => {
@@ -2091,14 +2089,14 @@ describe('Tetris Component', () => {
       }
     });
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('FINAL PUSH - Hit exact remaining lines 72-77, 82, 96', async () => {
     renderWithI18n(<Tetris />);
 
     // Start the game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -2139,14 +2137,14 @@ describe('Tetris Component', () => {
       canPerformActionMock.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('100% COVERAGE FINAL TEST - Precise targeting', async () => {
     renderWithI18n(<Tetris />);
 
     // Start game to get a piece
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -2196,14 +2194,14 @@ describe('Tetris Component', () => {
       mockCanPerformAction.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 
   test('ULTIMATE FINAL TEST - Hit line 72 edge case for 100% branch coverage', async () => {
     renderWithI18n(<Tetris />);
 
     // Start game
-    fireEvent.click(screen.getByText('Start Game'));
+    fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
 
     await act(async () => {
       jest.advanceTimersByTime(100);
@@ -2247,6 +2245,6 @@ describe('Tetris Component', () => {
       mockIsValidMove2.mockRestore();
     }
 
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText(testI18n.t('tetris.title'))).toBeInTheDocument();
   });
 });
