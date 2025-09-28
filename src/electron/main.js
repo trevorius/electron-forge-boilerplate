@@ -18,7 +18,8 @@ function createWindow() {
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
 		show: false, // Don't show until ready
-		titleBarStyle: 'default', // Standard draggable titlebar
+		titleBarStyle: 'hidden',
+    // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
 		minWidth: 800,
 		minHeight: 600
 	});
@@ -87,7 +88,7 @@ function createLicenseWindow() {
 		},
 		icon: path.join(__dirname, '../assets/icon.png'),
 		show: false,
-		titleBarStyle: 'default',
+		titleBarStyle: 'hidden',
 		resizable: true,
 		minimizable: true,
 		maximizable: false,
