@@ -218,3 +218,69 @@ export const calculateMovementDelta = (direction: 'left' | 'right' | 'down'): Po
   };
   return deltas[direction];
 };
+
+// Helper for piece placement when movement fails (extracted from Tetris.tsx lines 64-70)
+export const handleFailedMovement = (
+  direction: 'left' | 'right' | 'down',
+  board: number[][],
+  currentPiece: GamePiece,
+  score: number,
+  level: number
+): { shouldPlace: boolean; placementResult?: ReturnType<typeof handlePiecePlacement> } => {
+  if (direction === 'down') {
+    const placementResult = handlePiecePlacement(board, currentPiece, score, level);
+    return { shouldPlace: true, placementResult };
+  }
+  return { shouldPlace: false };
+};
+
+// Helper for game control logic (extracted from Tetris.tsx lines 74, 88, 117)
+export const canPerformAction = (currentPiece: GamePiece | null, gameOver: boolean): boolean => {
+  return !(!currentPiece || gameOver);
+};
+
+// Helper for game state operations (extracted from Tetris.tsx lines 100-110, 112-119)
+export const createGameState = () => ({
+  board: createEmptyBoard(),
+  score: 0,
+  level: 1,
+  lines: 0,
+  gameOver: false,
+  isPlaying: true,
+  dropTime: 1000,
+  currentPiece: null,
+  nextPiece: getRandomTetromino()
+});
+
+export const createPauseState = () => ({
+  isPlaying: false
+});
+
+export const createResumeState = (gameOver: boolean) => ({
+  isPlaying: !gameOver
+});
+
+// Helper for rendering board with boundary checks (extracted from Tetris.tsx line 198)
+export const renderPieceOnBoard = (
+  board: number[][],
+  currentPiece: GamePiece | null
+): number[][] => {
+  const displayBoard = board.map(row => [...row]);
+
+  if (currentPiece) {
+    for (let y = 0; y < currentPiece.tetromino.shape.length; y++) {
+      for (let x = 0; x < currentPiece.tetromino.shape[y].length; x++) {
+        if (currentPiece.tetromino.shape[y][x]) {
+          const boardX = currentPiece.position.x + x;
+          const boardY = currentPiece.position.y + y;
+          // This is the extracted line 198 logic
+          if (isPositionInBounds(boardX, boardY)) {
+            displayBoard[boardY][boardX] = 2;
+          }
+        }
+      }
+    }
+  }
+
+  return displayBoard;
+};

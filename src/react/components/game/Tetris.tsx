@@ -15,6 +15,12 @@ import {
   handlePauseResume,
   isPositionInBounds,
   calculateMovementDelta,
+  handleFailedMovement,
+  canPerformAction,
+  createGameState,
+  createPauseState,
+  createResumeState,
+  renderPieceOnBoard,
   type Tetromino,
   type GamePiece
 } from './Tetris.helpers';
@@ -61,17 +67,19 @@ const Tetris: React.FC = () => {
 
     if (isValidMove(board, currentPiece!, newPosition)) {
       setCurrentPiece(prev => prev ? { ...prev, position: newPosition } : null);
-    } else if (direction === 'down') {
-      const placementResult = handlePiecePlacement(board, currentPiece!, score, level);
-      setBoard(placementResult.newBoard);
-      setLines(prev => prev + placementResult.linesCleared);
-      setScore(prev => prev + placementResult.scoreIncrease);
-      setCurrentPiece(null);
+    } else {
+      const failedMovement = handleFailedMovement(direction, board, currentPiece!, score, level);
+      if (failedMovement.shouldPlace && failedMovement.placementResult) {
+        setBoard(failedMovement.placementResult.newBoard);
+        setLines(prev => prev + failedMovement.placementResult!.linesCleared);
+        setScore(prev => prev + failedMovement.placementResult!.scoreIncrease);
+        setCurrentPiece(null);
+      }
     }
   }, [currentPiece, board, gameOver, level]);
 
   const rotatePiece = useCallback(() => {
-    if (!currentPiece || gameOver) return;
+    if (!canPerformAction(currentPiece, gameOver)) return;
 
     const rotatedShape = rotateTetromino(currentPiece.tetromino.shape);
     const rotatedPiece = {
@@ -85,7 +93,7 @@ const Tetris: React.FC = () => {
   }, [currentPiece, board, gameOver]);
 
   const dropPiece = useCallback(() => {
-    if (!currentPiece || gameOver) return;
+    if (!canPerformAction(currentPiece, gameOver)) return;
 
     const dropPosition = calculateDropPosition(board, currentPiece);
     const droppedPiece = { ...currentPiece, position: dropPosition };
@@ -98,25 +106,26 @@ const Tetris: React.FC = () => {
   }, [currentPiece, board, gameOver, level, score]);
 
   const startGame = () => {
-    setBoard(createEmptyBoard());
-    setScore(0);
-    setLevel(1);
-    setLines(0);
-    setGameOver(false);
-    setIsPlaying(true);
-    setDropTime(1000);
-    setCurrentPiece(null);
-    setNextPiece(getRandomTetromino());
+    const gameState = createGameState();
+    setBoard(gameState.board);
+    setScore(gameState.score);
+    setLevel(gameState.level);
+    setLines(gameState.lines);
+    setGameOver(gameState.gameOver);
+    setIsPlaying(gameState.isPlaying);
+    setDropTime(gameState.dropTime);
+    setCurrentPiece(gameState.currentPiece);
+    setNextPiece(gameState.nextPiece);
   };
 
   const pauseGame = () => {
-    setIsPlaying(false);
+    const pauseState = createPauseState();
+    setIsPlaying(pauseState.isPlaying);
   };
 
   const resumeGame = () => {
-    if (!gameOver) {
-      setIsPlaying(true);
-    }
+    const resumeState = createResumeState(gameOver);
+    setIsPlaying(resumeState.isPlaying);
   };
 
   useEffect(() => {
@@ -187,21 +196,7 @@ const Tetris: React.FC = () => {
   }, [lines]);
 
   const renderBoard = () => {
-    const displayBoard = board.map(row => [...row]);
-
-    if (currentPiece) {
-      for (let y = 0; y < currentPiece.tetromino.shape.length; y++) {
-        for (let x = 0; x < currentPiece.tetromino.shape[y].length; x++) {
-          if (currentPiece.tetromino.shape[y][x]) {
-            const boardX = currentPiece.position.x + x;
-            const boardY = currentPiece.position.y + y;
-            if (isPositionInBounds(boardX, boardY)) {
-              displayBoard[boardY][boardX] = 2;
-            }
-          }
-        }
-      }
-    }
+    const displayBoard = renderPieceOnBoard(board, currentPiece);
 
     return displayBoard.map((row, y) => (
       <div key={y} className="flex">

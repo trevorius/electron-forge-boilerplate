@@ -16,6 +16,12 @@ import {
   handlePauseResume,
   isPositionInBounds,
   calculateMovementDelta,
+  handleFailedMovement,
+  canPerformAction,
+  createGameState,
+  createPauseState,
+  createResumeState,
+  renderPieceOnBoard,
   GamePiece,
   Position
 } from './Tetris.helpers';
@@ -520,6 +526,169 @@ describe('Tetris Helper Functions', () => {
 
       test('returns correct delta for down movement', () => {
         expect(calculateMovementDelta('down')).toEqual({ x: 0, y: 1 });
+      });
+    });
+
+    describe('handleFailedMovement', () => {
+      const mockBoard = createEmptyBoard();
+      const mockPiece: GamePiece = {
+        tetromino: TETROMINOES.I,
+        position: { x: 5, y: 10 }
+      };
+
+      test('returns shouldPlace true and placement result for down movement', () => {
+        const result = handleFailedMovement('down', mockBoard, mockPiece, 100, 2);
+
+        expect(result.shouldPlace).toBe(true);
+        expect(result.placementResult).toBeDefined();
+        expect(result.placementResult?.newBoard).toBeDefined();
+        expect(result.placementResult?.scoreIncrease).toBeDefined();
+        expect(result.placementResult?.linesCleared).toBeDefined();
+      });
+
+      test('returns shouldPlace false for left movement', () => {
+        const result = handleFailedMovement('left', mockBoard, mockPiece, 100, 2);
+
+        expect(result.shouldPlace).toBe(false);
+        expect(result.placementResult).toBeUndefined();
+      });
+
+      test('returns shouldPlace false for right movement', () => {
+        const result = handleFailedMovement('right', mockBoard, mockPiece, 100, 2);
+
+        expect(result.shouldPlace).toBe(false);
+        expect(result.placementResult).toBeUndefined();
+      });
+    });
+
+    describe('canPerformAction', () => {
+      const mockPiece: GamePiece = {
+        tetromino: TETROMINOES.T,
+        position: { x: 5, y: 5 }
+      };
+
+      test('returns true when piece exists and game is not over', () => {
+        expect(canPerformAction(mockPiece, false)).toBe(true);
+      });
+
+      test('returns false when piece is null', () => {
+        expect(canPerformAction(null, false)).toBe(false);
+      });
+
+      test('returns false when game is over', () => {
+        expect(canPerformAction(mockPiece, true)).toBe(false);
+      });
+
+      test('returns false when piece is null and game is over', () => {
+        expect(canPerformAction(null, true)).toBe(false);
+      });
+    });
+
+    describe('createGameState', () => {
+      test('creates correct initial game state', () => {
+        const gameState = createGameState();
+
+        expect(gameState.board).toEqual(createEmptyBoard());
+        expect(gameState.score).toBe(0);
+        expect(gameState.level).toBe(1);
+        expect(gameState.lines).toBe(0);
+        expect(gameState.gameOver).toBe(false);
+        expect(gameState.isPlaying).toBe(true);
+        expect(gameState.dropTime).toBe(1000);
+        expect(gameState.currentPiece).toBe(null);
+        expect(gameState.nextPiece).toBeDefined();
+      });
+    });
+
+    describe('createPauseState', () => {
+      test('creates correct pause state', () => {
+        const pauseState = createPauseState();
+
+        expect(pauseState.isPlaying).toBe(false);
+      });
+    });
+
+    describe('createResumeState', () => {
+      test('creates resume state with isPlaying true when game is not over', () => {
+        const resumeState = createResumeState(false);
+
+        expect(resumeState.isPlaying).toBe(true);
+      });
+
+      test('creates resume state with isPlaying false when game is over', () => {
+        const resumeState = createResumeState(true);
+
+        expect(resumeState.isPlaying).toBe(false);
+      });
+    });
+
+    describe('renderPieceOnBoard', () => {
+      const mockBoard = createEmptyBoard();
+
+      test('returns original board when no current piece', () => {
+        const result = renderPieceOnBoard(mockBoard, null);
+
+        expect(result).toEqual(mockBoard);
+        expect(result).not.toBe(mockBoard); // Should be a copy
+      });
+
+      test('renders piece on board within bounds', () => {
+        const mockPiece: GamePiece = {
+          tetromino: TETROMINOES.O, // 2x2 square
+          position: { x: 4, y: 10 }
+        };
+
+        const result = renderPieceOnBoard(mockBoard, mockPiece);
+
+        // Check that piece cells are marked as 2
+        expect(result[10][4]).toBe(2);
+        expect(result[10][5]).toBe(2);
+        expect(result[11][4]).toBe(2);
+        expect(result[11][5]).toBe(2);
+      });
+
+      test('handles piece positioned outside bounds gracefully', () => {
+        const mockPiece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: -1, y: -1 } // Outside bounds
+        };
+
+        // This should not throw an error and should properly check bounds
+        const result = renderPieceOnBoard(mockBoard, mockPiece);
+
+        expect(result).toBeDefined();
+        expect(result.length).toBe(BOARD_HEIGHT);
+        expect(result[0].length).toBe(BOARD_WIDTH);
+      });
+
+      test('only renders piece cells within board boundaries', () => {
+        const mockPiece: GamePiece = {
+          tetromino: TETROMINOES.T,
+          position: { x: BOARD_WIDTH - 1, y: BOARD_HEIGHT - 1 } // Near bottom-right edge
+        };
+
+        const result = renderPieceOnBoard(mockBoard, mockPiece);
+
+        // Should handle boundary checks properly without errors
+        expect(result).toBeDefined();
+        expect(result.length).toBe(BOARD_HEIGHT);
+      });
+
+      test('renders complex piece shape correctly', () => {
+        const mockPiece: GamePiece = {
+          tetromino: TETROMINOES.T, // T-shape
+          position: { x: 4, y: 10 }
+        };
+
+        const result = renderPieceOnBoard(mockBoard, mockPiece);
+
+        // T-shape: [0,1,0], [1,1,1]
+        expect(result[10][5]).toBe(2); // top center
+        expect(result[11][4]).toBe(2); // bottom left
+        expect(result[11][5]).toBe(2); // bottom center
+        expect(result[11][6]).toBe(2); // bottom right
+        expect(result[10][4]).toBe(0); // should remain empty
+        expect(result[10][6]).toBe(0); // should remain empty
       });
     });
   });
