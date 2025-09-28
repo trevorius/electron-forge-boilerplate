@@ -1,9 +1,10 @@
+import { FileText, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, FileText } from 'lucide-react';
+import i18n from '../../i18n';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import i18n from '../../i18n';
+import styles from './LicenseApp.module.css';
 
 interface License {
   id: string;
@@ -64,9 +65,8 @@ const LicenseApp: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
-      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
+      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col overflow-hidden">
+        <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 border-b ${styles.drag}`}>
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600" />
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
@@ -122,7 +122,6 @@ const LicenseApp: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
   );
 };
 
