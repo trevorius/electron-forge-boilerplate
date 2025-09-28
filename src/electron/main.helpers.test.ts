@@ -20,14 +20,7 @@ import {
 	handleWindowAction,
 	handleWindowShow,
 	handleWindowMaximizeToggle,
-	getLocaleOrDefault,
-	getParentWindow,
-	shouldPerformWindowMinimize,
-	shouldPerformWindowClose,
-	shouldPerformLicenseWindowClose,
-	getWindowMaximizedStatus,
-	shouldPerformLicenseWindowShow,
-	handleLicenseWindowShow
+	getLocaleOrDefault
 } from './main.helpers';
 
 describe('main.helpers', () => {
@@ -496,101 +489,6 @@ describe('main.helpers', () => {
 			const result = await getLocaleOrDefault(mockWindow);
 
 			expect(result).toBe('en');
-		});
-	});
-
-	describe('getParentWindow', () => {
-		it('should return mainWindow when it exists', () => {
-			const mockMainWindow = { id: 'main' };
-			expect(getParentWindow(mockMainWindow)).toBe(mockMainWindow);
-		});
-
-		it('should return undefined when mainWindow is null', () => {
-			expect(getParentWindow(null)).toBeUndefined();
-		});
-
-		it('should return undefined when mainWindow is undefined', () => {
-			expect(getParentWindow(undefined)).toBeUndefined();
-		});
-	});
-
-	describe('shouldPerformWindowMinimize', () => {
-		it('should return true for valid window', () => {
-			const mockWindow = { minimize: jest.fn() };
-			expect(shouldPerformWindowMinimize(mockWindow)).toBe(true);
-		});
-
-		it('should return false for null window', () => {
-			expect(shouldPerformWindowMinimize(null)).toBe(false);
-		});
-	});
-
-	describe('shouldPerformWindowClose', () => {
-		it('should return true for valid window', () => {
-			const mockWindow = { close: jest.fn() };
-			expect(shouldPerformWindowClose(mockWindow)).toBe(true);
-		});
-
-		it('should return false for null window', () => {
-			expect(shouldPerformWindowClose(null)).toBe(false);
-		});
-	});
-
-	describe('shouldPerformLicenseWindowClose', () => {
-		it('should return true for valid window', () => {
-			const mockWindow = { close: jest.fn() };
-			expect(shouldPerformLicenseWindowClose(mockWindow)).toBe(true);
-		});
-
-		it('should return false for null window', () => {
-			expect(shouldPerformLicenseWindowClose(null)).toBe(false);
-		});
-	});
-
-	describe('getWindowMaximizedStatus', () => {
-		it('should return true when window is maximized', () => {
-			const mockWindow = { isMaximized: jest.fn(() => true) };
-			expect(getWindowMaximizedStatus(mockWindow)).toBe(true);
-		});
-
-		it('should return false when window is not maximized', () => {
-			const mockWindow = { isMaximized: jest.fn(() => false) };
-			expect(getWindowMaximizedStatus(mockWindow)).toBe(false);
-		});
-
-		it('should return false when window is null', () => {
-			expect(getWindowMaximizedStatus(null)).toBe(false);
-		});
-	});
-
-	describe('shouldPerformLicenseWindowShow', () => {
-		it('should return true for valid window', () => {
-			const mockWindow = { show: jest.fn() };
-			expect(shouldPerformLicenseWindowShow(mockWindow)).toBe(true);
-		});
-
-		it('should return false for null window', () => {
-			expect(shouldPerformLicenseWindowShow(null)).toBe(false);
-		});
-	});
-
-	describe('handleLicenseWindowShow', () => {
-		it('should call show when window is valid', () => {
-			const mockWindow = { show: jest.fn() };
-			handleLicenseWindowShow(mockWindow);
-			expect(mockWindow.show).toHaveBeenCalled();
-		});
-
-		it('should not call show when window is null', () => {
-			const mockWindow = { show: jest.fn() };
-			handleLicenseWindowShow(null);
-			expect(mockWindow.show).not.toHaveBeenCalled();
-		});
-
-		it('should not call show when window is undefined', () => {
-			const mockWindow = { show: jest.fn() };
-			handleLicenseWindowShow(undefined);
-			expect(mockWindow.show).not.toHaveBeenCalled();
 		});
 	});
 });
