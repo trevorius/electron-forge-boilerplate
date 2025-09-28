@@ -8,6 +8,14 @@ import {
   isValidMove,
   placePiece,
   clearLines,
+  handleGameOverLogic,
+  handlePiecePlacement,
+  calculateDropPosition,
+  shouldGameEnd,
+  canPieceMove,
+  handlePauseResume,
+  isPositionInBounds,
+  calculateMovementDelta,
   GamePiece,
   Position
 } from './Tetris.helpers';
@@ -304,6 +312,215 @@ describe('Tetris Helper Functions', () => {
 
       // Clean up
       delete (window as any).testForceClearLines;
+    });
+  });
+
+  describe('New Helper Functions for Enhanced Testability', () => {
+    describe('handleGameOverLogic', () => {
+      test('returns true when spawn is invalid (game over)', () => {
+        expect(handleGameOverLogic(false)).toBe(true);
+      });
+
+      test('returns false when spawn is valid (continue game)', () => {
+        expect(handleGameOverLogic(true)).toBe(false);
+      });
+    });
+
+    describe('shouldGameEnd', () => {
+      test('returns true when piece cannot spawn', () => {
+        const board = createEmptyBoard();
+        // Block spawn position
+        board[0][4] = 1;
+        board[0][5] = 1;
+
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+
+        expect(shouldGameEnd(board, piece)).toBe(true);
+      });
+
+      test('returns false when piece can spawn', () => {
+        const board = createEmptyBoard();
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+
+        expect(shouldGameEnd(board, piece)).toBe(false);
+      });
+    });
+
+    describe('handlePiecePlacement', () => {
+      test('places piece and calculates score correctly', () => {
+        const board = createEmptyBoard();
+        // Create a setup for line clearing
+        for (let x = 0; x < BOARD_WIDTH - 1; x++) {
+          board[BOARD_HEIGHT - 1][x] = 1;
+        }
+
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: BOARD_WIDTH - 1, y: BOARD_HEIGHT - 1 }
+        };
+
+        const result = handlePiecePlacement(board, piece, 100, 2);
+
+        expect(result.linesCleared).toBe(1);
+        expect(result.scoreIncrease).toBe(200); // 1 line * 100 * level 2
+        expect(result.newBoard).toHaveLength(BOARD_HEIGHT);
+      });
+
+      test('handles placement without line clearing', () => {
+        const board = createEmptyBoard();
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.O,
+          position: { x: 4, y: 18 }
+        };
+
+        const result = handlePiecePlacement(board, piece, 0, 1);
+
+        expect(result.linesCleared).toBe(0);
+        expect(result.scoreIncrease).toBe(0);
+        expect(result.newBoard[18][4]).toBe(1);
+        expect(result.newBoard[18][5]).toBe(1);
+      });
+    });
+
+    describe('calculateDropPosition', () => {
+      test('calculates drop position on empty board', () => {
+        const board = createEmptyBoard();
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+
+        const dropPosition = calculateDropPosition(board, piece);
+        expect(dropPosition.x).toBe(4);
+        expect(dropPosition.y).toBe(BOARD_HEIGHT - 1); // Should drop to bottom
+      });
+
+      test('calculates drop position with obstacles', () => {
+        const board = createEmptyBoard();
+        // Place obstacle
+        board[18][4] = 1;
+        board[18][5] = 1;
+        board[18][6] = 1;
+        board[18][7] = 1;
+
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+
+        const dropPosition = calculateDropPosition(board, piece);
+        expect(dropPosition.x).toBe(4);
+        expect(dropPosition.y).toBe(17); // Should stop above obstacle
+      });
+
+      test('handles piece already at bottom', () => {
+        const board = createEmptyBoard();
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: BOARD_HEIGHT - 1 }
+        };
+
+        const dropPosition = calculateDropPosition(board, piece);
+        expect(dropPosition.x).toBe(4);
+        expect(dropPosition.y).toBe(BOARD_HEIGHT - 1); // No movement needed
+      });
+    });
+  });
+
+  describe('Coverage Enhancement Helper Functions', () => {
+    describe('canPieceMove', () => {
+      test('returns true when piece exists and game not over', () => {
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+        expect(canPieceMove(piece, false)).toBe(true);
+      });
+
+      test('returns false when no current piece', () => {
+        expect(canPieceMove(null, false)).toBe(false);
+      });
+
+      test('returns false when game is over', () => {
+        const piece: GamePiece = {
+          tetromino: TETROMINOES.I,
+          position: { x: 4, y: 0 }
+        };
+        expect(canPieceMove(piece, true)).toBe(false);
+      });
+
+      test('returns false when no piece and game over', () => {
+        expect(canPieceMove(null, true)).toBe(false);
+      });
+    });
+
+    describe('handlePauseResume', () => {
+      test('calls pauseGame when isPlaying is true', () => {
+        const pauseFn = jest.fn();
+        const resumeFn = jest.fn();
+
+        handlePauseResume(true, pauseFn, resumeFn);
+
+        expect(pauseFn).toHaveBeenCalled();
+        expect(resumeFn).not.toHaveBeenCalled();
+      });
+
+      test('calls resumeGame when isPlaying is false', () => {
+        const pauseFn = jest.fn();
+        const resumeFn = jest.fn();
+
+        handlePauseResume(false, pauseFn, resumeFn);
+
+        expect(pauseFn).not.toHaveBeenCalled();
+        expect(resumeFn).toHaveBeenCalled();
+      });
+    });
+
+    describe('isPositionInBounds', () => {
+      test('returns true for valid position', () => {
+        expect(isPositionInBounds(5, 10)).toBe(true);
+      });
+
+      test('returns false for x less than 0', () => {
+        expect(isPositionInBounds(-1, 10)).toBe(false);
+      });
+
+      test('returns false for x greater than board width', () => {
+        expect(isPositionInBounds(BOARD_WIDTH, 10)).toBe(false);
+      });
+
+      test('returns false for y less than 0', () => {
+        expect(isPositionInBounds(5, -1)).toBe(false);
+      });
+
+      test('returns false for y greater than board height', () => {
+        expect(isPositionInBounds(5, BOARD_HEIGHT)).toBe(false);
+      });
+
+      test('returns true for boundary positions', () => {
+        expect(isPositionInBounds(0, 0)).toBe(true);
+        expect(isPositionInBounds(BOARD_WIDTH - 1, BOARD_HEIGHT - 1)).toBe(true);
+      });
+    });
+
+    describe('calculateMovementDelta', () => {
+      test('returns correct delta for left movement', () => {
+        expect(calculateMovementDelta('left')).toEqual({ x: -1, y: 0 });
+      });
+
+      test('returns correct delta for right movement', () => {
+        expect(calculateMovementDelta('right')).toEqual({ x: 1, y: 0 });
+      });
+
+      test('returns correct delta for down movement', () => {
+        expect(calculateMovementDelta('down')).toEqual({ x: 0, y: 1 });
+      });
     });
   });
 });

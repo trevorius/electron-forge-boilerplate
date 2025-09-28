@@ -8,8 +8,13 @@ import {
   getRandomTetromino,
   rotateTetromino,
   isValidMove,
-  placePiece,
-  clearLines,
+  handlePiecePlacement,
+  calculateDropPosition,
+  shouldGameEnd,
+  canPieceMove,
+  handlePauseResume,
+  isPositionInBounds,
+  calculateMovementDelta,
   type Tetromino,
   type GamePiece
 } from './Tetris.helpers';
@@ -37,37 +42,30 @@ const Tetris: React.FC = () => {
 
     setNextPiece(getRandomTetromino());
 
-    if (isValidMove(board, newPiece, newPiece.position)) {
-      setCurrentPiece(newPiece);
-    } else {
+    if (shouldGameEnd(board, newPiece)) {
       setGameOver(true);
       setIsPlaying(false);
+    } else {
+      setCurrentPiece(newPiece);
     }
   }, [board, nextPiece]);
 
   const movePiece = useCallback((direction: 'left' | 'right' | 'down') => {
-    if (!currentPiece || gameOver) return;
+    if (!canPieceMove(currentPiece, gameOver)) return;
 
-    const delta = {
-      left: { x: -1, y: 0 },
-      right: { x: 1, y: 0 },
-      down: { x: 0, y: 1 }
-    };
-
+    const delta = calculateMovementDelta(direction);
     const newPosition = {
-      x: currentPiece.position.x + delta[direction].x,
-      y: currentPiece.position.y + delta[direction].y
+      x: currentPiece!.position.x + delta.x,
+      y: currentPiece!.position.y + delta.y
     };
 
-    if (isValidMove(board, currentPiece, newPosition)) {
+    if (isValidMove(board, currentPiece!, newPosition)) {
       setCurrentPiece(prev => prev ? { ...prev, position: newPosition } : null);
     } else if (direction === 'down') {
-      const newBoard = placePiece(board, currentPiece);
-      const { newBoard: clearedBoard, linesCleared } = clearLines(newBoard);
-
-      setBoard(clearedBoard);
-      setLines(prev => prev + linesCleared);
-      setScore(prev => prev + linesCleared * 100 * level);
+      const placementResult = handlePiecePlacement(board, currentPiece!, score, level);
+      setBoard(placementResult.newBoard);
+      setLines(prev => prev + placementResult.linesCleared);
+      setScore(prev => prev + placementResult.scoreIncrease);
       setCurrentPiece(null);
     }
   }, [currentPiece, board, gameOver, level]);
@@ -89,20 +87,15 @@ const Tetris: React.FC = () => {
   const dropPiece = useCallback(() => {
     if (!currentPiece || gameOver) return;
 
-    let newY = currentPiece.position.y;
-    while (isValidMove(board, currentPiece, { ...currentPiece.position, y: newY + 1 })) {
-      newY++;
-    }
+    const dropPosition = calculateDropPosition(board, currentPiece);
+    const droppedPiece = { ...currentPiece, position: dropPosition };
+    const placementResult = handlePiecePlacement(board, droppedPiece, score, level);
 
-    const droppedPiece = { ...currentPiece, position: { ...currentPiece.position, y: newY } };
-    const newBoard = placePiece(board, droppedPiece);
-    const { newBoard: clearedBoard, linesCleared } = clearLines(newBoard);
-
-    setBoard(clearedBoard);
-    setLines(prev => prev + linesCleared);
-    setScore(prev => prev + linesCleared * 100 * level + 20);
+    setBoard(placementResult.newBoard);
+    setLines(prev => prev + placementResult.linesCleared);
+    setScore(prev => prev + placementResult.scoreIncrease + 20); // +20 bonus for hard drop
     setCurrentPiece(null);
-  }, [currentPiece, board, gameOver, level]);
+  }, [currentPiece, board, gameOver, level, score]);
 
   const startGame = () => {
     setBoard(createEmptyBoard());
@@ -154,7 +147,7 @@ const Tetris: React.FC = () => {
         case 'p':
         case 'P':
           event.preventDefault();
-          isPlaying ? pauseGame() : resumeGame();
+          handlePauseResume(isPlaying, pauseGame, resumeGame);
           break;
       }
     };
@@ -202,7 +195,7 @@ const Tetris: React.FC = () => {
           if (currentPiece.tetromino.shape[y][x]) {
             const boardX = currentPiece.position.x + x;
             const boardY = currentPiece.position.y + y;
-            if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+            if (isPositionInBounds(boardX, boardY)) {
               displayBoard[boardY][boardX] = 2;
             }
           }

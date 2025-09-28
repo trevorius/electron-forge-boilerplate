@@ -161,3 +161,60 @@ export const clearLines = (board: number[][]): { newBoard: number[][]; linesClea
 
   return { newBoard, linesCleared };
 };
+
+export const handleGameOverLogic = (isValidSpawn: boolean): boolean => {
+  return !isValidSpawn;
+};
+
+export const handlePiecePlacement = (
+  board: number[][],
+  piece: GamePiece,
+  currentScore: number,
+  currentLevel: number
+) => {
+  const newBoard = placePiece(board, piece);
+  const { newBoard: clearedBoard, linesCleared } = clearLines(newBoard);
+  const scoreIncrease = linesCleared * 100 * currentLevel;
+
+  return {
+    newBoard: clearedBoard,
+    scoreIncrease,
+    linesCleared
+  };
+};
+
+export const calculateDropPosition = (
+  board: number[][],
+  piece: GamePiece
+): Position => {
+  let newY = piece.position.y;
+  while (isValidMove(board, piece, { ...piece.position, y: newY + 1 })) {
+    newY++;
+  }
+  return { ...piece.position, y: newY };
+};
+
+export const shouldGameEnd = (board: number[][], newPiece: GamePiece): boolean => {
+  return !isValidMove(board, newPiece, newPiece.position);
+};
+
+export const canPieceMove = (currentPiece: GamePiece | null, gameOver: boolean): boolean => {
+  return !(!currentPiece || gameOver);
+};
+
+export const handlePauseResume = (isPlaying: boolean, pauseFn: () => void, resumeFn: () => void): void => {
+  isPlaying ? pauseFn() : resumeFn();
+};
+
+export const isPositionInBounds = (x: number, y: number): boolean => {
+  return y >= 0 && y < BOARD_HEIGHT && x >= 0 && x < BOARD_WIDTH;
+};
+
+export const calculateMovementDelta = (direction: 'left' | 'right' | 'down'): Position => {
+  const deltas = {
+    left: { x: -1, y: 0 },
+    right: { x: 1, y: 0 },
+    down: { x: 0, y: 1 }
+  };
+  return deltas[direction];
+};
