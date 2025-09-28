@@ -10,6 +10,7 @@ function createWindow() {
 	mainWindow = new BrowserWindow({
 		width: 1200,
 		height: 800,
+		frame: false,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -80,6 +81,7 @@ function createLicenseWindow() {
 	licenseWindow = new BrowserWindow({
 		width: 500,
 		height: 700,
+    frame: false,
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
