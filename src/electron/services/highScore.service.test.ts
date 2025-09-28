@@ -46,7 +46,7 @@ describe('HighScoreService', () => {
     it('should return file URL for development', () => {
       process.env.NODE_ENV = 'development';
       const service = new HighScoreService();
-      expect(service['getDatabaseUrl']()).toBe('file:./database.db');
+      expect(service['getDatabaseUrl']()).toBe(`file:${process.cwd()}/prisma/database.db`);
     });
 
     it('should return userData path for production', () => {

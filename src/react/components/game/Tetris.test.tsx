@@ -28,6 +28,16 @@ testI18n
 // Mock timers for testing intervals
 jest.useFakeTimers();
 
+// Mock electron API
+const mockElectronAPI = {
+  isHighScore: jest.fn(),
+  saveScore: jest.fn(),
+};
+
+Object.defineProperty(window, 'electronAPI', {
+  value: mockElectronAPI,
+});
+
 // Wrapper component to provide i18n context
 const renderWithI18n = (component: React.ReactElement) => {
   return render(
@@ -40,6 +50,7 @@ const renderWithI18n = (component: React.ReactElement) => {
 describe('Tetris Component', () => {
   beforeEach(() => {
     jest.clearAllTimers();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -2365,4 +2376,5 @@ describe('Tetris Component', () => {
       delete (window as unknown as { testForceCollision?: boolean }).testForceCollision;
     }
   });
+
 });

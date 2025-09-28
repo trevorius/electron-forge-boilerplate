@@ -676,4 +676,34 @@ describe('main.ts', () => {
 		closedHandler();
 	});
 
+	it('should handle high score service initialization error', async () => {
+		// Reset modules first
+		jest.resetModules();
+
+		// Mock the high score service to throw an error
+		jest.doMock('./services/highScore.service', () => ({
+			highScoreService: {
+				initialize: jest.fn().mockRejectedValue(new Error('Database connection failed')),
+				close: jest.fn().mockResolvedValue(undefined),
+			},
+		}));
+
+		// Mock console.error to verify it's called
+		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Verify that console.error was called with the right message
+		expect(consoleSpy).toHaveBeenCalledWith(
+			'Failed to initialize high score service:',
+			expect.any(Error)
+		);
+
+		// Cleanup
+		consoleSpy.mockRestore();
+	});
+
 });
