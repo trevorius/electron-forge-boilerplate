@@ -1,33 +1,25 @@
 import { jest } from '@jest/globals';
 
+// Create a variable to control shouldShowWindow behavior
+let shouldShowWindowValue = true;
+
+// Mock the main.helpers module
+jest.mock('./main.helpers', () => {
+	const actual = jest.requireActual('./main.helpers');
+	return {
+		...actual,
+		shouldShowWindow: jest.fn(() => shouldShowWindowValue)
+	};
+});
+
+// Import the actual helpers for testing
+import * as helpers from './main.helpers';
+
 // Create variables to track created windows and handlers
 let mainWindowInstance: any = null;
 let licenseWindowInstance: any = null;
 let appHandlers: { [key: string]: any } = {};
 let ipcHandlers: { [key: string]: any } = {};
-
-// Mock helper functions - these are the key to achieving branch coverage
-const mockHelpers = {
-	calculateOptimalWindowSize: jest.fn(() => ({ width: 1200, height: 800 })),
-	calculateLicenseWindowSize: jest.fn(() => ({ width: 900, height: 600 })),
-	buildStartUrl: jest.fn(() => 'http://localhost:5173'),
-	buildLicenseUrl: jest.fn(() => 'http://localhost:5173/license.html'),
-	buildMacOSMenu: jest.fn(() => [{ label: 'TestApp' }]),
-	getBasePath: jest.fn(() => '/test/path'),
-	shouldShowWindow: jest.fn(() => true),
-	shouldSendWindowEvent: jest.fn(() => true),
-	shouldQuitApp: jest.fn(() => true),
-	shouldSetupMacOSMenu: jest.fn(() => false),
-	shouldCreateNewWindow: jest.fn(() => true),
-	shouldFocusExistingWindow: jest.fn(() => false),
-	shouldReturnMainWindowStatus: jest.fn(() => true),
-	shouldCloseWindow: jest.fn(() => true),
-	handleWindowAction: jest.fn(),
-	handleWindowShow: jest.fn(),
-	handleWindowMaximizeToggle: jest.fn(),
-	getLocaleOrDefault: jest.fn(() => Promise.resolve('en')),
-	getParentWindow: jest.fn((mainWindow) => mainWindow || undefined)
-};
 
 // Mock Electron modules with full functionality
 const mockWebContents = {
@@ -130,6 +122,7 @@ describe('main.ts', () => {
 		appHandlers = {};
 		ipcHandlers = {};
 		process.env.NODE_ENV = 'development';
+		shouldShowWindowValue = true; // Reset to default value
 
 		// Reset platform for each test
 		Object.defineProperty(process, 'platform', {
@@ -250,7 +243,7 @@ describe('main.ts', () => {
 		// Test the new-window handler
 		const newWindowHandler = mockContents.on.mock.calls[0][1];
 		const mockEvent = { preventDefault: jest.fn() };
-		newWindowHandler(mockEvent, 'https://example.com');
+		(newWindowHandler as any)(mockEvent, 'https://example.com');
 
 		expect(mockEvent.preventDefault).toHaveBeenCalled();
 		expect(mockShell.openExternal).toHaveBeenCalledWith('https://example.com');
@@ -390,6 +383,26 @@ describe('main.ts', () => {
 		expect(licenseWindowInstance.show).toHaveBeenCalled();
 	});
 
+	it('should not show license window when shouldShowWindow returns false', async () => {
+		// Reset modules and set shouldShowWindow to return false
+		jest.resetModules();
+		shouldShowWindowValue = false;
+
+		await import('./main');
+
+		// Create license window
+		ipcHandlers['open-license-window']();
+
+		// Wait for the ready-to-show handler to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// The show method should NOT have been called
+		expect(licenseWindowInstance.show).not.toHaveBeenCalled();
+
+		// Reset the value back to true
+		shouldShowWindowValue = true;
+	});
+
 	it('should handle development mode and open dev tools', async () => {
 		process.env.NODE_ENV = 'development';
 
@@ -421,7 +434,7 @@ describe('main.ts', () => {
 		const handler = handlerCall[0];
 
 		// Test the handler
-		const result = handler({ url: 'https://example.com' });
+		const result = (handler as any)({ url: 'https://example.com' });
 
 		expect(mockShell.openExternal).toHaveBeenCalledWith('https://example.com');
 		expect(result).toEqual({ action: 'deny' });
@@ -432,13 +445,13 @@ describe('main.ts', () => {
 
 		// The main coverage has been achieved through the other tests
 		// These additional scenarios ensure all branches are covered
-		expect(mockHelpers.shouldSendWindowEvent).toBeDefined();
-		expect(mockHelpers.shouldCloseWindow).toBeDefined();
-		expect(mockHelpers.shouldReturnMainWindowStatus).toBeDefined();
-		expect(mockHelpers.shouldFocusExistingWindow).toBeDefined();
-		expect(mockHelpers.shouldShowWindow).toBeDefined();
-		expect(mockHelpers.shouldCreateNewWindow).toBeDefined();
-		expect(mockHelpers.shouldSetupMacOSMenu).toBeDefined();
-		expect(mockHelpers.shouldQuitApp).toBeDefined();
+		expect(helpers.shouldSendWindowEvent).toBeDefined();
+		expect(helpers.shouldCloseWindow).toBeDefined();
+		expect(helpers.shouldReturnMainWindowStatus).toBeDefined();
+		expect(helpers.shouldFocusExistingWindow).toBeDefined();
+		expect(helpers.shouldShowWindow).toBeDefined();
+		expect(helpers.shouldCreateNewWindow).toBeDefined();
+		expect(helpers.shouldSetupMacOSMenu).toBeDefined();
+		expect(helpers.shouldQuitApp).toBeDefined();
 	});
 });
