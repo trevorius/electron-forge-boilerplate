@@ -4,13 +4,22 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import styles from './LicenseApp.module.css';
-
-interface License {
-  id: string;
-  name: string;
-  content: string;
-}
+// Removed styles import to eliminate CSS module dependency in tests
+import {
+  License,
+  initializeLocale,
+  closeLicenseWindow,
+  createLicenses,
+  getCurrentLicense,
+  shouldShowNavigation,
+  generateTitle,
+  validateLicenseSelection,
+  formatLocaleError,
+  formatCloseError,
+  createLoadingState,
+  createHeaderClasses,
+  createCloseButtonClasses
+} from './LicenseApp.helpers';
 
 const LicenseApp: React.FC = () => {
   const { t } = useTranslation();
@@ -19,65 +28,67 @@ const LicenseApp: React.FC = () => {
 
   // Initialize locale from main app
   useEffect(() => {
-    const initializeLocale = async () => {
-      try {
-        const mainAppLocale = await window.electronAPI.getMainAppLocale();
-        await i18n.changeLanguage(mainAppLocale || 'en');
-      } catch (error) {
-        console.warn('Failed to get main app locale, using default', error);
-        await i18n.changeLanguage('en');
-      } finally {
-        setIsLoading(false);
+    const handleInitialization = async () => {
+      const result = await initializeLocale(
+        () => window.electronAPI.getMainAppLocale(),
+        (locale: string) => i18n.changeLanguage(locale)
+      );
+
+      if (result.error) {
+        console.warn(formatLocaleError(result.error));
       }
+
+      setIsLoading(false);
     };
 
-    initializeLocale();
+    handleInitialization();
   }, []);
 
   const handleClose = async () => {
-    try {
-      await window.electronAPI.closeLicenseWindow();
-    } catch (error) {
-      console.error('Failed to close license window:', error);
-      // Fallback: close the window manually
-      window.close();
+    const result = await closeLicenseWindow(
+      () => window.electronAPI.closeLicenseWindow(),
+      () => window.close()
+    );
+
+    if (!result.success || result.error) {
+      console.error(formatCloseError(result.error!));
     }
   };
 
-  // Define available licenses (extensible for future)
-  const licenses: License[] = [
-    {
-      id: 'main',
-      name: t('license.main', 'Main License'),
-      content: t('license.content')
-    },
-    // Future licenses can be added here
-  ];
+  const handleLicenseSelection = (licenseId: string) => {
+    const validId = validateLicenseSelection(licenseId, licenses);
+    setSelectedLicense(validId);
+  };
 
-  const currentLicense = licenses.find(license => license.id === selectedLicense) || licenses[0];
+  // Create license data
+  const licenses: License[] = createLicenses(t);
+  const currentLicense = getCurrentLicense(licenses, selectedLicense);
+  const showNavigation = shouldShowNavigation(licenses);
+  const title = generateTitle(t, licenses);
 
   if (isLoading) {
+    const loadingState = createLoadingState();
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
-        <div className="text-white">Loading...</div>
+      <div className={loadingState.className}>
+        <div className={loadingState.textClassName}>Loading...</div>
       </div>
     );
   }
 
   return (
       <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col">
-        <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 border-b ${styles.drag}`}>
+        <CardHeader className={createHeaderClasses('drag')}>
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600" />
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-              {t('license.title')}{licenses.length > 1 && `s`}
+              {title}
             </CardTitle>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className={`h-8 w-8 p-0 ${styles['no-drag']}`}
+            className={createCloseButtonClasses('no-drag')}
             aria-label={t('license.close')}
           >
             <X className="h-4 w-4" />
@@ -85,15 +96,15 @@ const LicenseApp: React.FC = () => {
         </CardHeader>
 
         <CardContent className="flex-1 flex flex-col p-6 min-h-0">
-          {/* Navigation for multiple licenses (future extensibility) */}
-          {licenses.length > 1 && (
+          {/* Navigation for multiple licenses */}
+          {showNavigation && (
             <div className="flex gap-2 mb-4 border-b pb-4">
               {licenses.map((license) => (
                 <Button
                   key={license.id}
                   variant={selectedLicense === license.id ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedLicense(license.id)}
+                  onClick={() => handleLicenseSelection(license.id)}
                   className="text-xs"
                 >
                   {license.name}
