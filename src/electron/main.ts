@@ -107,7 +107,7 @@ function createLicenseWindow(): void {
 		resizable: false,
 		minimizable: true,
 		maximizable: false,
-		parent: valueOrUndefined<BrowserWindow>(mainWindow ?? undefined),
+		parent: valueOrUndefined<BrowserWindow>(mainWindow),
 		modal: false
 	});
 

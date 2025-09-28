@@ -28,7 +28,7 @@ describe('main.helpers', () => {
 
   describe('valueOrUndefined', () => {
     it('should return undefined when value is undefined', () => {
-      expect(valueOrUndefined(undefined)).toBe(undefined);
+      expect(valueOrUndefined(null)).toBe(undefined);
     });
 
     it('should return value when value is not undefined', () => {

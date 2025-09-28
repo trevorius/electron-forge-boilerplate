@@ -8,8 +8,8 @@ export interface ScreenInfo {
 	height: number;
 }
 
-export function valueOrUndefined<T>(value: T | undefined): T | undefined {
-	return value;
+export function valueOrUndefined<T>(value: T | null): T | undefined {
+	return value ?? undefined;
 }
 
 export function calculateOptimalWindowSize(
