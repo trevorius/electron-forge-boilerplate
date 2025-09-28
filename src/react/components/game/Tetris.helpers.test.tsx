@@ -9,6 +9,7 @@ import {
   placePiece,
   clearLines,
   handleGameOverLogic,
+  handleGameOverDialogChange,
   handlePiecePlacement,
   calculateDropPosition,
   shouldGameEnd,
@@ -690,6 +691,29 @@ describe('Tetris Helper Functions', () => {
         expect(result[10][4]).toBe(0); // should remain empty
         expect(result[10][6]).toBe(0); // should remain empty
       });
+    });
+  });
+
+  describe('handleGameOverDialogChange', () => {
+    test('does nothing when called (intentionally empty function)', () => {
+      // This function is intentionally empty to prevent the game over dialog from closing
+      // It should execute without throwing errors or side effects
+      expect(() => {
+        handleGameOverDialogChange();
+      }).not.toThrow();
+
+      // Function should return undefined (void)
+      const result = handleGameOverDialogChange();
+      expect(result).toBeUndefined();
+    });
+
+    test('can be called multiple times without issues', () => {
+      // Test that the function can be called repeatedly
+      expect(() => {
+        handleGameOverDialogChange();
+        handleGameOverDialogChange();
+        handleGameOverDialogChange();
+      }).not.toThrow();
     });
   });
 });

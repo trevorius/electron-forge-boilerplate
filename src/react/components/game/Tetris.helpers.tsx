@@ -284,3 +284,12 @@ export const renderPieceOnBoard = (
 
   return displayBoard;
 };
+
+/**
+ * Handler for Dialog onOpenChange event - prevents game over dialog from closing
+ * This function intentionally does nothing to keep the game over dialog open
+ * until the user clicks "New Game"
+ */
+export const handleGameOverDialogChange = (): void => {
+  // Intentionally empty - prevents dialog from closing
+};

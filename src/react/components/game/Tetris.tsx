@@ -15,6 +15,7 @@ import {
   createResumeState,
   getRandomTetromino,
   handleFailedMovement,
+  handleGameOverDialogChange,
   handlePauseResume,
   handlePiecePlacement,
   isValidMove,
@@ -306,7 +307,7 @@ const Tetris: React.FC = () => {
         )}
       </div>
 
-      <Dialog open={gameOver} onOpenChange={() => {}}>
+      <Dialog open={gameOver} onOpenChange={handleGameOverDialogChange}>
         <DialogContent className="bg-red-900 border-red-600 text-white text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.gameOver')}</DialogTitle>
