@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import styles from './App.module.css';
 import Navbar from './components/common/Navbar';
 import { routes } from './routes';
 import './styles/globals.css';
@@ -9,7 +10,7 @@ function App() {
       <div className="fixed inset-0 flex flex-col bg-background">
         <Navbar />
         {/* Main content area with proper margin and scrolling */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className={`flex-1 overflow-auto ${styles['main-container']}`}>
           <Routes>
             {routes.map((route) => {
               const Component = route.component;
