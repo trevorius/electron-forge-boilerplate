@@ -50,7 +50,7 @@ const LicenseApp: React.FC = () => {
       id: 'main',
       name: t('license.main', 'Main License'),
       content: t('license.content')
-    }
+    },
     // Future licenses can be added here
   ];
 
@@ -65,26 +65,26 @@ const LicenseApp: React.FC = () => {
   }
 
   return (
-      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col overflow-hidden">
+      <Card className="w-full h-full bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col">
         <CardHeader className={`flex flex-row items-center justify-between space-y-0 pb-4 border-b ${styles.drag}`}>
           <div className="flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600" />
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-              {t('license.title')}
+              {t('license.title')}{licenses.length > 1 && `s`}
             </CardTitle>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="h-8 w-8 p-0"
+            className={`h-8 w-8 p-0 ${styles['no-drag']}`}
             aria-label={t('license.close')}
           >
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
 
-        <CardContent className="flex-1 overflow-hidden flex flex-col p-6">
+        <CardContent className="flex-1 flex flex-col p-6 min-h-0">
           {/* Navigation for multiple licenses (future extensibility) */}
           {licenses.length > 1 && (
             <div className="flex gap-2 mb-4 border-b pb-4">
@@ -103,8 +103,8 @@ const LicenseApp: React.FC = () => {
           )}
 
           {/* License content */}
-          <div className="flex-1 overflow-auto">
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border h-full">
+          <div className="flex-1 overflow-auto min-h-0">
+            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border">
               <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-200">
                 {currentLicense.name}
               </h3>
