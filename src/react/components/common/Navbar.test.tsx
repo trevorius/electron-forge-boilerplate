@@ -40,7 +40,7 @@ jest.mock('../ui/navigation-menu', () => ({
   NavigationMenuItem: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="navigation-menu-item">{children}</div>
   ),
-  NavigationMenuLink: ({ children, className, ...props }: any) => (
+  NavigationMenuLink: ({ children, className, asChild, ...props }: any) => (
     <div data-testid="navigation-menu-link" className={className} {...props}>
       {children}
     </div>

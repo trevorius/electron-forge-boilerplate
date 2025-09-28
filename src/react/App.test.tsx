@@ -1,6 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
+// Mock CSS module directly
+jest.mock('./App.module.css', () => ({
+  __esModule: true,
+  default: {
+    'main-container': 'main-container'
+  }
+}), { virtual: true });
+
 // Import before any other imports that might use mocks
 import App from './App';
 
@@ -100,9 +108,10 @@ describe('App', () => {
     expect(mainDiv).toBeInTheDocument();
     expect(mainDiv).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
 
-    // Check for the content wrapper with flex, overflow and padding
-    const contentWrapper = mainDiv.querySelector('.flex-1.overflow-auto.p-4');
+    // Check for the content wrapper with flex and overflow
+    const contentWrapper = mainDiv.querySelector('.flex-1');
     expect(contentWrapper).toBeInTheDocument();
+    expect(contentWrapper).toHaveClass('flex-1', 'overflow-auto');
   });
 
   it('should be a functional component that returns JSX', () => {

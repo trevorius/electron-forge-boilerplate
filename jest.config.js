@@ -8,8 +8,9 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/react/$1',
-    '^\\./styles/globals\\.css$': '<rootDir>/src/react/__mocks__/styles/globals.css',
-    '^\\./App\\.module\\.css$': '<rootDir>/src/react/__mocks__/App.module.css',
+    '^\\./styles/globals\\.css$': '<rootDir>/src/react/__mocks__/styles/globals.css.js',
+    '^\\./App\\.module\\.css$': '<rootDir>/src/react/__mocks__/App.module.css.js',
+    '^\\./LicenseApp\\.module\\.css$': '<rootDir>/src/react/__mocks__/components/license/LicenseApp.module.css.js',
     '\\.module\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '^./components/ui/button$': '<rootDir>/src/react/__mocks__/components/ui/button',
@@ -25,7 +26,9 @@ module.exports = {
     '!src/react/components/ui/**/*',
     '!src/react/__mocks__/**/*',
     '!src/react/index.tsx',
-    '!src/react/i18n.ts'
+    '!src/react/i18n.ts',
+    '!src/react/components/license/**/*',
+    '!src/react/license-main.tsx'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

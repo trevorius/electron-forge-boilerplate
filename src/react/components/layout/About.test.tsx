@@ -60,28 +60,19 @@ jest.mock('../common/LanguageSelector', () => {
   };
 });
 
-// Mock LicenseModal
-jest.mock('../common/LicenseModal', () => {
-  return {
-    __esModule: true,
-    default: function MockLicenseModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-      return (
-        <div data-testid="mock-license-modal" data-open={isOpen}>
-          {isOpen && (
-            <>
-              <div>License Modal Content</div>
-              <button onClick={onClose} data-testid="modal-close-button">Close</button>
-            </>
-          )}
-        </div>
-      );
-    }
-  };
+// Mock window.electronAPI
+const mockOpenLicenseWindow = jest.fn();
+Object.defineProperty(window, 'electronAPI', {
+  value: {
+    openLicenseWindow: mockOpenLicenseWindow,
+  },
+  writable: true,
 });
 
 describe('About', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockOpenLicenseWindow.mockClear();
     mockUseTranslation.mockReturnValue({
       t: (key: string) => {
         const translations: { [key: string]: string } = {
@@ -192,62 +183,47 @@ describe('About', () => {
     expect(screen.getByTestId('mock-button')).toBeInTheDocument();
   });
 
-  it('should open license modal when view license button is clicked', async () => {
+  it('should call electronAPI.openLicenseWindow when view license button is clicked', async () => {
     const user = userEvent.setup();
     render(<About />);
-
-    // Initially modal should be closed
-    const modal = screen.getByTestId('mock-license-modal');
-    expect(modal).toHaveAttribute('data-open', 'false');
 
     // Click the view license button
     const viewLicenseButton = screen.getByText('View License');
     await user.click(viewLicenseButton);
 
-    // Modal should now be open
-    expect(modal).toHaveAttribute('data-open', 'true');
-    expect(screen.getByText('License Modal Content')).toBeInTheDocument();
+    // Should call the electron API
+    expect(mockOpenLicenseWindow).toHaveBeenCalledTimes(1);
   });
 
-  it('should close license modal when close button is clicked', async () => {
-    const user = userEvent.setup();
+  it('should handle license window opening with fireEvent', () => {
     render(<About />);
-
-    // Open the modal first
-    const viewLicenseButton = screen.getByText('View License');
-    await user.click(viewLicenseButton);
-
-    // Verify modal is open
-    const modal = screen.getByTestId('mock-license-modal');
-    expect(modal).toHaveAttribute('data-open', 'true');
-
-    // Close the modal
-    const closeButton = screen.getByTestId('modal-close-button');
-    await user.click(closeButton);
-
-    // Modal should now be closed
-    expect(modal).toHaveAttribute('data-open', 'false');
-  });
-
-  it('should handle license modal state correctly with fireEvent', () => {
-    render(<About />);
-
-    // Initially modal should be closed
-    const modal = screen.getByTestId('mock-license-modal');
-    expect(modal).toHaveAttribute('data-open', 'false');
 
     // Click the view license button
     const viewLicenseButton = screen.getByText('View License');
     fireEvent.click(viewLicenseButton);
 
-    // Modal should now be open
-    expect(modal).toHaveAttribute('data-open', 'true');
+    // Should call the electron API
+    expect(mockOpenLicenseWindow).toHaveBeenCalledTimes(1);
+  });
 
-    // Close the modal
-    const closeButton = screen.getByTestId('modal-close-button');
-    fireEvent.click(closeButton);
+  it('should handle error when electronAPI.openLicenseWindow fails', async () => {
+    const user = userEvent.setup();
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockOpenLicenseWindow.mockRejectedValueOnce(new Error('Failed to open window'));
 
-    // Modal should now be closed
-    expect(modal).toHaveAttribute('data-open', 'false');
+    render(<About />);
+
+    // Click the view license button
+    const viewLicenseButton = screen.getByText('View License');
+    await user.click(viewLicenseButton);
+
+    // Should call the electron API and handle error
+    expect(mockOpenLicenseWindow).toHaveBeenCalledTimes(1);
+
+    // Wait for error handling
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to open license window:', expect.any(Error));
+
+    consoleErrorSpy.mockRestore();
   });
 });
