@@ -286,10 +286,14 @@ export const renderPieceOnBoard = (
 };
 
 /**
- * Handler for Dialog onOpenChange event - prevents game over dialog from closing
- * This function intentionally does nothing to keep the game over dialog open
- * until the user clicks "New Game"
+ * Handler for Dialog onOpenChange event - allows closing the game over dialog
+ * This function updates the dialog visibility state when users try to close it
+ * @param open - The new open state of the dialog
+ * @param setShowGameOverDialog - State setter function to update dialog visibility
  */
-export const handleGameOverDialogChange = (): void => {
-  // Intentionally empty - prevents dialog from closing
+export const handleGameOverDialogChange = (
+  open: boolean,
+  setShowGameOverDialog: (show: boolean) => void
+): void => {
+  setShowGameOverDialog(open);
 };

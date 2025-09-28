@@ -695,25 +695,35 @@ describe('Tetris Helper Functions', () => {
   });
 
   describe('handleGameOverDialogChange', () => {
-    test('does nothing when called (intentionally empty function)', () => {
-      // This function is intentionally empty to prevent the game over dialog from closing
-      // It should execute without throwing errors or side effects
-      expect(() => {
-        handleGameOverDialogChange();
-      }).not.toThrow();
+    test('calls setShowGameOverDialog with the provided open state', () => {
+      const mockSetShowGameOverDialog = jest.fn();
 
-      // Function should return undefined (void)
-      const result = handleGameOverDialogChange();
+      // Test closing the dialog
+      handleGameOverDialogChange(false, mockSetShowGameOverDialog);
+      expect(mockSetShowGameOverDialog).toHaveBeenCalledWith(false);
+
+      // Test opening the dialog
+      handleGameOverDialogChange(true, mockSetShowGameOverDialog);
+      expect(mockSetShowGameOverDialog).toHaveBeenCalledWith(true);
+
+      expect(mockSetShowGameOverDialog).toHaveBeenCalledTimes(2);
+    });
+
+    test('returns undefined (void function)', () => {
+      const mockSetShowGameOverDialog = jest.fn();
+      const result = handleGameOverDialogChange(false, mockSetShowGameOverDialog);
       expect(result).toBeUndefined();
     });
 
-    test('can be called multiple times without issues', () => {
-      // Test that the function can be called repeatedly
-      expect(() => {
-        handleGameOverDialogChange();
-        handleGameOverDialogChange();
-        handleGameOverDialogChange();
-      }).not.toThrow();
+    test('can be called with different state setter functions', () => {
+      const mockSetter1 = jest.fn();
+      const mockSetter2 = jest.fn();
+
+      handleGameOverDialogChange(true, mockSetter1);
+      handleGameOverDialogChange(false, mockSetter2);
+
+      expect(mockSetter1).toHaveBeenCalledWith(true);
+      expect(mockSetter2).toHaveBeenCalledWith(false);
     });
   });
 });

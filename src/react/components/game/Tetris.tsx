@@ -39,6 +39,7 @@ const Tetris: React.FC = () => {
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [dropTime, setDropTime] = useState(1000);
+  const [showGameOverDialog, setShowGameOverDialog] = useState(false);
 
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -53,6 +54,7 @@ const Tetris: React.FC = () => {
     if (shouldGameEnd(board, newPiece)) {
       setGameOver(true);
       setIsPlaying(false);
+      setShowGameOverDialog(true);
     } else {
       setCurrentPiece(newPiece);
     }
@@ -118,6 +120,7 @@ const Tetris: React.FC = () => {
     setDropTime(gameState.dropTime);
     setCurrentPiece(gameState.currentPiece);
     setNextPiece(gameState.nextPiece);
+    setShowGameOverDialog(false);
   };
 
   const pauseGame = () => {
@@ -307,7 +310,7 @@ const Tetris: React.FC = () => {
         )}
       </div>
 
-      <Dialog open={gameOver} onOpenChange={handleGameOverDialogChange}>
+      <Dialog open={showGameOverDialog} onOpenChange={(open) => handleGameOverDialogChange(open, setShowGameOverDialog)}>
         <DialogContent className="bg-red-900 border-red-600 text-white text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.gameOver')}</DialogTitle>

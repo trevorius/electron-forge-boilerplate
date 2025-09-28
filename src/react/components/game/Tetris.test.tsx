@@ -2316,11 +2316,8 @@ describe('Tetris Component', () => {
     expect(previewCells.length).toBeGreaterThan(0);
   });
 
-  test('covers Dialog onOpenChange function by triggering game over', async () => {
+  test('covers Dialog onOpenChange function by triggering game over and closing dialog', async () => {
     renderWithI18n(<Tetris />);
-
-    // We need to force a game over state to open the Dialog
-    // Let's use the existing test infrastructure that forces game conditions
 
     // Start the game
     fireEvent.click(screen.getByText(testI18n.t('tetris.startGame')));
@@ -2347,14 +2344,22 @@ describe('Tetris Component', () => {
       const gameOverText = screen.queryByText(testI18n.t('tetris.gameOver'));
 
       if (gameOverText) {
-        // Game over dialog is open! Now try to trigger onOpenChange by pressing ESC
+        // Game over dialog is open!
+        expect(gameOverText).toBeInTheDocument();
+
+        // Now try to close the dialog by pressing ESC
         await act(() => {
           fireEvent.keyDown(document, { key: 'Escape' });
         });
 
-        // The onOpenChange={() => {}} function should have been called
-        // Since it's empty, the dialog should still be open (function does nothing)
-        expect(gameOverText).toBeInTheDocument();
+        // The dialog should now be closed since handleGameOverDialogChange allows closing
+        // Wait a moment for the dialog to close
+        await act(() => {
+          jest.advanceTimersByTime(100);
+        });
+
+        // Dialog should be closed now
+        expect(screen.queryByText(testI18n.t('tetris.gameOver'))).not.toBeInTheDocument();
       }
     } finally {
       delete (window as unknown as { testForceCollision?: boolean }).testForceCollision;
