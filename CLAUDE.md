@@ -63,3 +63,4 @@ This approach has proven successful in achieving 99%+ coverage by moving untesta
 - document complex features in `.doc.md` files with comprehensive developer-oriented documentation
 - documentation files should back link to README.md and be linked in README.md
 - use `<fileName>.doc.md` naming for VSCode file nesting
+- ALWAYS internationalise client facing text

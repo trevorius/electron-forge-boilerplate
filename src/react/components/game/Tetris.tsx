@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Card } from '../ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import {
   BOARD_WIDTH,
   calculateDropPosition,
@@ -26,6 +28,7 @@ import {
 const CELL_SIZE = 30;
 
 const Tetris: React.FC = () => {
+  const { t } = useTranslation();
   const [board, setBoard] = useState<number[][]>(createEmptyBoard);
   const [currentPiece, setCurrentPiece] = useState<GamePiece | null>(null);
   const [nextPiece, setNextPiece] = useState<Tetromino>(getRandomTetromino);
@@ -235,7 +238,7 @@ const Tetris: React.FC = () => {
 
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center space-y-4 p-4">
-      <h1 className="text-3xl font-bold text-white mb-4">Tetris</h1>
+      <h1 className="text-3xl font-bold text-white mb-4">{t('tetris.title')}</h1>
 
       <div className="flex space-x-8">
         <Card className="p-4 bg-gray-800 border-gray-600">
@@ -246,33 +249,33 @@ const Tetris: React.FC = () => {
 
         <div className="space-y-4">
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">Score</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('tetris.score')}</h3>
             <p className="text-2xl font-bold">{score}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">Level</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('tetris.level')}</h3>
             <p className="text-xl">{level}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">Lines</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('tetris.lines')}</h3>
             <p className="text-xl">{lines}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">Next</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('tetris.next')}</h3>
             <div className="flex flex-col items-center">
               {renderNextPiece()}
             </div>
           </Card>
           <Card className="p-4 bg-gray-800 border-gray-600 text-white text-sm">
-        <h3 className="font-semibold mb-2">Controls:</h3>
-        <p>← → : Move left/right</p>
-        <p>↓ : Soft drop</p>
-        <p>↑ : Rotate</p>
-        <p>Space : Hard drop</p>
-        <p>P : Pause/Resume</p>
+        <h3 className="font-semibold mb-2">{t('tetris.controls')}</h3>
+        <p>{t('tetris.controlMoveLeft')}</p>
+        <p>{t('tetris.controlSoftDrop')}</p>
+        <p>{t('tetris.controlRotate')}</p>
+        <p>{t('tetris.controlHardDrop')}</p>
+        <p>{t('tetris.controlPause')}</p>
       </Card>
         </div>
       </div>
@@ -280,35 +283,40 @@ const Tetris: React.FC = () => {
       <div className="flex space-x-2">
         {!isPlaying && !gameOver && (
           <Button onClick={startGame} className="bg-green-600 hover:bg-green-700">
-            Start Game
+            {t('tetris.startGame')}
           </Button>
         )}
 
         {!isPlaying && gameOver && (
           <Button onClick={startGame} className="bg-blue-600 hover:bg-blue-700">
-            New Game
+            {t('tetris.newGame')}
           </Button>
         )}
 
         {isPlaying && (
           <Button onClick={pauseGame} className="bg-yellow-600 hover:bg-yellow-700">
-            Pause
+            {t('tetris.pause')}
           </Button>
         )}
 
         {!isPlaying && !gameOver && currentPiece && (
           <Button onClick={resumeGame} className="bg-green-600 hover:bg-green-700">
-            Resume
+            {t('tetris.resume')}
           </Button>
         )}
       </div>
 
-      {gameOver && (
-        <Card className="p-4 bg-red-900 border-red-600 text-white text-center">
-          <h2 className="text-2xl font-bold mb-2">Game Over!</h2>
-          <p className="text-lg">Final Score: {score}</p>
-        </Card>
-      )}
+      <Dialog open={gameOver} onOpenChange={() => {}}>
+        <DialogContent className="bg-red-900 border-red-600 text-white text-center">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.gameOver')}</DialogTitle>
+          </DialogHeader>
+          <p className="text-lg mb-4">{t('tetris.finalScore', { score })}</p>
+          <Button onClick={startGame} className="bg-blue-600 hover:bg-blue-700">
+            {t('tetris.newGame')}
+          </Button>
+        </DialogContent>
+      </Dialog>
 
 </div>
   );

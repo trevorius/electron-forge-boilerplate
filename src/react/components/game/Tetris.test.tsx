@@ -1,10 +1,41 @@
 import React, { useState } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { I18nextProvider } from 'react-i18next';
+import i18n, { createInstance } from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import en from '../../locales/en.json';
 import Tetris from './Tetris';
+
+// Create a test-specific i18n instance
+const testI18n = createInstance();
+testI18n
+  .use(initReactI18next)
+  .init({
+    lng: 'en',
+    fallbackLng: 'en',
+    debug: false,
+    resources: {
+      en: {
+        translation: en
+      }
+    },
+    interpolation: {
+      escapeValue: false
+    }
+  });
 
 // Mock timers for testing intervals
 jest.useFakeTimers();
+
+// Wrapper component to provide i18n context
+const renderWithI18n = (component: React.ReactElement) => {
+  return render(
+    <I18nextProvider i18n={testI18n}>
+      {component}
+    </I18nextProvider>
+  );
+};
 
 describe('Tetris Component', () => {
   beforeEach(() => {
@@ -20,12 +51,14 @@ describe('Tetris Component', () => {
   });
 
   test('renders Tetris game title', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
+    // Debug: log what's actually being rendered
+    screen.debug();
     expect(screen.getByText('Tetris')).toBeInTheDocument();
   });
 
   test('renders initial game state', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     expect(screen.getByText('Score')).toBeInTheDocument();
     expect(screen.getAllByText('0')).toHaveLength(2); // Score and Lines both start at 0
@@ -36,12 +69,12 @@ describe('Tetris Component', () => {
   });
 
   test('shows start game button initially', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
     expect(screen.getByText('Start Game')).toBeInTheDocument();
   });
 
   test('starts game when start button is clicked', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     const startButton = screen.getByText('Start Game');
     fireEvent.click(startButton);
@@ -51,7 +84,7 @@ describe('Tetris Component', () => {
   });
 
   test('pauses game when pause button is clicked', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -66,7 +99,7 @@ describe('Tetris Component', () => {
   });
 
   test('resumes game when resume button is clicked', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -85,7 +118,7 @@ describe('Tetris Component', () => {
   });
 
   test('renders controls instructions', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     expect(screen.getByText('Controls:')).toBeInTheDocument();
     expect(screen.getByText('← → : Move left/right')).toBeInTheDocument();
@@ -96,7 +129,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles keyboard input for movement', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -114,7 +147,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles pause/resume with keyboard', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -135,7 +168,7 @@ describe('Tetris Component', () => {
   });
 
   test('does not respond to keyboard input when not playing', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Without starting the game, keyboard input should not affect anything
     fireEvent.keyDown(window, { key: 'ArrowLeft' });
@@ -146,7 +179,7 @@ describe('Tetris Component', () => {
   });
 
   test('displays game board', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // The game board should be rendered (checking for the container)
     const gameContainer = screen.getByText('Tetris').closest('div');
@@ -154,7 +187,7 @@ describe('Tetris Component', () => {
   });
 
   test('shows new game button when game is over', () => {
-    const { rerender } = render(<Tetris />);
+    const { rerender } = renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -162,14 +195,14 @@ describe('Tetris Component', () => {
 
     // Simulate game over state by rerendering
     // Note: This is a simplified test since triggering actual game over requires complex state manipulation
-    rerender(<Tetris />);
+    rerenderWithI18n(<Tetris />);
 
     // The component should handle game over states
     expect(screen.getByText('Tetris')).toBeInTheDocument();
   });
 
   test('prevents default behavior on arrow key presses during gameplay', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -184,7 +217,7 @@ describe('Tetris Component', () => {
   });
 
   test('ignores invalid keyboard inputs', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -200,7 +233,7 @@ describe('Tetris Component', () => {
   });
 
   test('updates drop time based on level progression', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -216,7 +249,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles component cleanup properly', () => {
-    const { unmount } = render(<Tetris />);
+    const { unmount } = renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -227,7 +260,7 @@ describe('Tetris Component', () => {
   });
 
   test('maintains score display format', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Score should be displayed as a number
     const scoreElements = screen.getAllByText('0');
@@ -235,14 +268,14 @@ describe('Tetris Component', () => {
   });
 
   test('displays next piece preview', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Next piece section should be visible
     expect(screen.getByText('Next')).toBeInTheDocument();
   });
 
   test('handles rapid key presses without breaking', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     const startButton = screen.getByText('Start Game');
@@ -259,7 +292,7 @@ describe('Tetris Component', () => {
   });
 
   test('renders all UI sections', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Check that all major UI sections are present
     expect(screen.getByText('Score')).toBeInTheDocument();
@@ -270,7 +303,7 @@ describe('Tetris Component', () => {
   });
 
   test('game state persists during pause/resume cycle', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -286,7 +319,7 @@ describe('Tetris Component', () => {
   });
 
   test('starts new game resets all values', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -299,7 +332,7 @@ describe('Tetris Component', () => {
   });
 
   test('simulates game over scenario', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -314,7 +347,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles hard drop functionality', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -334,7 +367,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles rotation functionality', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -354,7 +387,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles piece movement and placement', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -376,7 +409,7 @@ describe('Tetris Component', () => {
   });
 
   test('automatic piece falling', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -391,7 +424,7 @@ describe('Tetris Component', () => {
   });
 
   test('level progression and speed increase', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -406,7 +439,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles invalid piece placement attempts', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -428,7 +461,7 @@ describe('Tetris Component', () => {
   });
 
   test('displays game over message when game ends', () => {
-    const { rerender } = render(<Tetris />);
+    const { rerender } = renderWithI18n(<Tetris />);
 
     // This test verifies the game over UI would be shown
     // In a real scenario, game over happens when pieces can't spawn
@@ -436,14 +469,14 @@ describe('Tetris Component', () => {
   });
 
   test('new game button appears after game over', () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start and verify initial state
     expect(screen.getByText('Start Game')).toBeInTheDocument();
   });
 
   test('score and lines tracking', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -459,7 +492,7 @@ describe('Tetris Component', () => {
   });
 
   test('next piece preview functionality', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -474,7 +507,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles line clearing mechanics', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -497,7 +530,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles collision detection edge cases', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -522,7 +555,7 @@ describe('Tetris Component', () => {
   });
 
   test('simulates game over condition', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -540,7 +573,7 @@ describe('Tetris Component', () => {
   });
 
   test('handles piece rotation at boundaries', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -563,7 +596,7 @@ describe('Tetris Component', () => {
   });
 
   test('piece placement and line detection', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -585,7 +618,7 @@ describe('Tetris Component', () => {
   });
 
   test('validates piece movements near board boundaries', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -610,7 +643,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers collision detection with existing pieces on board', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -640,7 +673,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers line clearing when new board rows are added', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -670,7 +703,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers game over when new piece cannot spawn', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -701,7 +734,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers piece placement and scoring on collision with bottom', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -725,7 +758,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers all edge cases for collision detection', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -758,7 +791,7 @@ describe('Tetris Component', () => {
 
   test('force coverage of specific lines with mocking', async () => {
     // This test uses more aggressive tactics to force coverage
-    const component = render(<Tetris />);
+    const component = renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -789,7 +822,7 @@ describe('Tetris Component', () => {
   });
 
   test('test specific board filling patterns for line clearing', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -822,7 +855,7 @@ describe('Tetris Component', () => {
   });
 
   test('test game over condition with board overflow', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -860,7 +893,7 @@ describe('Tetris Component', () => {
     const originalRandom = Math.random;
     Math.random = jest.fn(() => 0.1); // This should generate predictable pieces
 
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -919,7 +952,7 @@ describe('Tetris Component', () => {
     // Set test flag to force line clearing
     (window as any).testForceClearLines = true;
 
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -948,7 +981,7 @@ describe('Tetris Component', () => {
     // Set test flag to force collision
     (window as any).testForceCollision = true;
 
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -975,7 +1008,7 @@ describe('Tetris Component', () => {
   });
 
   test('trigger game over condition for coverage', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1004,7 +1037,7 @@ describe('Tetris Component', () => {
   });
 
   test('cover final uncovered lines 123 and 164', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1063,7 +1096,7 @@ describe('Tetris Component', () => {
     // This test will create a board configuration that should trigger real line clearing
     // and execute line 164 (adding empty rows after clearing)
 
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1167,7 +1200,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers uncovered line 157 - P key for pause/resume toggle', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1200,7 +1233,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers uncovered lines when no current piece is present', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Test keyboard input when no game is started (no current piece)
     await act(() => {
@@ -1216,7 +1249,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers board rendering with current piece boundary checks (line 205)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game to get a current piece
     fireEvent.click(screen.getByText('Start Game'));
@@ -1251,7 +1284,7 @@ describe('Tetris Component', () => {
     // Create a spy that will return false to trigger the guard clause
     const canPieceMoveSpy = jest.spyOn(tetrisHelpers, 'canPieceMove').mockReturnValue(false);
 
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1275,7 +1308,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers resume game when not game over (line 117-119)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1296,7 +1329,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers piece placement with game over false scenario', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1374,7 +1407,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers movePiece with null currentPiece to test guard clause', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Don't start the game, so currentPiece remains null
 
@@ -1390,7 +1423,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers automatic game loop interval clearing', async () => {
-    const { unmount } = render(<Tetris />);
+    const { unmount } = renderWithI18n(<Tetris />);
 
     // Start the game to create intervals
     fireEvent.click(screen.getByText('Start Game'));
@@ -1410,7 +1443,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers piece placement when movement fails (lines 64-70)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1444,7 +1477,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers rotatePiece function (lines 73-85)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1474,7 +1507,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers dropPiece function (lines 87-98)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1492,7 +1525,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers startGame function (lines 100-110)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // This directly tests the startGame function by clicking the button
     fireEvent.click(screen.getByText('Start Game'));
@@ -1502,7 +1535,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers pauseGame and resumeGame functions (lines 112-120)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1522,7 +1555,7 @@ describe('Tetris Component', () => {
     console.error = jest.fn(); // Suppress React warnings for this test
 
     try {
-      render(<Tetris />);
+      renderWithI18n(<Tetris />);
 
       // Start the game
       fireEvent.click(screen.getByText('Start Game'));
@@ -1551,7 +1584,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers game over with resumeGame when game is over', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1585,7 +1618,7 @@ describe('Tetris Component', () => {
   });
 
   test('directly test rotatePiece with game over condition', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1652,7 +1685,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers line 198 directly with real Tetris component', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1681,7 +1714,7 @@ describe('Tetris Component', () => {
   });
 
   test('force exact lines 64-74 coverage with precise mocking', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1718,7 +1751,7 @@ describe('Tetris Component', () => {
   });
 
   test('force exact lines 88-117 coverage for game controls', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Test dropPiece function (lines 87-98)
     // Start the game first
@@ -1752,7 +1785,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers dropPiece null check (lines 88-89)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Don't start the game, so currentPiece is null
     // Try to drop piece with space key
@@ -1765,7 +1798,7 @@ describe('Tetris Component', () => {
   });
 
   test('covers rotatePiece null check (lines 74-75)', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Don't start the game, so currentPiece is null
     // Try to rotate piece
@@ -1779,7 +1812,7 @@ describe('Tetris Component', () => {
 
   test('ultimate boundary test for line 198', async () => {
     // Create a direct test of the renderBoard function with precise boundary conditions
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game to get a piece
     fireEvent.click(screen.getByText('Start Game'));
@@ -1817,7 +1850,7 @@ describe('Tetris Component', () => {
   });
 
   test('trigger resumeGame with gameOver true condition', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1853,7 +1886,7 @@ describe('Tetris Component', () => {
 
   test('FINAL COVERAGE PUSH - Direct code path execution', async () => {
     // This test will use the most aggressive approach to hit every single uncovered line
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
@@ -1988,7 +2021,7 @@ describe('Tetris Component', () => {
 
   test('COVERAGE HAMMER - Every remaining line', async () => {
     // This test will systematically target every single remaining uncovered line
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Ensure we start fresh
     expect(screen.getByText('Start Game')).toBeInTheDocument();
@@ -2062,7 +2095,7 @@ describe('Tetris Component', () => {
   });
 
   test('FINAL PUSH - Hit exact remaining lines 72-77, 82, 96', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start the game
     fireEvent.click(screen.getByText('Start Game'));
@@ -2110,7 +2143,7 @@ describe('Tetris Component', () => {
   });
 
   test('100% COVERAGE FINAL TEST - Precise targeting', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game to get a piece
     fireEvent.click(screen.getByText('Start Game'));
@@ -2167,7 +2200,7 @@ describe('Tetris Component', () => {
   });
 
   test('ULTIMATE FINAL TEST - Hit line 72 edge case for 100% branch coverage', async () => {
-    render(<Tetris />);
+    renderWithI18n(<Tetris />);
 
     // Start game
     fireEvent.click(screen.getByText('Start Game'));
