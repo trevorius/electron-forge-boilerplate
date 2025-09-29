@@ -138,10 +138,19 @@ function createLicenseWindow(): void {
 app.whenReady().then(async () => {
 	// Initialize high score service and register IPC handlers
 	try {
+		// Initialize high score service and register handlers
+		// The controller will also initialize the service but we do it here for redundancy
 		await highScoreService.initialize();
-		HighScoreController.registerHandlers();
+		await HighScoreController.registerHandlers();
+		console.log('High score service and handlers initialized');
 	} catch (error) {
 		console.error('Failed to initialize high score service:', error);
+		// Try to register handlers anyway in case the service can recover
+		try {
+			await HighScoreController.registerHandlers();
+		} catch (handlerError) {
+			console.error('Failed to register high score handlers:', handlerError);
+		}
 	}
 
 	createWindow();

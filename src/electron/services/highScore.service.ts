@@ -1,5 +1,6 @@
 import { PrismaClient } from '../generated/prisma';
 import * as path from 'path';
+import * as fs from 'fs';
 import { app } from 'electron';
 
 export interface ScoreRecord {
@@ -43,16 +44,70 @@ export class HighScoreService {
     return `file:${dbPath}`;
   }
 
+  private getDatabasePath(): string {
+    const isDev = process.env.NODE_ENV === 'development';
+
+    if (isDev) {
+      return path.join(process.cwd(), 'prisma', 'database.db');
+    }
+
+    const userDataPath = app.getPath('userData');
+    return path.join(userDataPath, 'database.db');
+  }
+
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
     try {
+      // Ensure database exists and has proper schema
+      await this.ensureDatabaseExists();
+
       await this.prisma.$connect();
+
+      // Check if tables exist, create them if not
+      await this.ensureTablesExist();
+
       this.initialized = true;
-      console.log('Database connected successfully');
+      console.log('Database connected and initialized successfully');
     } catch (error) {
       console.error('Failed to initialize database:', error);
       throw error;
+    }
+  }
+
+  private async ensureDatabaseExists(): Promise<void> {
+    const dbPath = this.getDatabasePath();
+    const dbDir = path.dirname(dbPath);
+
+    // Ensure directory exists
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+
+    // If database doesn't exist, it will be created when we connect
+    if (!fs.existsSync(dbPath)) {
+      console.log('Creating new database at:', dbPath);
+    }
+  }
+
+  private async ensureTablesExist(): Promise<void> {
+    try {
+      // Try to query the scores table
+      await this.prisma.$queryRaw`SELECT 1 FROM scores LIMIT 1`;
+      console.log('Scores table exists');
+    } catch (error) {
+      // Table doesn't exist, create it
+      console.log('Creating scores table...');
+      await this.prisma.$executeRaw`
+        CREATE TABLE IF NOT EXISTS "scores" (
+          "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+          "name" TEXT NOT NULL,
+          "score" INTEGER NOT NULL,
+          "game" TEXT NOT NULL,
+          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      console.log('Scores table created successfully');
     }
   }
 

@@ -11,7 +11,16 @@ export class HighScoreController {
    * Initialize all high score-related IPC handlers
    * Call this from main.ts after the app is ready
    */
-  static registerHandlers(): void {
+  static async registerHandlers(): Promise<void> {
+    // Initialize the database first
+    try {
+      await highScoreService.initialize();
+      console.log('High score service initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize high score service:', error);
+      // Continue anyway - the service will try to initialize on first use
+    }
+
     // Save a high score
     ipcMain.handle('save-score', async (_event, scoreData: CreateScoreRequest) => {
       try {
