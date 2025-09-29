@@ -1,5 +1,6 @@
 import { HighScoreService } from './highScore.service';
 import { PrismaClient } from '../generated/prisma';
+import * as fs from 'fs';
 
 // Mock fs module
 jest.mock('fs', () => ({
@@ -77,6 +78,37 @@ describe('HighScoreService', () => {
       process.env.NODE_ENV = 'production';
       const service = new HighScoreService();
       expect(service['getDatabasePath']()).toBe('/mock/userData/database.db');
+    });
+  });
+
+  describe('ensureDatabaseExists', () => {
+    it('should create directory if it does not exist (line 84)', async () => {
+      const mockFs = fs as jest.Mocked<typeof fs>;
+
+      // Mock directory doesn't exist
+      mockFs.existsSync.mockReturnValueOnce(false).mockReturnValueOnce(true);
+      mockPrismaInstance.$connect.mockResolvedValue(undefined);
+      mockPrismaInstance.$queryRaw.mockResolvedValue([{ 1: 1 }]);
+
+      await service.initialize();
+
+      expect(mockFs.mkdirSync).toHaveBeenCalledWith(expect.any(String), { recursive: true });
+    });
+
+    it('should log message when database file does not exist (line 89)', async () => {
+      const mockFs = fs as jest.Mocked<typeof fs>;
+
+      // Mock directory exists but database file doesn't exist
+      mockFs.existsSync.mockReturnValueOnce(true).mockReturnValueOnce(false);
+      mockPrismaInstance.$connect.mockResolvedValue(undefined);
+      mockPrismaInstance.$queryRaw.mockResolvedValue([{ 1: 1 }]);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+      await service.initialize();
+
+      expect(consoleSpy).toHaveBeenCalledWith('Creating new database at:', expect.any(String));
+      consoleSpy.mockRestore();
     });
   });
 

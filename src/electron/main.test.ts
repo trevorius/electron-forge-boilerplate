@@ -676,6 +676,87 @@ describe('main.ts', () => {
 		closedHandler();
 	});
 
+	it('should handle high score controller registration error', async () => {
+		// Mock console.error to verify it's called
+		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+		// Reset the mock variables to safe defaults
+		const originalValues = {
+			shouldShowWindowValue,
+			shouldSendWindowEventValue,
+			shouldCloseWindowValue,
+			shouldReturnMainWindowStatusValue
+		};
+
+		// Reset to safe values that won't trigger license window issues
+		shouldShowWindowValue = false; // Prevent license window from trying to show
+		shouldSendWindowEventValue = true;
+		shouldCloseWindowValue = true;
+		shouldReturnMainWindowStatusValue = true;
+
+		// Reset modules and remake the mock to throw an error
+		jest.resetModules();
+		mainWindowInstance = null;
+		licenseWindowInstance = null;
+
+		// Re-setup the electron mocks first
+		jest.doMock('electron', () => ({
+			app: mockApp,
+			BrowserWindow: mockBrowserWindow,
+			Menu: mockMenu,
+			ipcMain: mockIpcMain,
+			screen: mockScreen,
+			shell: mockShell
+		}));
+
+		jest.doMock('path', () => mockPath);
+
+		// Mock the helpers again
+		jest.doMock('./main.helpers', () => {
+			const actual = jest.requireActual('./main.helpers');
+			return {
+				...actual,
+				shouldShowWindow: jest.fn(() => shouldShowWindowValue),
+				shouldSendWindowEvent: jest.fn(() => shouldSendWindowEventValue),
+				shouldCloseWindow: jest.fn(() => shouldCloseWindowValue),
+				shouldReturnMainWindowStatus: jest.fn(() => shouldReturnMainWindowStatusValue)
+			};
+		});
+
+		// Mock the high score service to succeed
+		jest.doMock('./services/highScore.service', () => ({
+			highScoreService: {
+				initialize: jest.fn().mockResolvedValue(undefined),
+				close: jest.fn().mockResolvedValue(undefined),
+			},
+		}));
+
+		// Mock the high score controller to fail on registerHandlers
+		jest.doMock('./controllers/highScore.controller', () => ({
+			HighScoreController: {
+				registerHandlers: jest.fn().mockRejectedValue(new Error('Handler registration failed')),
+			},
+		}));
+
+		await import('./main');
+
+		// Wait a bit for the app.whenReady().then() callback to execute
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Verify that console.error was called with the handler registration error (line 152)
+		expect(consoleSpy).toHaveBeenCalledWith(
+			'Failed to register high score handlers:',
+			expect.any(Error)
+		);
+
+		// Cleanup and restore original values
+		consoleSpy.mockRestore();
+		shouldShowWindowValue = originalValues.shouldShowWindowValue;
+		shouldSendWindowEventValue = originalValues.shouldSendWindowEventValue;
+		shouldCloseWindowValue = originalValues.shouldCloseWindowValue;
+		shouldReturnMainWindowStatusValue = originalValues.shouldReturnMainWindowStatusValue;
+	});
+
 	it('should handle high score service initialization error', async () => {
 		// Mock console.error to verify it's called
 		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
