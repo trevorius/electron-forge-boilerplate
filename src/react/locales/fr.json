@@ -15,6 +15,7 @@
   },
   "nav": {
     "home": "Accueil",
+    "chat": "Chat",
     "games": "Jeux",
     "about": "À propos",
     "branding": "Jeux Electron",

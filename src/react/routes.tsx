@@ -1,9 +1,10 @@
+import { Gamepad2, Home, Info, LucideIcon, MessageSquare } from 'lucide-react';
 import React from 'react';
-import { Home, Info, Gamepad2, LucideIcon } from 'lucide-react';
-import Game from './components/layout/Game';
-import About from './components/layout/About';
 import Tetris from './components/game/Tetris';
 import TicTacToe from './components/game/TicTacToe';
+import About from './components/layout/About';
+import Game from './components/layout/Game';
+import ChatPage from './pages/Chat';
 
 export interface Route {
   path: string;
@@ -52,6 +53,13 @@ export const routes: Route[] = [
     component: About,
     title: 'nav.about',
     icon: Info,
+    inNavbar: true
+  },
+  {
+    path: '/chat',
+    component: ChatPage,
+    title: 'nav.chat',
+    icon: MessageSquare,
     inNavbar: true
   }
 ];

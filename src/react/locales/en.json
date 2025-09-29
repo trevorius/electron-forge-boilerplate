@@ -15,6 +15,7 @@
   },
   "nav": {
     "home": "Home",
+    "chat": "Chat",
     "games": "Games",
     "about": "About",
     "branding": "Electron Games",
