@@ -7,10 +7,24 @@ import {
   getMessageContainerClasses,
   updateStreamingMessage,
   canSendMessage,
+  scrollToBottom,
+  focusInput,
 } from './ChatInterface.helpers';
 
 describe('ChatInterface.helpers', () => {
   describe('handleKeyDown', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      // Mock document.getElementById
+      document.getElementById = jest.fn().mockReturnValue({
+        focus: jest.fn()
+      });
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('should call onSend when Enter is pressed with non-empty input', () => {
       const mockOnSend = jest.fn();
       const mockEvent = {
@@ -20,6 +34,11 @@ describe('ChatInterface.helpers', () => {
       handleKeyDown(mockEvent, 'Hello', mockOnSend);
 
       expect(mockOnSend).toHaveBeenCalledWith('Hello');
+
+      // Fast-forward timers to trigger setTimeout
+      jest.runAllTimers();
+
+      expect(document.getElementById).toHaveBeenCalledWith('chat-input-field');
     });
 
     it('should not call onSend when Enter is pressed with empty input', () => {
@@ -54,15 +73,48 @@ describe('ChatInterface.helpers', () => {
 
       expect(mockOnSend).not.toHaveBeenCalled();
     });
+
+    it('should handle missing input element gracefully', () => {
+      document.getElementById = jest.fn().mockReturnValue(null);
+      const mockOnSend = jest.fn();
+      const mockEvent = {
+        key: 'Enter',
+      } as React.KeyboardEvent<HTMLInputElement>;
+
+      handleKeyDown(mockEvent, 'Hello', mockOnSend);
+
+      expect(mockOnSend).toHaveBeenCalledWith('Hello');
+
+      // Fast-forward timers
+      jest.runAllTimers();
+
+      expect(document.getElementById).toHaveBeenCalledWith('chat-input-field');
+    });
   });
 
   describe('handleSendClick', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+      document.getElementById = jest.fn().mockReturnValue({
+        focus: jest.fn()
+      });
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('should call onSend when input is non-empty', () => {
       const mockOnSend = jest.fn();
 
       handleSendClick('Hello', mockOnSend);
 
       expect(mockOnSend).toHaveBeenCalledWith('Hello');
+
+      // Fast-forward timers to trigger setTimeout
+      jest.runAllTimers();
+
+      expect(document.getElementById).toHaveBeenCalledWith('chat-input-field');
     });
 
     it('should not call onSend when input is empty', () => {
@@ -79,6 +131,20 @@ describe('ChatInterface.helpers', () => {
       handleSendClick('   ', mockOnSend);
 
       expect(mockOnSend).not.toHaveBeenCalled();
+    });
+
+    it('should handle missing input element gracefully', () => {
+      document.getElementById = jest.fn().mockReturnValue(null);
+      const mockOnSend = jest.fn();
+
+      handleSendClick('Hello', mockOnSend);
+
+      expect(mockOnSend).toHaveBeenCalledWith('Hello');
+
+      // Fast-forward timers
+      jest.runAllTimers();
+
+      expect(document.getElementById).toHaveBeenCalledWith('chat-input-field');
     });
   });
 
@@ -207,6 +273,41 @@ describe('ChatInterface.helpers', () => {
 
     it('should return false when both empty and streaming', () => {
       expect(canSendMessage('', true)).toBe(false);
+    });
+  });
+
+  describe('scrollToBottom', () => {
+    it('should scroll element to bottom when element is provided', () => {
+      const mockElement = {
+        scrollTop: 0,
+        scrollHeight: 1000,
+      } as HTMLDivElement;
+
+      scrollToBottom(mockElement);
+
+      expect(mockElement.scrollTop).toBe(1000);
+    });
+
+    it('should handle null element gracefully', () => {
+      // Should not throw
+      expect(() => scrollToBottom(null)).not.toThrow();
+    });
+  });
+
+  describe('focusInput', () => {
+    it('should focus input when element is provided', () => {
+      const mockElement = {
+        focus: jest.fn(),
+      } as unknown as HTMLInputElement;
+
+      focusInput(mockElement);
+
+      expect(mockElement.focus).toHaveBeenCalled();
+    });
+
+    it('should handle null element gracefully', () => {
+      // Should not throw
+      expect(() => focusInput(null)).not.toThrow();
     });
   });
 });

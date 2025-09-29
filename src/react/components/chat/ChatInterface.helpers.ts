@@ -134,3 +134,23 @@ export function updateStreamingMessage(
 export function canSendMessage(inputValue: string, isStreaming: boolean): boolean {
   return inputValue.trim() !== '' && !isStreaming;
 }
+
+/**
+ * Scrolls a container element to the bottom
+ * @param element - The HTML element to scroll, or null if not available
+ */
+export function scrollToBottom(element: HTMLDivElement | null): void {
+  if (element) {
+    element.scrollTop = element.scrollHeight;
+  }
+}
+
+/**
+ * Focuses an input element
+ * @param element - The input element to focus, or null if not available
+ */
+export function focusInput(element: HTMLInputElement | null): void {
+  if (element) {
+    element.focus();
+  }
+}

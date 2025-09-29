@@ -71,7 +71,7 @@ export function ChatSidebar({ selectedChatId, onChatSelect, onNewChat, onChatDel
   };
 
   return (
-    <Sidebar className="mt-12 bg-slate-800">
+    <Sidebar className="mt-12 bg-slate-800 max-w-3xs">
       <SidebarHeader className="p-4 flex flex-row justify-between">
         <h1 className="text-lg font-semibold text-slate-200">{t("chat").toUpperCase()}</h1>
         <SidebarTrigger />

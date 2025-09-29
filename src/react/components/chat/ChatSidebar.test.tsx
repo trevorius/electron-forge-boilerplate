@@ -200,8 +200,8 @@ describe('ChatSidebar', () => {
       expect(screen.getByText('Chat 1')).toBeInTheDocument();
     });
 
-    const chatButton = screen.getByText('Chat 1').closest('button');
-    fireEvent.click(chatButton!);
+    const chatItem = screen.getByText('Chat 1');
+    fireEvent.click(chatItem);
 
     expect(mockOnChatSelect).toHaveBeenCalledWith(1);
   });
@@ -300,8 +300,8 @@ describe('ChatSidebar', () => {
     );
 
     await waitFor(() => {
-      const chat1Button = screen.getByText('Chat 1').closest('button');
-      expect(chat1Button).toHaveClass('bg-slate-700');
+      const chat1Container = screen.getByText('Chat 1').closest('div.group');
+      expect(chat1Container).toHaveClass('bg-slate-700');
     });
   });
 

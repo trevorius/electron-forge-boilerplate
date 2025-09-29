@@ -12,6 +12,8 @@ import {
   handleKeyDown,
   handleSendClick,
   updateStreamingMessage,
+  scrollToBottom,
+  focusInput,
 } from './ChatInterface.helpers';
 
 interface ChatInterfaceProps {
@@ -85,9 +87,7 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    if (chatHistoryRef.current) {
-      chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
-    }
+    scrollToBottom(chatHistoryRef.current);
   }, [messages]);
 
   const handleSend = async (message: string) => {
@@ -119,9 +119,7 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
       }
 
       //focus the input field
-      if (chatInputFieldRef.current) {
-        chatInputFieldRef.current.focus();
-      }
+      focusInput(chatInputFieldRef.current);
     } catch (error) {
       console.error('Failed to send message:', error);
       setIsStreaming(false);

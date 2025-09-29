@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ChatInterface from './ChatInterface';
+import { SidebarProvider } from '../ui/sidebar';
 
 // Mock the translation hook
 jest.mock('react-i18next', () => ({
@@ -33,6 +34,15 @@ jest.mock('lucide-react', () => ({
   Send: () => <span>Send Icon</span>
 }));
 
+// Mock the sidebar components
+jest.mock('../ui/sidebar', () => {
+  const React = require('react');
+  return {
+    SidebarProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    SidebarTrigger: () => <button data-testid="sidebar-trigger">Toggle</button>,
+  };
+});
+
 // Mock window.electronAPI
 const mockChatCreate = jest.fn();
 const mockChatSendMessage = jest.fn();
@@ -45,6 +55,11 @@ beforeAll(() => {
     chatOnMessageStream: mockChatOnMessageStream,
   };
 });
+
+// Helper to render with SidebarProvider
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<SidebarProvider>{ui}</SidebarProvider>);
+};
 
 describe('ChatInterface', () => {
   beforeEach(() => {
@@ -60,7 +75,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    render(<ChatInterface />);
+    renderWithProvider(<ChatInterface />);
 
     expect(screen.getByText('New Chat')).toBeInTheDocument();
   });
@@ -73,7 +88,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    render(<ChatInterface />);
+    renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalledTimes(1);
@@ -88,7 +103,7 @@ describe('ChatInterface', () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockChatCreate.mockRejectedValue(new Error('Failed to create chat'));
 
-    render(<ChatInterface />);
+    renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(consoleError).toHaveBeenCalledWith('Failed to initialize chat:', expect.any(Error));
@@ -111,7 +126,7 @@ describe('ChatInterface', () => {
       autoNamed: false,
     });
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -145,17 +160,18 @@ describe('ChatInterface', () => {
       autoNamed: false,
     });
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
     });
 
     const input = container.querySelector('input') as HTMLInputElement;
-    const button = container.querySelector('button') as HTMLButtonElement;
+    const buttons = container.querySelectorAll('button');
+    const sendButton = Array.from(buttons).find(btn => !btn.hasAttribute('data-testid')) as HTMLButtonElement;
 
     fireEvent.change(input, { target: { value: 'Hello' } });
-    fireEvent.click(button);
+    fireEvent.click(sendButton);
 
     await waitFor(() => {
       expect(mockChatSendMessage).toHaveBeenCalledWith(1, 'Hello');
@@ -170,7 +186,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -196,7 +212,7 @@ describe('ChatInterface', () => {
       autoNamed: false,
     });
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -225,7 +241,39 @@ describe('ChatInterface', () => {
       autoNamed: true,
     });
 
-    const { container } = render(<ChatInterface />);
+    const mockOnChatNamed = jest.fn();
+    const { container } = renderWithProvider(<ChatInterface onChatNamed={mockOnChatNamed} />);
+
+    await waitFor(() => {
+      expect(mockChatCreate).toHaveBeenCalled();
+    });
+
+    const input = container.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Hello' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    await waitFor(() => {
+      expect(screen.getByText('Generated Name')).toBeInTheDocument();
+      expect(mockOnChatNamed).toHaveBeenCalled();
+    });
+  });
+
+  it('should update chat name when auto-named without onChatNamed callback', async () => {
+    mockChatCreate.mockResolvedValue({
+      id: 1,
+      name: 'New Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    mockChatSendMessage.mockResolvedValue({
+      userMessage: { id: 1, chatId: 1, content: 'Hello', role: 'user', createdAt: new Date() },
+      assistantMessage: { id: 2, chatId: 1, content: 'Hi', role: 'assistant', createdAt: new Date() },
+      autoNamed: true,
+    });
+
+    // No onChatNamed callback provided
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -238,6 +286,8 @@ describe('ChatInterface', () => {
     await waitFor(() => {
       expect(screen.getByText('Generated Name')).toBeInTheDocument();
     });
+
+    // Should not crash even without callback
   });
 
   it('should handle message send error', async () => {
@@ -251,7 +301,7 @@ describe('ChatInterface', () => {
 
     mockChatSendMessage.mockRejectedValue(new Error('Failed to send message'));
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -282,7 +332,7 @@ describe('ChatInterface', () => {
       return () => {};
     });
 
-    render(<ChatInterface />);
+    renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -328,7 +378,7 @@ describe('ChatInterface', () => {
       return () => {};
     });
 
-    render(<ChatInterface />);
+    renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -367,21 +417,22 @@ describe('ChatInterface', () => {
       });
     });
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
     });
 
     const input = container.querySelector('input') as HTMLInputElement;
-    const button = container.querySelector('button') as HTMLButtonElement;
+    const buttons = container.querySelectorAll('button');
+    const sendButton = Array.from(buttons).find(btn => !btn.hasAttribute('data-testid')) as HTMLButtonElement;
 
     fireEvent.change(input, { target: { value: 'Hello' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
     await waitFor(() => {
       expect(input.disabled).toBe(true);
-      expect(button.disabled).toBe(true);
+      expect(sendButton.disabled).toBe(true);
     });
   });
 
@@ -389,7 +440,7 @@ describe('ChatInterface', () => {
     // Make chatCreate hang so chatId stays null
     mockChatCreate.mockImplementation(() => new Promise(() => {}));
 
-    const { container } = render(<ChatInterface />);
+    const { container } = renderWithProvider(<ChatInterface />);
 
     const input = container.querySelector('input') as HTMLInputElement;
 
@@ -419,7 +470,7 @@ describe('ChatInterface', () => {
     (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
     (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue(mockMessages);
 
-    render(<ChatInterface chatId={5} />);
+    renderWithProvider(<ChatInterface chatId={5} />);
 
     await waitFor(() => {
       expect((window.electronAPI as any).chatGet).toHaveBeenCalledWith(5);
@@ -442,7 +493,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    render(<ChatInterface onChatCreated={mockOnChatCreated} />);
+    renderWithProvider(<ChatInterface onChatCreated={mockOnChatCreated} />);
 
     await waitFor(() => {
       expect(mockOnChatCreated).toHaveBeenCalledWith(10);
@@ -461,7 +512,7 @@ describe('ChatInterface', () => {
     (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
     (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue([]);
 
-    render(<ChatInterface chatId={5} onChatCreated={mockOnChatCreated} />);
+    renderWithProvider(<ChatInterface chatId={5} onChatCreated={mockOnChatCreated} />);
 
     await waitFor(() => {
       expect((window.electronAPI as any).chatGet).toHaveBeenCalled();
@@ -478,7 +529,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    render(<ChatInterface chatId={undefined} />);
+    renderWithProvider(<ChatInterface chatId={undefined} />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -493,7 +544,7 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
-    render(<ChatInterface chatId={null} />);
+    renderWithProvider(<ChatInterface chatId={null} />);
 
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
@@ -511,11 +562,12 @@ describe('ChatInterface', () => {
     (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
     (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue([]);
 
-    render(<ChatInterface chatId={0} />);
+    renderWithProvider(<ChatInterface chatId={0} />);
 
     // Since 0 is falsy, it should create a new chat instead of loading
     await waitFor(() => {
       expect(mockChatCreate).toHaveBeenCalled();
     });
   });
+
 });

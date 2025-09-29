@@ -6,11 +6,12 @@ import ChatPage from './Chat';
 jest.mock('@/components/chat/ChatInterface', () => {
   return {
     __esModule: true,
-    default: function MockChatInterface({ chatId, onChatCreated }: any) {
+    default: function MockChatInterface({ chatId, onChatCreated, onChatNamed }: any) {
       return (
         <div data-testid="mock-chat-interface" data-chat-id={String(chatId)}>
           Chat Interface
           <button onClick={() => onChatCreated?.(123)}>Create Chat</button>
+          <button onClick={() => onChatNamed?.()}>Chat Named</button>
         </div>
       );
     }
@@ -94,6 +95,15 @@ describe('ChatPage', () => {
 
     const chatInterface = getByTestId('mock-chat-interface');
     expect(chatInterface).toHaveAttribute('data-chat-id', 'null');
+  });
+
+  it('should handle chat named event', () => {
+    const { getByText } = render(<ChatPage />);
+
+    const namedButton = getByText('Chat Named');
+    fireEvent.click(namedButton);
+
+    // If it doesn't crash, the handleChatNamed function worked
   });
 
   it('should update selected chat when chat is created', () => {
