@@ -286,6 +286,17 @@ describe('HighScores', () => {
     });
   });
 
+  it('applies correct styling for bronze medal (3rd place)', async () => {
+    mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
+
+    render(<HighScores game="tetris" />);
+
+    await waitFor(() => {
+      const bronzeElement = screen.getByText('3 🥉').closest('.grid');
+      expect(bronzeElement).toHaveClass('bg-orange-900', 'text-orange-200');
+    });
+  });
+
   it('formats dates correctly', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
@@ -303,6 +314,41 @@ describe('HighScores', () => {
 
     await waitFor(() => {
       expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('tetris', 5);
+    });
+  });
+
+  it('applies correct styling for all ranking positions', async () => {
+    const extendedMockScores = [
+      ...mockScores,
+      {
+        id: 4,
+        name: 'Player4',
+        score: 700,
+        game: 'tetris',
+        createdAt: new Date('2023-01-04'),
+      },
+    ];
+
+    mockElectronAPI.getHighScores.mockResolvedValue(extendedMockScores);
+
+    render(<HighScores game="tetris" />);
+
+    await waitFor(() => {
+      // Test gold medal (index 0)
+      const goldElement = screen.getByText('1 🥇').closest('.grid');
+      expect(goldElement).toHaveClass('bg-yellow-900', 'text-yellow-200');
+
+      // Test silver medal (index 1)
+      const silverElement = screen.getByText('2 🥈').closest('.grid');
+      expect(silverElement).toHaveClass('bg-gray-700', 'text-gray-200');
+
+      // Test bronze medal (index 2) - this covers line 144
+      const bronzeElement = screen.getByText('3 🥉').closest('.grid');
+      expect(bronzeElement).toHaveClass('bg-orange-900', 'text-orange-200');
+
+      // Test 4th place and beyond (index > 2)
+      const fourthElement = screen.getByText('4').closest('.grid');
+      expect(fourthElement).toHaveClass('bg-gray-800', 'text-gray-300');
     });
   });
 });
