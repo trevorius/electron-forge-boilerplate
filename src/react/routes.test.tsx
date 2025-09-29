@@ -1,12 +1,13 @@
 import React from 'react';
 import { routes } from './routes';
-import { Home, Info, Gamepad2 } from 'lucide-react';
+import { Home, Info, Gamepad2, MessageSquare } from 'lucide-react';
 
 // Mock lucide-react
 jest.mock('lucide-react', () => ({
   Home: jest.fn(() => null),
   Info: jest.fn(() => null),
-  Gamepad2: jest.fn(() => null)
+  Gamepad2: jest.fn(() => null),
+  MessageSquare: jest.fn(() => null)
 }));
 
 // Mock the components
@@ -42,6 +43,15 @@ jest.mock('./components/game/TicTacToe', () => {
     __esModule: true,
     default: function MockTicTacToe() {
       return <div>TicTacToe Component</div>;
+    }
+  };
+});
+
+jest.mock('./pages/Chat', () => {
+  return {
+    __esModule: true,
+    default: function MockChatPage() {
+      return <div>Chat Page Component</div>;
     }
   };
 });

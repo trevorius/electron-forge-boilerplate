@@ -33,6 +33,30 @@ jest.mock('./controllers/highScore.controller', () => ({
 	},
 }));
 
+// Mock the chat service
+jest.mock('./services/chat.service', () => ({
+	chatService: {
+		initialize: jest.fn().mockResolvedValue(undefined),
+		close: jest.fn().mockResolvedValue(undefined),
+	},
+}));
+
+// Mock the chat controller
+jest.mock('./controllers/chat.controller', () => ({
+	ChatController: {
+		registerHandlers: jest.fn(),
+	},
+}));
+
+// Mock path module for Prisma
+jest.mock('path', () => {
+	const actualPath = jest.requireActual('path');
+	return {
+		...actualPath,
+		resolve: jest.fn((...args) => args.join('/')),
+	};
+});
+
 // Import the actual helpers for testing
 import * as helpers from './main.helpers';
 

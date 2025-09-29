@@ -1,4 +1,4 @@
-import React from 'react';
+const React = require('react');
 
 export const Card = React.forwardRef<
   HTMLDivElement,

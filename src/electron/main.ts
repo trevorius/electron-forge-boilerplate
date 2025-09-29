@@ -24,6 +24,8 @@ import {
 } from './main.helpers';
 import { highScoreService } from './services/highScore.service';
 import { HighScoreController } from './controllers/highScore.controller';
+import { chatService } from './services/chat.service';
+import { ChatController } from './controllers/chat.controller';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
 
@@ -153,6 +155,21 @@ app.whenReady().then(async () => {
 		}
 	}
 
+	// Initialize chat service and register IPC handlers
+	try {
+		await chatService.initialize();
+		await ChatController.registerHandlers();
+		console.log('Chat service and handlers initialized');
+	} catch (error) {
+		console.error('Failed to initialize chat service:', error);
+		// Try to register handlers anyway in case the service can recover
+		try {
+			await ChatController.registerHandlers();
+		} catch (handlerError) {
+			console.error('Failed to register chat handlers:', handlerError);
+		}
+	}
+
 	createWindow();
 
 	app.on('activate', () => {
@@ -171,6 +188,7 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', async () => {
 	if (shouldQuitApp(process.platform)) {
 		await highScoreService.close();
+		await chatService.close();
 		app.quit();
 	}
 });

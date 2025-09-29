@@ -20,3 +20,24 @@ model Score {
 
   @@map("scores")
 }
+
+model Chat {
+  id        Int       @id @default(autoincrement())
+  name      String    @default("New Chat")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  content   String
+  role      String   // "user" or "assistant"
+  createdAt DateTime @default(now())
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}

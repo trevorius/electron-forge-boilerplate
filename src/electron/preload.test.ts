@@ -8,7 +8,8 @@ const mockContextBridge = {
 const mockIpcRenderer = {
 	invoke: jest.fn(),
 	on: jest.fn(),
-	removeAllListeners: jest.fn()
+	removeAllListeners: jest.fn(),
+	removeListener: jest.fn()
 };
 
 jest.mock('electron', () => ({
@@ -299,6 +300,76 @@ describe('preload.ts', () => {
 				if ('clearScores' in electronAPI) {
 					await electronAPI.clearScores('tetris');
 					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'tetris');
+				}
+			});
+
+			it('should test chatCreate if available', async () => {
+				if ('chatCreate' in electronAPI) {
+					await electronAPI.chatCreate('Test Chat');
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-create', 'Test Chat');
+				}
+			});
+
+			it('should test chatGet if available', async () => {
+				if ('chatGet' in electronAPI) {
+					await electronAPI.chatGet(1);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-get', 1);
+				}
+			});
+
+			it('should test chatGetAll if available', async () => {
+				if ('chatGetAll' in electronAPI) {
+					await electronAPI.chatGetAll();
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-get-all');
+				}
+			});
+
+			it('should test chatUpdateName if available', async () => {
+				if ('chatUpdateName' in electronAPI) {
+					await electronAPI.chatUpdateName(1, 'Updated Name');
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-update-name', 1, 'Updated Name');
+				}
+			});
+
+			it('should test chatDelete if available', async () => {
+				if ('chatDelete' in electronAPI) {
+					await electronAPI.chatDelete(1);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-delete', 1);
+				}
+			});
+
+			it('should test chatSendMessage if available', async () => {
+				if ('chatSendMessage' in electronAPI) {
+					await electronAPI.chatSendMessage(1, 'Hello');
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-send-message', 1, 'Hello');
+				}
+			});
+
+			it('should test chatGetMessages if available', async () => {
+				if ('chatGetMessages' in electronAPI) {
+					await electronAPI.chatGetMessages(1);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-get-messages', 1);
+				}
+			});
+
+			it('should test chatGetMessageCount if available', async () => {
+				if ('chatGetMessageCount' in electronAPI) {
+					await electronAPI.chatGetMessageCount(1);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('chat-get-message-count', 1);
+				}
+			});
+
+			it('should test chatOnMessageStream if available', () => {
+				if ('chatOnMessageStream' in electronAPI) {
+					const callback = jest.fn();
+					const removeListener = electronAPI.chatOnMessageStream(callback);
+
+					expect(mockIpcRenderer.on).toHaveBeenCalledWith('chat-message-stream', expect.any(Function));
+
+					// Test cleanup function
+					if (typeof removeListener === 'function') {
+						removeListener();
+					}
 				}
 			});
 		});
