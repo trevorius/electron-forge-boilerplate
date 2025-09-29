@@ -1,11 +1,19 @@
 import { HighScoreService } from './highScore.service';
 import { PrismaClient } from '../generated/prisma';
 
+// Mock fs module
+jest.mock('fs', () => ({
+  existsSync: jest.fn().mockReturnValue(true),
+  mkdirSync: jest.fn(),
+}));
+
 // Mock Prisma Client
 jest.mock('../generated/prisma', () => ({
   PrismaClient: jest.fn().mockImplementation(() => ({
     $connect: jest.fn(),
     $disconnect: jest.fn(),
+    $queryRaw: jest.fn(),
+    $executeRaw: jest.fn(),
     score: {
       create: jest.fn(),
       findMany: jest.fn(),
@@ -31,6 +39,8 @@ describe('HighScoreService', () => {
     mockPrismaInstance = {
       $connect: jest.fn(),
       $disconnect: jest.fn(),
+      $queryRaw: jest.fn(),
+      $executeRaw: jest.fn(),
       score: {
         create: jest.fn(),
         findMany: jest.fn(),
@@ -56,13 +66,30 @@ describe('HighScoreService', () => {
     });
   });
 
+  describe('getDatabasePath', () => {
+    it('should return path for development', () => {
+      process.env.NODE_ENV = 'development';
+      const service = new HighScoreService();
+      expect(service['getDatabasePath']()).toBe(`${process.cwd()}/prisma/database.db`);
+    });
+
+    it('should return userData path for production', () => {
+      process.env.NODE_ENV = 'production';
+      const service = new HighScoreService();
+      expect(service['getDatabasePath']()).toBe('/mock/userData/database.db');
+    });
+  });
+
   describe('initialize', () => {
     it('should connect to database', async () => {
       mockPrismaInstance.$connect.mockResolvedValue(undefined);
+      // Mock successful table query (table exists)
+      mockPrismaInstance.$queryRaw.mockResolvedValue([{ 1: 1 }]);
 
       await service.initialize();
 
       expect(mockPrismaInstance.$connect).toHaveBeenCalled();
+      expect(mockPrismaInstance.$queryRaw).toHaveBeenCalled();
       expect(service['initialized']).toBe(true);
     });
 
@@ -72,6 +99,20 @@ describe('HighScoreService', () => {
       await service.initialize();
 
       expect(mockPrismaInstance.$connect).not.toHaveBeenCalled();
+    });
+
+    it('should create table if it does not exist', async () => {
+      mockPrismaInstance.$connect.mockResolvedValue(undefined);
+      // Mock table doesn't exist error
+      mockPrismaInstance.$queryRaw.mockRejectedValue(new Error('no such table: scores'));
+      mockPrismaInstance.$executeRaw.mockResolvedValue(undefined);
+
+      await service.initialize();
+
+      expect(mockPrismaInstance.$executeRaw).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.stringContaining('CREATE TABLE IF NOT EXISTS')])
+      );
+      expect(service['initialized']).toBe(true);
     });
 
     it('should throw error if connection fails', async () => {

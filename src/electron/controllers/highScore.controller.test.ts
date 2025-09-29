@@ -5,6 +5,7 @@ import { highScoreService } from '../services/highScore.service';
 // Mock the high score service
 jest.mock('../services/highScore.service', () => ({
   highScoreService: {
+    initialize: jest.fn(),
     saveScore: jest.fn(),
     getHighScores: jest.fn(),
     getAllHighScores: jest.fn(),
@@ -31,9 +32,27 @@ describe('HighScoreController', () => {
   });
 
   describe('registerHandlers', () => {
-    it('should register all IPC handlers', () => {
-      HighScoreController.registerHandlers();
+    it('should initialize service and register all IPC handlers', async () => {
+      mockHighScoreService.initialize.mockResolvedValue(undefined);
 
+      await HighScoreController.registerHandlers();
+
+      expect(mockHighScoreService.initialize).toHaveBeenCalled();
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('save-score', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('get-high-scores', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('get-all-high-scores', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('is-high-score', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('delete-score', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledWith('clear-scores', expect.any(Function));
+      expect(mockIpcMain.handle).toHaveBeenCalledTimes(6);
+    });
+
+    it('should register handlers even if initialization fails', async () => {
+      mockHighScoreService.initialize.mockRejectedValue(new Error('Init failed'));
+
+      await HighScoreController.registerHandlers();
+
+      expect(mockHighScoreService.initialize).toHaveBeenCalled();
       expect(mockIpcMain.handle).toHaveBeenCalledWith('save-score', expect.any(Function));
       expect(mockIpcMain.handle).toHaveBeenCalledWith('get-high-scores', expect.any(Function));
       expect(mockIpcMain.handle).toHaveBeenCalledWith('get-all-high-scores', expect.any(Function));
@@ -66,8 +85,9 @@ describe('HighScoreController', () => {
     let deleteScoreHandler: Function;
     let clearScoresHandler: Function;
 
-    beforeEach(() => {
-      HighScoreController.registerHandlers();
+    beforeEach(async () => {
+      mockHighScoreService.initialize.mockResolvedValue(undefined);
+      await HighScoreController.registerHandlers();
 
       // Extract the handler functions from the mock calls
       const calls = mockIpcMain.handle.mock.calls;
