@@ -47,7 +47,8 @@ module.exports = {
       collectCoverageFrom: [
         'src/electron/**/*.{ts,tsx}',
         '!src/electron/**/*.d.ts',
-        '!src/electron/**/*.{test,spec}.{ts,tsx}'
+        '!src/electron/**/*.{test,spec}.{ts,tsx}',
+        '!src/electron/preload.template.ts'
       ]
     }
   ],
@@ -58,7 +59,8 @@ module.exports = {
     '!src/react/components/ui/**/*.{ts,tsx}',
     '!src/react/__mocks__/**/*',
     '!src/react/index.tsx',
-    '!src/react/i18n.ts'
+    '!src/react/i18n.ts',
+    '!src/electron/preload.template.ts'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

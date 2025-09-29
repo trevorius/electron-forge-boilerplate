@@ -677,8 +677,58 @@ describe('main.ts', () => {
 	});
 
 	it('should handle high score service initialization error', async () => {
-		// Reset modules first
+		// Mock console.error to verify it's called
+		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+		// Reset the mock variables to safe defaults
+		const originalValues = {
+			shouldShowWindowValue,
+			shouldSendWindowEventValue,
+			shouldCloseWindowValue,
+			shouldReturnMainWindowStatusValue
+		};
+
+		// Reset to safe values that won't trigger license window issues
+		shouldShowWindowValue = false; // Prevent license window from trying to show
+		shouldSendWindowEventValue = true;
+		shouldCloseWindowValue = true;
+		shouldReturnMainWindowStatusValue = true;
+
+		// Reset modules and remake the mock to throw an error
 		jest.resetModules();
+		mainWindowInstance = null;
+		licenseWindowInstance = null;
+
+		// Re-setup the electron mocks first
+		jest.doMock('electron', () => ({
+			app: mockApp,
+			BrowserWindow: mockBrowserWindow,
+			Menu: mockMenu,
+			ipcMain: mockIpcMain,
+			screen: mockScreen,
+			shell: mockShell
+		}));
+
+		jest.doMock('path', () => mockPath);
+
+		// Mock the helpers again
+		jest.doMock('./main.helpers', () => {
+			const actual = jest.requireActual('./main.helpers');
+			return {
+				...actual,
+				shouldShowWindow: jest.fn(() => shouldShowWindowValue),
+				shouldSendWindowEvent: jest.fn(() => shouldSendWindowEventValue),
+				shouldCloseWindow: jest.fn(() => shouldCloseWindowValue),
+				shouldReturnMainWindowStatus: jest.fn(() => shouldReturnMainWindowStatusValue)
+			};
+		});
+
+		// Mock the high score controller
+		jest.doMock('./controllers/highScore.controller', () => ({
+			HighScoreController: {
+				registerHandlers: jest.fn(),
+			},
+		}));
 
 		// Mock the high score service to throw an error
 		jest.doMock('./services/highScore.service', () => ({
@@ -687,9 +737,6 @@ describe('main.ts', () => {
 				close: jest.fn().mockResolvedValue(undefined),
 			},
 		}));
-
-		// Mock console.error to verify it's called
-		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
 		await import('./main');
 
@@ -702,8 +749,12 @@ describe('main.ts', () => {
 			expect.any(Error)
 		);
 
-		// Cleanup
+		// Cleanup and restore original values
 		consoleSpy.mockRestore();
+		shouldShowWindowValue = originalValues.shouldShowWindowValue;
+		shouldSendWindowEventValue = originalValues.shouldSendWindowEventValue;
+		shouldCloseWindowValue = originalValues.shouldCloseWindowValue;
+		shouldReturnMainWindowStatusValue = originalValues.shouldReturnMainWindowStatusValue;
 	});
 
 });

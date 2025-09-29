@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
  * Database Types and Interfaces
  * Shared between main and renderer processes
  */
-export interface ScoreRecord {
+interface ScoreRecord {
   id: number;
   name: string;
   score: number;
@@ -12,17 +12,17 @@ export interface ScoreRecord {
   createdAt: Date;
 }
 
-export interface CreateScoreRequest {
+interface CreateScoreRequest {
   name: string;
   score: number;
   game: string;
 }
 
 /**
- * Database API functions for preload script
+ * High Score API functions for preload script
  * These functions handle IPC communication for database operations
  */
-export const databaseAPI = {
+export const HighSCoresApi = {
   saveScore: (scoreData: CreateScoreRequest): Promise<ScoreRecord> =>
     ipcRenderer.invoke('save-score', scoreData),
 
@@ -41,16 +41,3 @@ export const databaseAPI = {
   clearScores: (game?: string): Promise<void> =>
     ipcRenderer.invoke('clear-scores', game)
 };
-
-/**
- * Type definitions for the main ElectronAPI interface
- * Use this to extend the main ElectronAPI interface
- */
-export interface DatabaseAPI {
-  saveScore: (scoreData: CreateScoreRequest) => Promise<ScoreRecord>;
-  getHighScores: (game: string, limit?: number) => Promise<ScoreRecord[]>;
-  getAllHighScores: (limit?: number) => Promise<ScoreRecord[]>;
-  isHighScore: (game: string, score: number) => Promise<boolean>;
-  deleteScore: (id: number) => Promise<void>;
-  clearScores: (game?: string) => Promise<void>;
-}

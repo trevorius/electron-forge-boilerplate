@@ -1,5 +1,5 @@
 import { ipcRenderer } from 'electron';
-import { databaseAPI } from './preload.highScore';
+import { HighSCoresApi } from './preload.highScore';
 
 // Mock ipcRenderer
 jest.mock('electron', () => ({
@@ -22,7 +22,7 @@ describe('preload.highScore', () => {
         const mockResult = { id: 1, ...scoreData, createdAt: new Date() };
         mockIpcRenderer.invoke.mockResolvedValue(mockResult);
 
-        const result = await databaseAPI.saveScore(scoreData);
+        const result = await HighSCoresApi.saveScore(scoreData);
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('save-score', scoreData);
         expect(result).toEqual(mockResult);
@@ -36,7 +36,7 @@ describe('preload.highScore', () => {
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await databaseAPI.getHighScores('tetris', 10);
+        const result = await HighSCoresApi.getHighScores('tetris', 10);
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', 10);
         expect(result).toEqual(mockScores);
@@ -48,7 +48,7 @@ describe('preload.highScore', () => {
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await databaseAPI.getHighScores('tetris');
+        const result = await HighSCoresApi.getHighScores('tetris');
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', undefined);
         expect(result).toEqual(mockScores);
@@ -63,7 +63,7 @@ describe('preload.highScore', () => {
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await databaseAPI.getAllHighScores(10);
+        const result = await HighSCoresApi.getAllHighScores(10);
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-all-high-scores', 10);
         expect(result).toEqual(mockScores);
@@ -75,7 +75,7 @@ describe('preload.highScore', () => {
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await databaseAPI.getAllHighScores();
+        const result = await HighSCoresApi.getAllHighScores();
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-all-high-scores', undefined);
         expect(result).toEqual(mockScores);
@@ -86,7 +86,7 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with is-high-score', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(true);
 
-        const result = await databaseAPI.isHighScore('tetris', 1000);
+        const result = await HighSCoresApi.isHighScore('tetris', 1000);
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'tetris', 1000);
         expect(result).toBe(true);
@@ -97,7 +97,7 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with delete-score', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(undefined);
 
-        await databaseAPI.deleteScore(1);
+        await HighSCoresApi.deleteScore(1);
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('delete-score', 1);
       });
@@ -107,7 +107,7 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with clear-scores for specific game', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(undefined);
 
-        await databaseAPI.clearScores('tetris');
+        await HighSCoresApi.clearScores('tetris');
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'tetris');
       });
@@ -115,7 +115,7 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with clear-scores for all games', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(undefined);
 
-        await databaseAPI.clearScores();
+        await HighSCoresApi.clearScores();
 
         expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', undefined);
       });

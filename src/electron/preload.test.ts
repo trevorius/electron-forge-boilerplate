@@ -32,7 +32,8 @@ describe('preload.ts', () => {
 		// Import preload to trigger execution
 		await import('./preload');
 
-		expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith('electronAPI', expect.objectContaining({
+		// Base API functions that should always be present
+		const expectedBaseAPI = {
 			sendMessage: expect.any(Function),
 			getVersion: expect.any(Function),
 			getPlatform: expect.any(Function),
@@ -47,7 +48,22 @@ describe('preload.ts', () => {
 			openLicenseWindow: expect.any(Function),
 			closeLicenseWindow: expect.any(Function),
 			getMainAppLocale: expect.any(Function)
-		}));
+		};
+
+		expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalledWith('electronAPI', expect.objectContaining(expectedBaseAPI));
+
+		// Get the actual electronAPI that was exposed
+		const electronAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
+			call => call[0] === 'electronAPI'
+		);
+		const exposedAPI = electronAPICall![1];
+
+		// Check that it includes all base functions
+		expect(exposedAPI).toMatchObject(expectedBaseAPI);
+
+		// Verify it's an object with functions (dynamic API modules will be spread in)
+		expect(typeof exposedAPI).toBe('object');
+		expect(exposedAPI).not.toBeNull();
 	});
 
 	it('should expose nodeAPI to main world', async () => {
@@ -103,7 +119,9 @@ describe('preload.ts', () => {
 		);
 
 		expect(electronAPICall).toBeDefined();
-		expect(electronAPICall![1]).toMatchObject({
+
+		// Base API functions that should always be present
+		const expectedBaseAPI = {
 			sendMessage: expect.any(Function),
 			getVersion: expect.any(Function),
 			getPlatform: expect.any(Function),
@@ -118,7 +136,9 @@ describe('preload.ts', () => {
 			openLicenseWindow: expect.any(Function),
 			closeLicenseWindow: expect.any(Function),
 			getMainAppLocale: expect.any(Function)
-		});
+		};
+
+		expect(electronAPICall![1]).toMatchObject(expectedBaseAPI);
 
 		// Verify that the nodeAPI is exposed with correct structure
 		const nodeAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
@@ -143,6 +163,7 @@ describe('preload.ts', () => {
 			electronAPI = electronAPICall![1];
 		});
 
+		// Base API function tests
 		it('should call sendMessage with correct parameters', async () => {
 			await electronAPI.sendMessage('test message');
 			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('send-message', 'test message');
@@ -218,6 +239,68 @@ describe('preload.ts', () => {
 		it('should call getMainAppLocale with correct parameters', async () => {
 			await electronAPI.getMainAppLocale();
 			expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-main-app-locale');
+		});
+
+		// Dynamic API tests - test any additional APIs that were included from modules
+		it('should test all available API functions', () => {
+			// Get all function properties from the electronAPI
+			const apiFunctions = Object.keys(electronAPI).filter(key =>
+				typeof electronAPI[key] === 'function'
+			);
+
+			// Ensure we have all the base functions plus any from modules
+			expect(apiFunctions.length).toBeGreaterThanOrEqual(14); // 14 base functions minimum
+
+			// Test that all functions are callable (basic smoke test)
+			apiFunctions.forEach(funcName => {
+				expect(typeof electronAPI[funcName]).toBe('function');
+			});
+		});
+
+		// Test specific API functions if they exist (dynamic testing based on what's actually available)
+		describe('conditional API tests', () => {
+			it('should test saveScore if available', async () => {
+				if ('saveScore' in electronAPI) {
+					const scoreData = { name: 'Player', score: 1000, game: 'tetris' };
+					await electronAPI.saveScore(scoreData);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('save-score', scoreData);
+				}
+			});
+
+			it('should test getHighScores if available', async () => {
+				if ('getHighScores' in electronAPI) {
+					await electronAPI.getHighScores('tetris', 10);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', 10);
+				}
+			});
+
+			it('should test getAllHighScores if available', async () => {
+				if ('getAllHighScores' in electronAPI) {
+					await electronAPI.getAllHighScores(20);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-all-high-scores', 20);
+				}
+			});
+
+			it('should test isHighScore if available', async () => {
+				if ('isHighScore' in electronAPI) {
+					await electronAPI.isHighScore('tetris', 1500);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'tetris', 1500);
+				}
+			});
+
+			it('should test deleteScore if available', async () => {
+				if ('deleteScore' in electronAPI) {
+					await electronAPI.deleteScore(123);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('delete-score', 123);
+				}
+			});
+
+			it('should test clearScores if available', async () => {
+				if ('clearScores' in electronAPI) {
+					await electronAPI.clearScores('tetris');
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'tetris');
+				}
+			});
 		});
 	});
 

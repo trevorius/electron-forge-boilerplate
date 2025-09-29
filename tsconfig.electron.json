@@ -29,6 +29,7 @@
     "src/electron/**/*.test.ts",
     "src/electron/**/*.test.tsx",
     "src/electron/**/*.spec.ts",
-    "src/electron/**/*.spec.tsx"
+    "src/electron/**/*.spec.tsx",
+    "src/electron/preload.template.ts"
   ]
 }

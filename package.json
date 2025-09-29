@@ -11,7 +11,7 @@
 		"build": "npm run build:vite && npm run build:electron",
 		"build:vite": "vite build",
 		"build:electron": "npm run compile:electron",
-		"compile:electron": "tsc -p tsconfig.electron.json && cp -r src/electron/generated dist-electron/ 2>/dev/null || true",
+		"compile:electron": "node scripts/build-preload.js && tsc -p tsconfig.electron.json && cp -r src/electron/generated dist-electron/ 2>/dev/null || true",
 		"compile:electron:watch": "tsc -p tsconfig.electron.json --watch",
 		"package": "npm run build && electron-forge package",
 		"make": "npm run build && electron-forge make",
