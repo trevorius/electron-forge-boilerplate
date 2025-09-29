@@ -50,3 +50,9 @@ electron-builder.yml
 
 
 /src/electron/generated/prisma
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+prisma/database.db
