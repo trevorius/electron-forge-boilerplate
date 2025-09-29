@@ -1,30 +1,34 @@
 import { Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { SidebarTrigger } from '../ui/sidebar';
 import {
   Message,
-  handleKeyDown,
-  handleSendClick,
+  canSendMessage,
   getMessageCardClasses,
   getMessageContainerClasses,
+  handleKeyDown,
+  handleSendClick,
   updateStreamingMessage,
-  canSendMessage,
 } from './ChatInterface.helpers';
 
 interface ChatInterfaceProps {
   chatId?: number | null;
   onChatCreated?: (chatId: number) => void;
+  onChatNamed?: () => void;
 }
 
-const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps) => {
+const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatInterfaceProps) => {
   const { t } = useTranslation();
   const [chatId, setChatId] = useState<number | null>(propChatId || null);
   const [chatName, setChatName] = useState<string>('New Chat');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const chatHistoryRef = useRef<HTMLDivElement>(null);
+  const chatInputFieldRef = useRef<HTMLInputElement>(null);
 
   // Initialize or load chat
   useEffect(() => {
@@ -79,6 +83,13 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps
     return cleanup;
   }, [chatId]);
 
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const handleSend = async (message: string) => {
     if (!chatId || !canSendMessage(message, isStreaming)) return;
 
@@ -101,6 +112,16 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps
       // Update chat name if auto-named
       if (result.autoNamed) {
         setChatName('Generated Name');
+        // Notify parent component to refresh sidebar
+        if (onChatNamed) {
+          onChatNamed();
+        }
+      }
+
+
+      //focus the input field
+      if (chatInputFieldRef.current) {
+        chatInputFieldRef.current.focus();
       }
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -109,13 +130,15 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div id="chat-name-container" className="flex-shrink-0 w-full p-4">
-        <h1 className="text-2xl font-bold">{chatName}</h1>
+    <div className="flex flex-col h-full pt-12">
+      <div id="chat-name-container" className="flex-shrink-0 w-full p-4 flex items-center gap-4">
+        <SidebarTrigger />
+        <h1 className="text-2xl font-bold text-slate-100">{chatName}</h1>
       </div>
       <div
+        ref={chatHistoryRef}
         id="chat-history-container"
-        className="flex-1 overflow-y-auto w-full p-4 min-h-0 mt-12"
+        className="flex-1 overflow-y-auto w-full p-4 min-h-0"
       >
         {messages.map((message, index) => (
           <div
@@ -124,23 +147,25 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps
           >
             <Card className={getMessageCardClasses(message.author)}>
               <CardHeader>
-                <CardTitle>{message.author}</CardTitle>
+                <CardTitle className="text-slate-900">{message.author}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{message.message}</p>
+                <p className="text-slate-800">{message.message}</p>
               </CardContent>
             </Card>
           </div>
         ))}
       </div>
-      <div id="chat-input-container" className="flex-shrink-0 w-full p-4 ">
-        <div className="flex gap-2 items-center gap-0 bg-blue-500 shadow-lg rounded-l-none rounded-r-full overflow-hidden border-2 border-blue-600 transition-all duration-300 hover:shadow-xl focus-within:shadow-xl focus-within:border-blue-400 p-3 rounded-2xl">
+      <div id="chat-input-container" className="flex-shrink-0 w-full p-4">
+        <div className="flex items-center gap-0 bg-blue-500 shadow-lg rounded-l-none rounded-r-full overflow-hidden border-2 border-blue-600 transition-all duration-300 hover:shadow-xl focus-within:shadow-xl focus-within:border-blue-400 p-3 rounded-2xl">
           <input
+            id="chat-input-field"
+            ref={chatInputFieldRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={t('chat.inputPlaceholder')}
-            className="flex-1 bg- px-6 py-4 text-base outline-none placeholder:text-muted-foreground text-slate-900 bg-slate-800"
+            className="mr-3 flex-1 bg-slate-800 px-6 py-4 text-base outline-none placeholder:text-slate-400 text-slate-100"
             disabled={isStreaming}
             onKeyDown={(e) => handleKeyDown(e, inputValue, handleSend)}
           />

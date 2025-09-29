@@ -27,6 +27,13 @@ export function handleKeyDown(
 ): void {
   if (e.key === 'Enter' && inputValue.trim()) {
     onSend(inputValue);
+    //focus the input field
+    setTimeout(() => {
+      const inputField = document.getElementById('chat-input-field') as HTMLInputElement;
+      if (inputField) {
+        inputField.focus();
+      }
+    }, 0);
   }
 }
 
@@ -39,6 +46,13 @@ export function handleSendClick(
 ): void {
   if (inputValue.trim()) {
     onSend(inputValue);
+    //focus the input field
+    setTimeout(() => {
+      const inputField = document.getElementById('chat-input-field') as HTMLInputElement;
+      if (inputField) {
+        inputField.focus();
+      }
+    }, 0);
   }
 }
 
