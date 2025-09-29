@@ -2,7 +2,7 @@
 
 This document provides comprehensive guidance on the backend architecture of the Electron React Boilerplate. It covers the database layer, service architecture, controller pattern, preload scripts, and secure IPC communication.
 
-← [Back to README](README.md)
+← [Back to README](/README.md)
 
 ## Table of Contents
 
@@ -625,4 +625,4 @@ async backupDatabase(): Promise<void> {
 - **Caching**: Implement caching for frequently accessed data
 - **Batch Operations**: Use batch operations for bulk data processing
 
-← [Back to README](README.md)
+← [Back to README](/README.md)

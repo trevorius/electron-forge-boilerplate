@@ -2,7 +2,7 @@
 
 This document provides comprehensive guidance on achieving and maintaining 100% test coverage in the Electron React Boilerplate. It covers testing methodologies, helper function extraction patterns, edge case handling, and proven strategies for testing complex scenarios.
 
-← [Back to README](README.md)
+← [Back to README](/README.md)
 
 ## Table of Contents
 
@@ -830,4 +830,4 @@ test('handles file operations', async () => {
 
 This testing strategy ensures maintainable, reliable code with complete coverage while supporting rapid development and confident refactoring.
 
-← [Back to README](README.md)
+← [Back to README](/README.md)

@@ -2,7 +2,7 @@
 
 This document provides comprehensive guidance on implementing routes and pages in the Electron React Boilerplate. It covers the type-safe routing system, component organization, and best practices for adding new pages.
 
-← [Back to README](README.md)
+← [Back to README](/README.md)
 
 ## Table of Contents
 
@@ -403,4 +403,4 @@ Routes work seamlessly with Electron's window management:
 - **Window State**: Navigation state is maintained across window operations
 - **Menu Integration**: Routes can be triggered from Electron's native menu
 
-← [Back to README](README.md)
+← [Back to README](/README.md)
