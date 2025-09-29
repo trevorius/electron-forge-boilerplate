@@ -154,7 +154,7 @@ export class ChatService {
         },
       });
 
-      return chat;
+      return chat as ChatWithMessages | null;
     } catch (error) {
       console.error('Failed to get chat:', error);
       throw error;
@@ -223,7 +223,7 @@ export class ChatService {
         data: { updatedAt: new Date() },
       });
 
-      return message;
+      return message as MessageRecord;
     } catch (error) {
       console.error('Failed to create message:', error);
       throw error;
@@ -239,7 +239,7 @@ export class ChatService {
         orderBy: { createdAt: 'asc' },
       });
 
-      return messages;
+      return messages as MessageRecord[];
     } catch (error) {
       console.error('Failed to get messages:', error);
       throw error;

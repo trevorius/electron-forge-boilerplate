@@ -1,9 +1,8 @@
-import { Card } from '@/__mocks__/components/ui/card';
 import { Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
-import { CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import {
   Message,
   handleKeyDown,
