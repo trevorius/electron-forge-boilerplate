@@ -70,11 +70,18 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
   useEffect(() => {
     if (!chatId) return;
 
+    console.log('Setting up streaming listener for chatId:', chatId);
     const cleanup = window.electronAPI.chatOnMessageStream((data) => {
+      console.log('Streaming data received:', data);
       if (data.chatId === chatId) {
-        setMessages((prev) => updateStreamingMessage(prev, data.messageId, data.content));
+        setMessages((prev) => {
+          const updated = updateStreamingMessage(prev, data.messageId, data.content);
+          console.log('Messages after update:', updated);
+          return updated;
+        });
 
         if (data.done) {
+          console.log('Streaming complete');
           setIsStreaming(false);
         }
       }
@@ -93,6 +100,9 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
   const handleSend = async (message: string) => {
     if (!chatId || !canSendMessage(message, isStreaming)) return;
 
+    console.log('handleSend called with message:', message);
+    console.log('chatId:', chatId);
+
     try {
       // Add user message immediately
       setMessages((prev) => [
@@ -106,8 +116,10 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
       setInputValue('');
       setIsStreaming(true);
 
+      console.log('Sending message to backend...');
       // Send message to backend
       const result = await window.electronAPI.chatSendMessage(chatId, message);
+      console.log('Backend response:', result);
 
       // Update chat name if auto-named
       if (result.autoNamed) {
@@ -117,7 +129,6 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
           onChatNamed();
         }
       }
-
 
       //focus the input field
       if (chatInputFieldRef.current) {
@@ -147,10 +158,10 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
           >
             <Card className={getMessageCardClasses(message.author)}>
               <CardHeader>
-                <CardTitle className="text-slate-900">{message.author}</CardTitle>
+                <CardTitle className="text-slate-300">{message.author}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-800">{message.message}</p>
+                <p className="text-slate-100">{message.message}</p>
               </CardContent>
             </Card>
           </div>

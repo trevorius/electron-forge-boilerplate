@@ -22,13 +22,18 @@ export async function streamMessage(
   chatId: number,
   messageId: number
 ): Promise<void> {
-  if (!window) return;
+  if (!window) {
+    console.log('streamMessage: No window provided');
+    return;
+  }
 
+  console.log('streamMessage: Starting stream for chatId:', chatId, 'messageId:', messageId);
   const words = message.split(' ');
   let accumulated = '';
 
   for (const word of words) {
     accumulated += (accumulated ? ' ' : '') + word;
+    console.log('streamMessage: Sending word:', word, 'accumulated:', accumulated);
     window.webContents.send('chat-message-stream', {
       chatId,
       messageId,
@@ -41,6 +46,7 @@ export async function streamMessage(
   }
 
   // Send final message indicating completion
+  console.log('streamMessage: Sending final message');
   window.webContents.send('chat-message-stream', {
     chatId,
     messageId,
