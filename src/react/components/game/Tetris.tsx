@@ -16,8 +16,12 @@ import {
   getRandomTetromino,
   handleFailedMovement,
   handleGameOverDialogChange,
+  handleHighScoreSkip,
   handlePauseResume,
   handlePiecePlacement,
+  handlePlayerNameChange,
+  handlePlayerNameKeyPress,
+  highScoreDialogOnOpenChange,
   isValidMove,
   renderPieceOnBoard,
   rotateTetromino,
@@ -356,7 +360,7 @@ const Tetris: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showHighScoreDialog} onOpenChange={() => {}}>
+      <Dialog open={showHighScoreDialog} onOpenChange={highScoreDialogOnOpenChange}>
         <DialogContent className="bg-yellow-600 border-yellow-400 text-white text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.newHighScore')}</DialogTitle>
@@ -370,8 +374,8 @@ const Tetris: React.FC = () => {
               id="playerName"
               type="text"
               value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && saveHighScore()}
+              onChange={(e) => handlePlayerNameChange(e, setPlayerName)}
+              onKeyPress={(e) => handlePlayerNameKeyPress(e, saveHighScore)}
               className="w-full px-3 py-2 text-black rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
               placeholder={t('tetris.nameInputPlaceholder')}
               maxLength={20}
@@ -387,11 +391,7 @@ const Tetris: React.FC = () => {
               {t('tetris.saveScore')}
             </Button>
             <Button
-              onClick={() => {
-                setShowHighScoreDialog(false);
-                setShowGameOverDialog(true);
-                setPlayerName('');
-              }}
+              onClick={() => handleHighScoreSkip(setShowHighScoreDialog, setShowGameOverDialog, setPlayerName)}
               className="bg-gray-600 hover:bg-gray-700"
             >
               {t('tetris.skip')}

@@ -297,3 +297,53 @@ export const handleGameOverDialogChange = (
 ): void => {
   setShowGameOverDialog(open);
 };
+
+// High Score Helper Functions
+/**
+ * Empty function used for high score dialog onOpenChange (to prevent closing)
+ */
+export const highScoreDialogOnOpenChange = (): void => {
+  // Empty function - high score dialog cannot be closed by user interaction
+};
+
+/**
+ * Handles input changes for player name in high score dialog
+ * @param event - Input change event
+ * @param setPlayerName - State setter function to update player name
+ */
+export const handlePlayerNameChange = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setPlayerName: (name: string) => void
+): void => {
+  setPlayerName(event.target.value);
+};
+
+/**
+ * Handles key press events for player name input - triggers save on Enter
+ * @param event - Keyboard event
+ * @param saveHighScore - Function to save the high score
+ */
+export const handlePlayerNameKeyPress = (
+  event: React.KeyboardEvent<HTMLInputElement>,
+  saveHighScore: () => void
+): void => {
+  if (event.key === 'Enter') {
+    saveHighScore();
+  }
+};
+
+/**
+ * Handles skip button click in high score dialog
+ * @param setShowHighScoreDialog - Function to hide high score dialog
+ * @param setShowGameOverDialog - Function to show game over dialog
+ * @param setPlayerName - Function to clear player name
+ */
+export const handleHighScoreSkip = (
+  setShowHighScoreDialog: (show: boolean) => void,
+  setShowGameOverDialog: (show: boolean) => void,
+  setPlayerName: (name: string) => void
+): void => {
+  setShowHighScoreDialog(false);
+  setShowGameOverDialog(true);
+  setPlayerName('');
+};

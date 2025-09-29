@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   BOARD_WIDTH,
   BOARD_HEIGHT,
@@ -23,6 +24,10 @@ import {
   createPauseState,
   createResumeState,
   renderPieceOnBoard,
+  highScoreDialogOnOpenChange,
+  handlePlayerNameChange,
+  handlePlayerNameKeyPress,
+  handleHighScoreSkip,
   GamePiece,
   Position
 } from './Tetris.helpers';
@@ -724,6 +729,137 @@ describe('Tetris Helper Functions', () => {
 
       expect(mockSetter1).toHaveBeenCalledWith(true);
       expect(mockSetter2).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('High Score Helper Functions', () => {
+    describe('highScoreDialogOnOpenChange', () => {
+      test('is a void function that does nothing', () => {
+        const result = highScoreDialogOnOpenChange();
+        expect(result).toBeUndefined();
+      });
+
+      test('can be called multiple times without error', () => {
+        expect(() => {
+          highScoreDialogOnOpenChange();
+          highScoreDialogOnOpenChange();
+          highScoreDialogOnOpenChange();
+        }).not.toThrow();
+      });
+    });
+
+    describe('handlePlayerNameChange', () => {
+      test('calls setPlayerName with the input value', () => {
+        const mockSetPlayerName = jest.fn();
+        const mockEvent = {
+          target: { value: 'TestPlayer' }
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        handlePlayerNameChange(mockEvent, mockSetPlayerName);
+        expect(mockSetPlayerName).toHaveBeenCalledWith('TestPlayer');
+      });
+
+      test('handles empty string input', () => {
+        const mockSetPlayerName = jest.fn();
+        const mockEvent = {
+          target: { value: '' }
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        handlePlayerNameChange(mockEvent, mockSetPlayerName);
+        expect(mockSetPlayerName).toHaveBeenCalledWith('');
+      });
+
+      test('handles input with spaces', () => {
+        const mockSetPlayerName = jest.fn();
+        const mockEvent = {
+          target: { value: '  Player Name  ' }
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        handlePlayerNameChange(mockEvent, mockSetPlayerName);
+        expect(mockSetPlayerName).toHaveBeenCalledWith('  Player Name  ');
+      });
+    });
+
+    describe('handlePlayerNameKeyPress', () => {
+      test('calls saveHighScore when Enter key is pressed', () => {
+        const mockSaveHighScore = jest.fn();
+        const mockEvent = {
+          key: 'Enter'
+        } as React.KeyboardEvent<HTMLInputElement>;
+
+        handlePlayerNameKeyPress(mockEvent, mockSaveHighScore);
+        expect(mockSaveHighScore).toHaveBeenCalledTimes(1);
+      });
+
+      test('does not call saveHighScore for non-Enter keys', () => {
+        const mockSaveHighScore = jest.fn();
+        const mockEvent = {
+          key: 'a'
+        } as React.KeyboardEvent<HTMLInputElement>;
+
+        handlePlayerNameKeyPress(mockEvent, mockSaveHighScore);
+        expect(mockSaveHighScore).not.toHaveBeenCalled();
+      });
+
+      test('handles different key presses correctly', () => {
+        const mockSaveHighScore = jest.fn();
+
+        const testKeys = ['Space', 'Escape', 'Tab', 'ArrowUp', 'Shift'];
+        testKeys.forEach(key => {
+          const mockEvent = { key } as React.KeyboardEvent<HTMLInputElement>;
+          handlePlayerNameKeyPress(mockEvent, mockSaveHighScore);
+        });
+
+        expect(mockSaveHighScore).not.toHaveBeenCalled();
+      });
+
+      test('handles Enter key case sensitivity', () => {
+        const mockSaveHighScore = jest.fn();
+
+        // Test lowercase 'enter' - should not trigger
+        const lowerEvent = { key: 'enter' } as React.KeyboardEvent<HTMLInputElement>;
+        handlePlayerNameKeyPress(lowerEvent, mockSaveHighScore);
+        expect(mockSaveHighScore).not.toHaveBeenCalled();
+
+        // Test correct case 'Enter' - should trigger
+        const correctEvent = { key: 'Enter' } as React.KeyboardEvent<HTMLInputElement>;
+        handlePlayerNameKeyPress(correctEvent, mockSaveHighScore);
+        expect(mockSaveHighScore).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('handleHighScoreSkip', () => {
+      test('calls all three state setter functions with correct values', () => {
+        const mockSetShowHighScoreDialog = jest.fn();
+        const mockSetShowGameOverDialog = jest.fn();
+        const mockSetPlayerName = jest.fn();
+
+        handleHighScoreSkip(mockSetShowHighScoreDialog, mockSetShowGameOverDialog, mockSetPlayerName);
+
+        expect(mockSetShowHighScoreDialog).toHaveBeenCalledWith(false);
+        expect(mockSetShowGameOverDialog).toHaveBeenCalledWith(true);
+        expect(mockSetPlayerName).toHaveBeenCalledWith('');
+      });
+
+      test('calls functions in the correct order', () => {
+        const callOrder: string[] = [];
+        const mockSetShowHighScoreDialog = jest.fn(() => callOrder.push('hideHighScore'));
+        const mockSetShowGameOverDialog = jest.fn(() => callOrder.push('showGameOver'));
+        const mockSetPlayerName = jest.fn(() => callOrder.push('clearName'));
+
+        handleHighScoreSkip(mockSetShowHighScoreDialog, mockSetShowGameOverDialog, mockSetPlayerName);
+
+        expect(callOrder).toEqual(['hideHighScore', 'showGameOver', 'clearName']);
+      });
+
+      test('returns undefined (void function)', () => {
+        const mockSetShowHighScoreDialog = jest.fn();
+        const mockSetShowGameOverDialog = jest.fn();
+        const mockSetPlayerName = jest.fn();
+
+        const result = handleHighScoreSkip(mockSetShowHighScoreDialog, mockSetShowGameOverDialog, mockSetPlayerName);
+        expect(result).toBeUndefined();
+      });
     });
   });
 });
