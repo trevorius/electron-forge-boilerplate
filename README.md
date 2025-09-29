@@ -15,6 +15,10 @@ A modern, feature-rich Electron application boilerplate with React, TypeScript, 
   - [🧪 Testing](#-testing)
     - [Test Coverage Strategy](#test-coverage-strategy)
     - [Running Tests](#running-tests)
+  - [⚡ Adding Features](#-adding-features)
+    - [📄 Documentation Guides](#-documentation-guides)
+    - [🎯 Feature Development Workflow](#-feature-development-workflow)
+    - [📋 Quick Reference](#-quick-reference)
   - [🌍 Internationalization](#-internationalization)
   - [📱 Distribution](#-distribution)
     - [Supported Platforms](#supported-platforms)
@@ -149,6 +153,34 @@ npm run test:watch
 # Generate coverage report
 npm run test:coverage
 ```
+
+## ⚡ Adding Features
+
+This section provides comprehensive guides for extending the application with new functionality. Each guide includes implementation patterns, best practices, and testing strategies to maintain code quality and consistency.
+
+### 📄 Documentation Guides
+
+| Guide | Description | Focus Areas |
+|-------|-------------|------------|
+| [Routes and Pages](routes-and-pages.doc.md) | Complete guide for adding new routes and pages | Type-safe routing, component organization, navigation integration, i18n support |
+| [Backend Architecture](backend-architecture.doc.md) | Comprehensive backend development guide | Database layer, service architecture, controllers, preload scripts, IPC communication |
+| [Testing Strategies](testing-strategies.doc.md) | Advanced testing techniques for 100% coverage | Helper function extraction, edge case testing, mocking strategies, coverage analysis |
+
+### 🎯 Feature Development Workflow
+
+1. **Plan the Feature**: Review relevant documentation guides above
+2. **Define Routes**: Follow [Routes and Pages Guide](routes-and-pages.doc.md) for frontend navigation
+3. **Implement Backend**: Use [Backend Architecture Guide](backend-architecture.doc.md) for data layer and IPC
+4. **Achieve Coverage**: Apply [Testing Strategies Guide](testing-strategies.doc.md) for comprehensive testing
+5. **Validate**: Run `npm run test:coverage` to ensure 100% coverage maintenance
+
+### 📋 Quick Reference
+
+- **New Page Component**: Extract complex logic to helpers for testability
+- **Database Operations**: Use service layer with Prisma ORM and automatic initialization
+- **IPC Communication**: Implement secure controller-preload-component patterns
+- **Testing**: Target 100% coverage through helper function extraction and edge case testing
+- **Internationalization**: Add i18n keys for all user-facing text
 
 ## 🌍 Internationalization
 
