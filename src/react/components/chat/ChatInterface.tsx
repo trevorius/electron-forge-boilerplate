@@ -38,6 +38,9 @@ const ChatInterface = () => {
 
   return (
   <div className="flex flex-col h-full">
+    <div id="chat-name-container" className="flex-shrink-0 w-full p-4">
+      <h1 className="text-2xl font-bold">{t('chat.name')}</h1>
+    </div>
     <div id="chat-history-container" className="flex-1 overflow-y-auto w-full p-4 min-h-0 mt-12">
       {messages.map((message, index) => (
         <div key={index} className={`flex flex-row w-full pb-4 ${message.author === 'assistant' ? 'justify-start': 'justify-end'}`}>
