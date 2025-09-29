@@ -366,9 +366,21 @@ describe('preload.ts', () => {
 
 					expect(mockIpcRenderer.on).toHaveBeenCalledWith('chat-message-stream', expect.any(Function));
 
+					// Get the listener function that was registered
+					const listenerCall = (mockIpcRenderer.on as jest.Mock).mock.calls.find(
+						call => call[0] === 'chat-message-stream'
+					);
+					if (listenerCall) {
+						const listener = listenerCall[1];
+						// Call the listener to test the callback wrapper
+						listener(null, { chatId: 1, messageId: 1, content: 'test', done: false });
+						expect(callback).toHaveBeenCalledWith({ chatId: 1, messageId: 1, content: 'test', done: false });
+					}
+
 					// Test cleanup function
 					if (typeof removeListener === 'function') {
 						removeListener();
+						expect(mockIpcRenderer.removeListener).toHaveBeenCalledWith('chat-message-stream', expect.any(Function));
 					}
 				}
 			});

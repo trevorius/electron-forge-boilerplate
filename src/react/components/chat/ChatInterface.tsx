@@ -14,28 +14,54 @@ import {
   canSendMessage,
 } from './ChatInterface.helpers';
 
-const ChatInterface = () => {
+interface ChatInterfaceProps {
+  chatId?: number | null;
+  onChatCreated?: (chatId: number) => void;
+}
+
+const ChatInterface = ({ chatId: propChatId, onChatCreated }: ChatInterfaceProps) => {
   const { t } = useTranslation();
-  const [chatId, setChatId] = useState<number | null>(null);
+  const [chatId, setChatId] = useState<number | null>(propChatId || null);
   const [chatName, setChatName] = useState<string>('New Chat');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
 
-  // Initialize chat on mount
+  // Initialize or load chat
   useEffect(() => {
     const initializeChat = async () => {
       try {
-        const chat = await window.electronAPI.chatCreate();
-        setChatId(chat.id);
-        setChatName(chat.name);
+        if (propChatId) {
+          // Load existing chat
+          const chat = await window.electronAPI.chatGet(propChatId);
+          const chatMessages = await window.electronAPI.chatGetMessages(propChatId);
+
+          setChatId(chat.id);
+          setChatName(chat.name);
+          setMessages(
+            chatMessages.map((msg) => ({
+              author: msg.role,
+              message: msg.content,
+            }))
+          );
+        } else {
+          // Create new chat
+          const chat = await window.electronAPI.chatCreate();
+          setChatId(chat.id);
+          setChatName(chat.name);
+          setMessages([]);
+
+          if (onChatCreated) {
+            onChatCreated(chat.id);
+          }
+        }
       } catch (error) {
-        console.error('Failed to create chat:', error);
+        console.error('Failed to initialize chat:', error);
       }
     };
 
     initializeChat();
-  }, []);
+  }, [propChatId]);
 
   // Set up streaming message listener
   useEffect(() => {

@@ -466,4 +466,50 @@ describe('ChatService', () => {
       expect(url).toContain('/mock/user/data');
     });
   });
+
+  describe('getDatabasePath', () => {
+    it('should return dev path in development', () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
+
+      const service = new ChatService();
+      const dbPath = (service as any).getDatabasePath();
+
+      expect(dbPath).toContain('prisma/database.db');
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('should return userData path in production', () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const service = new ChatService();
+      const dbPath = (service as any).getDatabasePath();
+
+      expect(dbPath).toContain('/mock/user/data/database.db');
+      process.env.NODE_ENV = originalEnv;
+    });
+  });
+
+  describe('ensureInitialized', () => {
+    it('should call initialize if not already initialized', async () => {
+      const service = new ChatService();
+      (service as any).initialized = false;
+
+      const initializeSpy = jest.spyOn(service, 'initialize');
+      await (service as any).ensureInitialized();
+
+      expect(initializeSpy).toHaveBeenCalled();
+    });
+
+    it('should not call initialize if already initialized', async () => {
+      const service = new ChatService();
+      await service.initialize();
+
+      const initializeSpy = jest.spyOn(service, 'initialize');
+      await (service as any).ensureInitialized();
+
+      expect(initializeSpy).not.toHaveBeenCalled();
+    });
+  });
 });

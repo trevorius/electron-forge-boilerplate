@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow } from 'electron';
-import { chatService, CreateMessageRequest } from '../services/chat.service';
+import { chatService } from '../services/chat.service';
 
 /**
  * Generate a 25-word Lorem Ipsum response

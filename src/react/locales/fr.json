@@ -88,5 +88,11 @@
     "date": "Date",
     "actions": "Actions",
     "delete": "Supprimer"
-  }
+  },
+  "chat": "Chat",
+  "newChat": "Nouveau Chat",
+  "conversations": "Conversations",
+  "loading": "Chargement",
+  "noChats": "Aucun chat pour le moment. Commencez une nouvelle conversation !",
+  "deleteChat": "Supprimer le chat"
 }

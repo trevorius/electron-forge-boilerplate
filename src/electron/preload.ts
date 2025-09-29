@@ -27,35 +27,6 @@ interface NodeAPI {
 	env: string | undefined;
 }
 
-/**
- * Chat API Types
- */
-interface ChatRecord {
-  id: number;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface MessageRecord {
-  id: number;
-  chatId: number;
-  content: string;
-  role: 'user' | 'assistant';
-  createdAt: Date;
-}
-
-interface ChatWithMessages extends ChatRecord {
-  messages: MessageRecord[];
-}
-
-interface ChatMessageStreamData {
-  chatId: number;
-  messageId: number;
-  content: string;
-  done: boolean;
-}
-
 const HighSCoresApi = {
   saveScore: (scoreData: CreateScoreRequest): Promise<ScoreRecord> =>
     ipcRenderer.invoke('save-score', scoreData),
@@ -74,42 +45,6 @@ const HighSCoresApi = {
 
   clearScores: (game?: string): Promise<void> =>
     ipcRenderer.invoke('clear-scores', game)
-};
-
-const ChatApi = {
-  chatCreate: (name?: string): Promise<ChatRecord> =>
-    ipcRenderer.invoke('chat-create', name),
-
-  chatGet: (chatId: number): Promise<ChatWithMessages | null> =>
-    ipcRenderer.invoke('chat-get', chatId),
-
-  chatGetAll: (): Promise<ChatRecord[]> =>
-    ipcRenderer.invoke('chat-get-all'),
-
-  chatUpdateName: (chatId: number, name: string): Promise<ChatRecord> =>
-    ipcRenderer.invoke('chat-update-name', chatId, name),
-
-  chatDelete: (chatId: number): Promise<void> =>
-    ipcRenderer.invoke('chat-delete', chatId),
-
-  chatSendMessage: (chatId: number, content: string): Promise<{
-    userMessage: MessageRecord;
-    assistantMessage: MessageRecord;
-    autoNamed: boolean;
-  }> =>
-    ipcRenderer.invoke('chat-send-message', chatId, content),
-
-  chatGetMessages: (chatId: number): Promise<MessageRecord[]> =>
-    ipcRenderer.invoke('chat-get-messages', chatId),
-
-  chatGetMessageCount: (chatId: number): Promise<number> =>
-    ipcRenderer.invoke('chat-get-message-count', chatId),
-
-  chatOnMessageStream: (callback: (data: ChatMessageStreamData) => void): (() => void) => {
-    const listener = (_event: unknown, data: ChatMessageStreamData) => callback(data);
-    ipcRenderer.on('chat-message-stream', listener);
-    return () => ipcRenderer.removeListener('chat-message-stream', listener);
-  }
 };
 
 const electronAPI = {
@@ -141,8 +76,7 @@ const electronAPI = {
 	getMainAppLocale: (): Promise<string> => ipcRenderer.invoke('get-main-app-locale'),
 
 	// API endpoints from modules
-  ...HighSCoresApi,
-  ...ChatApi
+  ...HighSCoresApi
 };
 
 const nodeAPI: NodeAPI = {
@@ -168,20 +102,6 @@ interface BaseElectronAPI {
 	openLicenseWindow: () => Promise<void>;
 	closeLicenseWindow: () => Promise<void>;
 	getMainAppLocale: () => Promise<string>;
-	// Chat API methods
-	chatCreate: (name?: string) => Promise<ChatRecord>;
-	chatGet: (chatId: number) => Promise<ChatWithMessages | null>;
-	chatGetAll: () => Promise<ChatRecord[]>;
-	chatUpdateName: (chatId: number, name: string) => Promise<ChatRecord>;
-	chatDelete: (chatId: number) => Promise<void>;
-	chatSendMessage: (chatId: number, content: string) => Promise<{
-		userMessage: MessageRecord;
-		assistantMessage: MessageRecord;
-		autoNamed: boolean;
-	}>;
-	chatGetMessages: (chatId: number) => Promise<MessageRecord[]>;
-	chatGetMessageCount: (chatId: number) => Promise<number>;
-	chatOnMessageStream: (callback: (data: ChatMessageStreamData) => void) => () => void;
 }
 
 // Extensible ElectronAPI type that can include additional APIs

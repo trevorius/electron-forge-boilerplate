@@ -91,7 +91,7 @@ describe('ChatInterface', () => {
     render(<ChatInterface />);
 
     await waitFor(() => {
-      expect(consoleError).toHaveBeenCalledWith('Failed to create chat:', expect.any(Error));
+      expect(consoleError).toHaveBeenCalledWith('Failed to initialize chat:', expect.any(Error));
     });
 
     consoleError.mockRestore();
@@ -382,6 +382,140 @@ describe('ChatInterface', () => {
     await waitFor(() => {
       expect(input.disabled).toBe(true);
       expect(button.disabled).toBe(true);
+    });
+  });
+
+  it('should not send message before chatId is initialized', async () => {
+    // Make chatCreate hang so chatId stays null
+    mockChatCreate.mockImplementation(() => new Promise(() => {}));
+
+    const { container } = render(<ChatInterface />);
+
+    const input = container.querySelector('input') as HTMLInputElement;
+
+    // Try to send a message before chatId is set
+    fireEvent.change(input, { target: { value: 'Hello' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    // Wait a bit
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // chatSendMessage should not have been called
+    expect(mockChatSendMessage).not.toHaveBeenCalled();
+  });
+
+  it('should load existing chat when chatId prop is provided', async () => {
+    const mockChat = {
+      id: 5,
+      name: 'Existing Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const mockMessages = [
+      { id: 1, chatId: 5, content: 'Hello', role: 'user', createdAt: new Date() },
+      { id: 2, chatId: 5, content: 'Hi there', role: 'assistant', createdAt: new Date() },
+    ];
+
+    (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
+    (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue(mockMessages);
+
+    render(<ChatInterface chatId={5} />);
+
+    await waitFor(() => {
+      expect((window.electronAPI as any).chatGet).toHaveBeenCalledWith(5);
+      expect((window.electronAPI as any).chatGetMessages).toHaveBeenCalledWith(5);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Existing Chat')).toBeInTheDocument();
+      expect(screen.getByText('Hello')).toBeInTheDocument();
+      expect(screen.getByText('Hi there')).toBeInTheDocument();
+    });
+  });
+
+  it('should call onChatCreated when new chat is created', async () => {
+    const mockOnChatCreated = jest.fn();
+    mockChatCreate.mockResolvedValue({
+      id: 10,
+      name: 'New Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    render(<ChatInterface onChatCreated={mockOnChatCreated} />);
+
+    await waitFor(() => {
+      expect(mockOnChatCreated).toHaveBeenCalledWith(10);
+    });
+  });
+
+  it('should not call onChatCreated when loading existing chat', async () => {
+    const mockOnChatCreated = jest.fn();
+    const mockChat = {
+      id: 5,
+      name: 'Existing Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
+    (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue([]);
+
+    render(<ChatInterface chatId={5} onChatCreated={mockOnChatCreated} />);
+
+    await waitFor(() => {
+      expect((window.electronAPI as any).chatGet).toHaveBeenCalled();
+    });
+
+    expect(mockOnChatCreated).not.toHaveBeenCalled();
+  });
+
+  it('should handle undefined chatId prop', async () => {
+    mockChatCreate.mockResolvedValue({
+      id: 1,
+      name: 'New Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    render(<ChatInterface chatId={undefined} />);
+
+    await waitFor(() => {
+      expect(mockChatCreate).toHaveBeenCalled();
+    });
+  });
+
+  it('should handle null chatId prop', async () => {
+    mockChatCreate.mockResolvedValue({
+      id: 1,
+      name: 'New Chat',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    render(<ChatInterface chatId={null} />);
+
+    await waitFor(() => {
+      expect(mockChatCreate).toHaveBeenCalled();
+    });
+  });
+
+  it('should handle chatId of 0', async () => {
+    const mockChat = {
+      id: 0,
+      name: 'Chat Zero',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
+    (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue([]);
+
+    render(<ChatInterface chatId={0} />);
+
+    // Since 0 is falsy, it should create a new chat instead of loading
+    await waitFor(() => {
+      expect(mockChatCreate).toHaveBeenCalled();
     });
   });
 });

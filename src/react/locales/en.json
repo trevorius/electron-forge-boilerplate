@@ -88,5 +88,11 @@
     "date": "Date",
     "actions": "Actions",
     "delete": "Delete"
-  }
+  },
+  "chat": "Chat",
+  "newChat": "New Chat",
+  "conversations": "Conversations",
+  "loading": "Loading",
+  "noChats": "No chats yet. Start a new conversation!",
+  "deleteChat": "Delete chat"
 }
