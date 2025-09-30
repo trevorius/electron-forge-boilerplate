@@ -3,6 +3,8 @@
  * These functions are extracted to enable 100% test coverage
  */
 
+import React from 'react';
+
 export interface Message {
   author: 'user' | 'assistant';
   message: string;
@@ -154,3 +156,13 @@ export function focusInput(element: HTMLInputElement | null): void {
     element.focus();
   }
 }
+
+/**
+ * Markdown component renderers for react-markdown
+ */
+export const markdownComponents = {
+  p: ({ children }: { children: React.ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
+  ul: ({ children }: { children: React.ReactNode }) => <ul className="list-disc ml-4 space-y-1">{children}</ul>,
+  ol: ({ children }: { children: React.ReactNode }) => <ol className="list-decimal ml-4 space-y-1">{children}</ol>,
+  li: ({ children }: { children: React.ReactNode }) => <li className="my-1">{children}</li>,
+};

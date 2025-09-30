@@ -27,69 +27,94 @@ export interface DownloadProgress {
   progress: number;
 }
 
+function llmListAvailable(): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-list-available');
+}
+
+function llmListInstalled(): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-list-installed');
+}
+
+function llmSelectFromDisk(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-select-from-disk');
+}
+
+function llmLoadModel(modelPath: string, config?: Partial<LLMConfig>): Promise<void> {
+  return ipcRenderer.invoke('llm-load-model', modelPath, config);
+}
+
+function llmUnloadModel(): Promise<void> {
+  return ipcRenderer.invoke('llm-unload-model');
+}
+
+function llmIsLoaded(): Promise<boolean> {
+  return ipcRenderer.invoke('llm-is-loaded');
+}
+
+function llmGetCurrentModel(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-get-current-model');
+}
+
+function llmDownloadModel(modelInfo: ModelInfo): Promise<void> {
+  return ipcRenderer.invoke('llm-download-model', modelInfo);
+}
+
+function llmDeleteModel(modelInfo: ModelInfo): Promise<void> {
+  return ipcRenderer.invoke('llm-delete-model', modelInfo);
+}
+
+function llmUpdateConfig(config: Partial<LLMConfig>): Promise<void> {
+  return ipcRenderer.invoke('llm-update-config', config);
+}
+
+function llmGetConfig(): Promise<LLMConfig> {
+  return ipcRenderer.invoke('llm-get-config');
+}
+
+function llmGenerateResponse(prompt: string): Promise<string> {
+  return ipcRenderer.invoke('llm-generate-response', prompt);
+}
+
+function llmOnDownloadProgress(callback: (progress: DownloadProgress) => void): () => void {
+  const listener = (_event: Electron.IpcRendererEvent, progress: DownloadProgress): void => callback(progress);
+  ipcRenderer.on('llm-download-progress', listener);
+  return (): void => { ipcRenderer.removeListener('llm-download-progress', listener); };
+}
+
+function llmOnToken(callback: (token: string) => void): () => void {
+  const listener = (_event: Electron.IpcRendererEvent, token: string): void => callback(token);
+  ipcRenderer.on('llm-token', listener);
+  return (): void => { ipcRenderer.removeListener('llm-token', listener); };
+}
+
+function llmGetModelsDirectory(): Promise<string> {
+  return ipcRenderer.invoke('llm-get-models-directory');
+}
+
+function llmSetModelsDirectory(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-set-models-directory');
+}
+
+function llmScanFolder(folderPath?: string): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-scan-folder', folderPath);
+}
+
 export const LLMApi = {
-  // List all models defined in llms.json
-  llmListAvailable: (): Promise<Array<ModelInfo>> => ipcRenderer.invoke('llm-list-available'),
-
-  // List only installed models
-  llmListInstalled: (): Promise<Array<ModelInfo>> => ipcRenderer.invoke('llm-list-installed'),
-
-  // Open file dialog to select model from disk
-  llmSelectFromDisk: (): Promise<string | null> => ipcRenderer.invoke('llm-select-from-disk'),
-
-  // Load a model
-  llmLoadModel: (modelPath: string, config?: Partial<LLMConfig>): Promise<void> =>
-    ipcRenderer.invoke('llm-load-model', modelPath, config),
-
-  // Unload current model
-  llmUnloadModel: (): Promise<void> => ipcRenderer.invoke('llm-unload-model'),
-
-  // Check if a model is currently loaded
-  llmIsLoaded: (): Promise<boolean> => ipcRenderer.invoke('llm-is-loaded'),
-
-  // Get current loaded model path
-  llmGetCurrentModel: (): Promise<string | null> => ipcRenderer.invoke('llm-get-current-model'),
-
-  // Download a model from llms.json
-  llmDownloadModel: (modelInfo: ModelInfo): Promise<void> =>
-    ipcRenderer.invoke('llm-download-model', modelInfo),
-
-  // Delete a downloaded model
-  llmDeleteModel: (modelInfo: ModelInfo): Promise<void> =>
-    ipcRenderer.invoke('llm-delete-model', modelInfo),
-
-  // Update LLM configuration
-  llmUpdateConfig: (config: Partial<LLMConfig>): Promise<void> =>
-    ipcRenderer.invoke('llm-update-config', config),
-
-  // Get current LLM configuration
-  llmGetConfig: (): Promise<LLMConfig> => ipcRenderer.invoke('llm-get-config'),
-
-  // Generate response with streaming support
-  llmGenerateResponse: (prompt: string): Promise<string> =>
-    ipcRenderer.invoke('llm-generate-response', prompt),
-
-  // Listen for download progress updates
-  llmOnDownloadProgress: (callback: (progress: DownloadProgress) => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, progress: DownloadProgress): void => callback(progress);
-    ipcRenderer.on('llm-download-progress', listener);
-    return (): void => { ipcRenderer.removeListener('llm-download-progress', listener); };
-  },
-
-  // Listen for token streaming
-  llmOnToken: (callback: (token: string) => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, token: string): void => callback(token);
-    ipcRenderer.on('llm-token', listener);
-    return (): void => { ipcRenderer.removeListener('llm-token', listener); };
-  },
-
-  // Get models directory
-  llmGetModelsDirectory: (): Promise<string> => ipcRenderer.invoke('llm-get-models-directory'),
-
-  // Set models directory
-  llmSetModelsDirectory: (): Promise<string | null> => ipcRenderer.invoke('llm-set-models-directory'),
-
-  // Scan folder for models
-  llmScanFolder: (folderPath?: string): Promise<Array<ModelInfo>> =>
-    ipcRenderer.invoke('llm-scan-folder', folderPath)
+  llmListAvailable,
+  llmListInstalled,
+  llmSelectFromDisk,
+  llmLoadModel,
+  llmUnloadModel,
+  llmIsLoaded,
+  llmGetCurrentModel,
+  llmDownloadModel,
+  llmDeleteModel,
+  llmUpdateConfig,
+  llmGetConfig,
+  llmGenerateResponse,
+  llmOnDownloadProgress,
+  llmOnToken,
+  llmGetModelsDirectory,
+  llmSetModelsDirectory,
+  llmScanFolder
 };

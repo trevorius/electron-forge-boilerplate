@@ -1,3 +1,5 @@
+import React from 'react';
+import { render } from '@testing-library/react';
 import {
   handleKeyDown,
   handleSendClick,
@@ -9,6 +11,7 @@ import {
   canSendMessage,
   scrollToBottom,
   focusInput,
+  markdownComponents,
 } from './ChatInterface.helpers';
 
 describe('ChatInterface.helpers', () => {
@@ -308,6 +311,44 @@ describe('ChatInterface.helpers', () => {
     it('should handle null element gracefully', () => {
       // Should not throw
       expect(() => focusInput(null)).not.toThrow();
+    });
+  });
+
+  describe('markdownComponents', () => {
+    it('should render p component with correct styling', () => {
+      const PComponent = markdownComponents.p;
+      const { container } = render(<PComponent>Test paragraph</PComponent>);
+      const p = container.querySelector('p');
+      expect(p).toBeInTheDocument();
+      expect(p).toHaveTextContent('Test paragraph');
+      expect(p).toHaveClass('mb-2', 'last:mb-0');
+    });
+
+    it('should render ul component with correct styling', () => {
+      const UlComponent = markdownComponents.ul;
+      const { container } = render(<UlComponent>Test list</UlComponent>);
+      const ul = container.querySelector('ul');
+      expect(ul).toBeInTheDocument();
+      expect(ul).toHaveTextContent('Test list');
+      expect(ul).toHaveClass('list-disc', 'ml-4', 'space-y-1');
+    });
+
+    it('should render ol component with correct styling', () => {
+      const OlComponent = markdownComponents.ol;
+      const { container } = render(<OlComponent>Test ordered list</OlComponent>);
+      const ol = container.querySelector('ol');
+      expect(ol).toBeInTheDocument();
+      expect(ol).toHaveTextContent('Test ordered list');
+      expect(ol).toHaveClass('list-decimal', 'ml-4', 'space-y-1');
+    });
+
+    it('should render li component with correct styling', () => {
+      const LiComponent = markdownComponents.li;
+      const { container } = render(<LiComponent>Test list item</LiComponent>);
+      const li = container.querySelector('li');
+      expect(li).toBeInTheDocument();
+      expect(li).toHaveTextContent('Test list item');
+      expect(li).toHaveClass('my-1');
     });
   });
 });

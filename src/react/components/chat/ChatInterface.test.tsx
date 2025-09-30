@@ -34,6 +34,26 @@ jest.mock('lucide-react', () => ({
   Send: () => <span>Send Icon</span>
 }));
 
+// Mock react-markdown
+jest.mock('react-markdown', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: React.ReactNode }) => <div className="markdown">{children}</div>
+  };
+});
+
+// Mock remark plugins
+jest.mock('remark-gfm', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
+
+jest.mock('remark-breaks', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
+
 // Mock the sidebar components
 jest.mock('../ui/sidebar', () => {
   const React = require('react');
@@ -45,12 +65,16 @@ jest.mock('../ui/sidebar', () => {
 
 // Mock window.electronAPI
 const mockChatCreate = jest.fn();
+const mockChatGet = jest.fn();
+const mockChatGetMessages = jest.fn();
 const mockChatSendMessage = jest.fn();
 const mockChatOnMessageStream = jest.fn();
 
 beforeAll(() => {
   (global as any).window.electronAPI = {
     chatCreate: mockChatCreate,
+    chatGet: mockChatGet,
+    chatGetMessages: mockChatGetMessages,
     chatSendMessage: mockChatSendMessage,
     chatOnMessageStream: mockChatOnMessageStream,
   };
@@ -65,6 +89,7 @@ describe('ChatInterface', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockChatOnMessageStream.mockReturnValue(() => {});
+    mockChatGetMessages.mockResolvedValue([]);
   });
 
   it('should render without crashing', () => {
@@ -235,6 +260,14 @@ describe('ChatInterface', () => {
       updatedAt: new Date(),
     });
 
+    mockChatGet.mockResolvedValue({
+      id: 1,
+      name: 'AI Generated Chat Title',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      messages: [],
+    });
+
     mockChatSendMessage.mockResolvedValue({
       userMessage: { id: 1, chatId: 1, content: 'Hello', role: 'user', createdAt: new Date() },
       assistantMessage: { id: 2, chatId: 1, content: 'Hi', role: 'assistant', createdAt: new Date() },
@@ -253,7 +286,8 @@ describe('ChatInterface', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
 
     await waitFor(() => {
-      expect(screen.getByText('Generated Name')).toBeInTheDocument();
+      expect(mockChatGet).toHaveBeenCalledWith(1);
+      expect(screen.getByText('AI Generated Chat Title')).toBeInTheDocument();
       expect(mockOnChatNamed).toHaveBeenCalled();
     });
   });
@@ -264,6 +298,14 @@ describe('ChatInterface', () => {
       name: 'New Chat',
       createdAt: new Date(),
       updatedAt: new Date(),
+    });
+
+    mockChatGet.mockResolvedValue({
+      id: 1,
+      name: 'Auto Generated Title',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      messages: [],
     });
 
     mockChatSendMessage.mockResolvedValue({
@@ -284,7 +326,8 @@ describe('ChatInterface', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
 
     await waitFor(() => {
-      expect(screen.getByText('Generated Name')).toBeInTheDocument();
+      expect(mockChatGet).toHaveBeenCalledWith(1);
+      expect(screen.getByText('Auto Generated Title')).toBeInTheDocument();
     });
 
     // Should not crash even without callback
@@ -467,14 +510,14 @@ describe('ChatInterface', () => {
       { id: 2, chatId: 5, content: 'Hi there', role: 'assistant', createdAt: new Date() },
     ];
 
-    (window.electronAPI as any).chatGet = jest.fn().mockResolvedValue(mockChat);
-    (window.electronAPI as any).chatGetMessages = jest.fn().mockResolvedValue(mockMessages);
+    mockChatGet.mockResolvedValue(mockChat);
+    mockChatGetMessages.mockResolvedValue(mockMessages);
 
     renderWithProvider(<ChatInterface chatId={5} />);
 
     await waitFor(() => {
-      expect((window.electronAPI as any).chatGet).toHaveBeenCalledWith(5);
-      expect((window.electronAPI as any).chatGetMessages).toHaveBeenCalledWith(5);
+      expect(mockChatGet).toHaveBeenCalledWith(5);
+      expect(mockChatGetMessages).toHaveBeenCalledWith(5);
     });
 
     await waitFor(() => {

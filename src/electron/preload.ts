@@ -34,6 +34,48 @@ interface ChatMessageStreamData {
  * Chat API functions for preload script
  * These functions handle IPC communication for chat operations
  */
+function chatCreate(name?: string): Promise<ChatRecord> {
+  return ipcRenderer.invoke('chat-create', name);
+}
+
+function chatGet(chatId: number): Promise<ChatWithMessages | null> {
+  return ipcRenderer.invoke('chat-get', chatId);
+}
+
+function chatGetAll(): Promise<ChatRecord[]> {
+  return ipcRenderer.invoke('chat-get-all');
+}
+
+function chatUpdateName(chatId: number, name: string): Promise<ChatRecord> {
+  return ipcRenderer.invoke('chat-update-name', chatId, name);
+}
+
+function chatDelete(chatId: number): Promise<void> {
+  return ipcRenderer.invoke('chat-delete', chatId);
+}
+
+function chatSendMessage(chatId: number, content: string): Promise<{
+  userMessage: MessageRecord;
+  assistantMessage: MessageRecord;
+  autoNamed: boolean;
+}> {
+  return ipcRenderer.invoke('chat-send-message', chatId, content);
+}
+
+function chatGetMessages(chatId: number): Promise<MessageRecord[]> {
+  return ipcRenderer.invoke('chat-get-messages', chatId);
+}
+
+function chatGetMessageCount(chatId: number): Promise<number> {
+  return ipcRenderer.invoke('chat-get-message-count', chatId);
+}
+
+function chatOnMessageStream(callback: (data: ChatMessageStreamData) => void): () => void {
+  const listener = (_event: unknown, data: ChatMessageStreamData) => callback(data);
+  ipcRenderer.on('chat-message-stream', listener);
+  return () => ipcRenderer.removeListener('chat-message-stream', listener);
+}
+
 
 /**
  * Database Types and Interfaces
@@ -57,6 +99,30 @@ interface CreateScoreRequest {
  * High Score API functions for preload script
  * These functions handle IPC communication for database operations
  */
+function saveScore(scoreData: CreateScoreRequest): Promise<ScoreRecord> {
+  return ipcRenderer.invoke('save-score', scoreData);
+}
+
+function getHighScores(game: string, limit?: number): Promise<ScoreRecord[]> {
+  return ipcRenderer.invoke('get-high-scores', game, limit);
+}
+
+function getAllHighScores(limit?: number): Promise<ScoreRecord[]> {
+  return ipcRenderer.invoke('get-all-high-scores', limit);
+}
+
+function isHighScore(game: string, score: number): Promise<boolean> {
+  return ipcRenderer.invoke('is-high-score', game, score);
+}
+
+function deleteScore(id: number): Promise<void> {
+  return ipcRenderer.invoke('delete-score', id);
+}
+
+function clearScores(game?: string): Promise<void> {
+  return ipcRenderer.invoke('clear-scores', game);
+}
+
 
 export interface ModelInfo {
   id: string;
@@ -85,131 +151,121 @@ export interface DownloadProgress {
   progress: number;
 }
 
+function llmListAvailable(): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-list-available');
+}
+
+function llmListInstalled(): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-list-installed');
+}
+
+function llmSelectFromDisk(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-select-from-disk');
+}
+
+function llmLoadModel(modelPath: string, config?: Partial<LLMConfig>): Promise<void> {
+  return ipcRenderer.invoke('llm-load-model', modelPath, config);
+}
+
+function llmUnloadModel(): Promise<void> {
+  return ipcRenderer.invoke('llm-unload-model');
+}
+
+function llmIsLoaded(): Promise<boolean> {
+  return ipcRenderer.invoke('llm-is-loaded');
+}
+
+function llmGetCurrentModel(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-get-current-model');
+}
+
+function llmDownloadModel(modelInfo: ModelInfo): Promise<void> {
+  return ipcRenderer.invoke('llm-download-model', modelInfo);
+}
+
+function llmDeleteModel(modelInfo: ModelInfo): Promise<void> {
+  return ipcRenderer.invoke('llm-delete-model', modelInfo);
+}
+
+function llmUpdateConfig(config: Partial<LLMConfig>): Promise<void> {
+  return ipcRenderer.invoke('llm-update-config', config);
+}
+
+function llmGetConfig(): Promise<LLMConfig> {
+  return ipcRenderer.invoke('llm-get-config');
+}
+
+function llmGenerateResponse(prompt: string): Promise<string> {
+  return ipcRenderer.invoke('llm-generate-response', prompt);
+}
+
+function llmOnDownloadProgress(callback: (progress: DownloadProgress) => void): () => void {
+  const listener = (_event: Electron.IpcRendererEvent, progress: DownloadProgress): void => callback(progress);
+  ipcRenderer.on('llm-download-progress', listener);
+  return (): void => { ipcRenderer.removeListener('llm-download-progress', listener); };
+}
+
+function llmOnToken(callback: (token: string) => void): () => void {
+  const listener = (_event: Electron.IpcRendererEvent, token: string): void => callback(token);
+  ipcRenderer.on('llm-token', listener);
+  return (): void => { ipcRenderer.removeListener('llm-token', listener); };
+}
+
+function llmGetModelsDirectory(): Promise<string> {
+  return ipcRenderer.invoke('llm-get-models-directory');
+}
+
+function llmSetModelsDirectory(): Promise<string | null> {
+  return ipcRenderer.invoke('llm-set-models-directory');
+}
+
+function llmScanFolder(folderPath?: string): Promise<Array<ModelInfo>> {
+  return ipcRenderer.invoke('llm-scan-folder', folderPath);
+}
+
 interface NodeAPI {
 	env: string | undefined;
 }
 
 const ChatApi = {
-  chatCreate: (name?: string): Promise<ChatRecord> =>
-    ipcRenderer.invoke('chat-create', name),
-
-  chatGet: (chatId: number): Promise<ChatWithMessages | null> =>
-    ipcRenderer.invoke('chat-get', chatId),
-
-  chatGetAll: (): Promise<ChatRecord[]> =>
-    ipcRenderer.invoke('chat-get-all'),
-
-  chatUpdateName: (chatId: number, name: string): Promise<ChatRecord> =>
-    ipcRenderer.invoke('chat-update-name', chatId, name),
-
-  chatDelete: (chatId: number): Promise<void> =>
-    ipcRenderer.invoke('chat-delete', chatId),
-
-  chatSendMessage: (chatId: number, content: string): Promise<{
-    userMessage: MessageRecord;
-    assistantMessage: MessageRecord;
-    autoNamed: boolean;
-  }> =>
-    ipcRenderer.invoke('chat-send-message', chatId, content),
-
-  chatGetMessages: (chatId: number): Promise<MessageRecord[]> =>
-    ipcRenderer.invoke('chat-get-messages', chatId),
-
-  chatGetMessageCount: (chatId: number): Promise<number> =>
-    ipcRenderer.invoke('chat-get-message-count', chatId),
-
-  chatOnMessageStream: (callback: (data: ChatMessageStreamData) => void): (() => void) => {
-    const listener = (_event: unknown, data: ChatMessageStreamData) => callback(data);
-    ipcRenderer.on('chat-message-stream', listener);
-    return () => ipcRenderer.removeListener('chat-message-stream', listener);
-  }
+  chatCreate,
+  chatGet,
+  chatGetAll,
+  chatUpdateName,
+  chatDelete,
+  chatSendMessage,
+  chatGetMessages,
+  chatGetMessageCount,
+  chatOnMessageStream
 };
 
 const HighSCoresApi = {
-  saveScore: (scoreData: CreateScoreRequest): Promise<ScoreRecord> =>
-    ipcRenderer.invoke('save-score', scoreData),
-
-  getHighScores: (game: string, limit?: number): Promise<ScoreRecord[]> =>
-    ipcRenderer.invoke('get-high-scores', game, limit),
-
-  getAllHighScores: (limit?: number): Promise<ScoreRecord[]> =>
-    ipcRenderer.invoke('get-all-high-scores', limit),
-
-  isHighScore: (game: string, score: number): Promise<boolean> =>
-    ipcRenderer.invoke('is-high-score', game, score),
-
-  deleteScore: (id: number): Promise<void> =>
-    ipcRenderer.invoke('delete-score', id),
-
-  clearScores: (game?: string): Promise<void> =>
-    ipcRenderer.invoke('clear-scores', game)
+  saveScore,
+  getHighScores,
+  getAllHighScores,
+  isHighScore,
+  deleteScore,
+  clearScores
 };
 
 const LLMApi = {
-  // List all models defined in llms.json
-  llmListAvailable: (): Promise<Array<ModelInfo>> => ipcRenderer.invoke('llm-list-available'),
-
-  // List only installed models
-  llmListInstalled: (): Promise<Array<ModelInfo>> => ipcRenderer.invoke('llm-list-installed'),
-
-  // Open file dialog to select model from disk
-  llmSelectFromDisk: (): Promise<string | null> => ipcRenderer.invoke('llm-select-from-disk'),
-
-  // Load a model
-  llmLoadModel: (modelPath: string, config?: Partial<LLMConfig>): Promise<void> =>
-    ipcRenderer.invoke('llm-load-model', modelPath, config),
-
-  // Unload current model
-  llmUnloadModel: (): Promise<void> => ipcRenderer.invoke('llm-unload-model'),
-
-  // Check if a model is currently loaded
-  llmIsLoaded: (): Promise<boolean> => ipcRenderer.invoke('llm-is-loaded'),
-
-  // Get current loaded model path
-  llmGetCurrentModel: (): Promise<string | null> => ipcRenderer.invoke('llm-get-current-model'),
-
-  // Download a model from llms.json
-  llmDownloadModel: (modelInfo: ModelInfo): Promise<void> =>
-    ipcRenderer.invoke('llm-download-model', modelInfo),
-
-  // Delete a downloaded model
-  llmDeleteModel: (modelInfo: ModelInfo): Promise<void> =>
-    ipcRenderer.invoke('llm-delete-model', modelInfo),
-
-  // Update LLM configuration
-  llmUpdateConfig: (config: Partial<LLMConfig>): Promise<void> =>
-    ipcRenderer.invoke('llm-update-config', config),
-
-  // Get current LLM configuration
-  llmGetConfig: (): Promise<LLMConfig> => ipcRenderer.invoke('llm-get-config'),
-
-  // Generate response with streaming support
-  llmGenerateResponse: (prompt: string): Promise<string> =>
-    ipcRenderer.invoke('llm-generate-response', prompt),
-
-  // Listen for download progress updates
-  llmOnDownloadProgress: (callback: (progress: DownloadProgress) => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, progress: DownloadProgress): void => callback(progress);
-    ipcRenderer.on('llm-download-progress', listener);
-    return (): void => { ipcRenderer.removeListener('llm-download-progress', listener); };
-  },
-
-  // Listen for token streaming
-  llmOnToken: (callback: (token: string) => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent, token: string): void => callback(token);
-    ipcRenderer.on('llm-token', listener);
-    return (): void => { ipcRenderer.removeListener('llm-token', listener); };
-  },
-
-  // Get models directory
-  llmGetModelsDirectory: (): Promise<string> => ipcRenderer.invoke('llm-get-models-directory'),
-
-  // Set models directory
-  llmSetModelsDirectory: (): Promise<string | null> => ipcRenderer.invoke('llm-set-models-directory'),
-
-  // Scan folder for models
-  llmScanFolder: (folderPath?: string): Promise<Array<ModelInfo>> =>
-    ipcRenderer.invoke('llm-scan-folder', folderPath)
+  llmListAvailable,
+  llmListInstalled,
+  llmSelectFromDisk,
+  llmLoadModel,
+  llmUnloadModel,
+  llmIsLoaded,
+  llmGetCurrentModel,
+  llmDownloadModel,
+  llmDeleteModel,
+  llmUpdateConfig,
+  llmGetConfig,
+  llmGenerateResponse,
+  llmOnDownloadProgress,
+  llmOnToken,
+  llmGetModelsDirectory,
+  llmSetModelsDirectory,
+  llmScanFolder
 };
 
 const electronAPI = {

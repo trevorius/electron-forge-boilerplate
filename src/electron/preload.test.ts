@@ -181,12 +181,34 @@ describe('preload.ts', () => {
 		const progressCallback = jest.fn();
 		const unsubProgress = electronAPI.llmOnDownloadProgress(progressCallback);
 		expect(mockIpcRenderer.on).toHaveBeenCalledWith('llm-download-progress', expect.any(Function));
+
+		// Get the listener function and call it to test the inner arrow function
+		const progressListenerCall = (mockIpcRenderer.on as jest.Mock).mock.calls.find(
+			call => call[0] === 'llm-download-progress'
+		);
+		if (progressListenerCall) {
+			const listener = progressListenerCall[1];
+			listener(null, { modelId: 'test', progress: 50 });
+			expect(progressCallback).toHaveBeenCalledWith({ modelId: 'test', progress: 50 });
+		}
+
 		unsubProgress();
 		expect(mockIpcRenderer.removeListener).toHaveBeenCalled();
 
 		const tokenCallback = jest.fn();
 		const unsubToken = electronAPI.llmOnToken(tokenCallback);
 		expect(mockIpcRenderer.on).toHaveBeenCalledWith('llm-token', expect.any(Function));
+
+		// Get the listener function and call it to test the inner arrow function
+		const tokenListenerCall = (mockIpcRenderer.on as jest.Mock).mock.calls.find(
+			call => call[0] === 'llm-token'
+		);
+		if (tokenListenerCall) {
+			const listener = tokenListenerCall[1];
+			listener(null, 'test token');
+			expect(tokenCallback).toHaveBeenCalledWith('test token');
+		}
+
 		unsubToken();
 		expect(mockIpcRenderer.removeListener).toHaveBeenCalled();
 

@@ -1,6 +1,9 @@
 import { Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { SidebarTrigger } from '../ui/sidebar';
@@ -14,6 +17,7 @@ import {
   updateStreamingMessage,
   scrollToBottom,
   focusInput,
+  markdownComponents,
 } from './ChatInterface.helpers';
 
 interface ChatInterfaceProps {
@@ -111,7 +115,9 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
 
       // Update chat name if auto-named
       if (result.autoNamed) {
-        setChatName('Generated Name');
+        // Fetch the updated chat to get the new name
+        const updatedChat = await window.electronAPI.chatGet(chatId);
+        setChatName(updatedChat.name);
         // Notify parent component to refresh sidebar
         if (onChatNamed) {
           onChatNamed();
@@ -147,7 +153,14 @@ const ChatInterface = ({ chatId: propChatId, onChatCreated, onChatNamed }: ChatI
                 <CardTitle className="text-slate-300">{message.author}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-100">{message.message}</p>
+                <div className="text-slate-100 prose prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm, remarkBreaks]}
+                    components={markdownComponents}
+                  >
+                    {message.message}
+                  </ReactMarkdown>
+                </div>
               </CardContent>
             </Card>
           </div>
