@@ -26,6 +26,7 @@ import { highScoreService } from './services/highScore.service';
 import { HighScoreController } from './controllers/highScore.controller';
 import { chatService } from './services/chat.service';
 import { ChatController } from './controllers/chat.controller';
+import { LLMController } from './controllers/llm.controller';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
 
@@ -168,6 +169,14 @@ app.whenReady().then(async () => {
 		} catch (handlerError) {
 			console.error('Failed to register chat handlers:', handlerError);
 		}
+	}
+
+	// Initialize LLM service and register IPC handlers
+	try {
+		await LLMController.registerHandlers();
+		console.log('LLM service and handlers initialized');
+	} catch (error) {
+		console.error('Failed to initialize LLM service:', error);
 	}
 
 	createWindow();

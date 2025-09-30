@@ -24,9 +24,12 @@
 	"config": {
 		"forge": {
 			"packagerConfig": {
-				"asar": true,
+				"asar": {
+					"unpack": "**/{node_modules/node-llama-cpp,llms.json}"
+				},
 				"extraResource": [
-					"dist-react"
+					"dist-react",
+					"llms.json"
 				]
 			},
 			"makers": [
@@ -85,6 +88,7 @@
 		"i18next": "^25.5.2",
 		"i18next-browser-languagedetector": "^8.2.0",
 		"lucide-react": "^0.544.0",
+		"node-llama-cpp": "^3.13.0",
 		"prisma": "^6.16.2",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
@@ -93,6 +97,7 @@
 		"tailwind-merge": "^3.3.1"
 	},
 	"devDependencies": {
+		"@arethetypeswrong/cli": "^0.18.2",
 		"@electron-forge/cli": "^7.9.0",
 		"@electron-forge/maker-deb": "^7.9.0",
 		"@electron-forge/maker-rpm": "^7.9.0",
@@ -119,6 +124,7 @@
 		"tailwindcss": "^4.1.13",
 		"tailwindcss-animate": "^1.0.7",
 		"ts-jest": "^29.4.4",
+		"tsx": "^4.20.6",
 		"typescript": "^5.9.2",
 		"vite": "^7.1.7",
 		"wait-on": "^9.0.1"

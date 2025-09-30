@@ -1,8 +1,20 @@
 import { ipcMain, BrowserWindow } from 'electron';
 import { chatService } from '../services/chat.service';
 
+let llmServicePromise: Promise<any> | null = null;
+
+async function getLLMService() {
+  if (!llmServicePromise) {
+    llmServicePromise = (async () => {
+      const { getLLMService: getService } = await import('../services/llm.service');
+      return getService();
+    })();
+  }
+  return llmServicePromise;
+}
+
 /**
- * Generate a 25-word Lorem Ipsum response
+ * Generate a 25-word Lorem Ipsum response (fallback)
  */
 export function generateLoremIpsum(): string {
   const words = [
@@ -47,6 +59,94 @@ export async function streamMessage(
     content: accumulated,
     done: true,
   });
+}
+
+/**
+ * Generate response using LLM with streaming
+ */
+export async function generateLLMResponse(
+  window: BrowserWindow | null,
+  prompt: string,
+  chatId: number,
+  messageId: number
+): Promise<string> {
+  try {
+    const llmService = await getLLMService();
+
+    // Check if model is loaded
+    if (!llmService.isModelLoaded()) {
+      console.log('No LLM model loaded, falling back to Lorem Ipsum');
+      return generateLoremIpsum();
+    }
+
+    let fullResponse = '';
+
+    // Generate with streaming
+    const response = await llmService.generateResponse(prompt, (token: string) => {
+      fullResponse += token;
+      if (window) {
+        window.webContents.send('chat-message-stream', {
+          chatId,
+          messageId,
+          content: fullResponse,
+          done: false,
+        });
+      }
+    });
+
+    // Send final message
+    if (window) {
+      window.webContents.send('chat-message-stream', {
+        chatId,
+        messageId,
+        content: response,
+        done: true,
+      });
+    }
+
+    return response;
+  } catch (error) {
+    console.error('LLM generation failed, falling back to Lorem Ipsum:', error);
+    return generateLoremIpsum();
+  }
+}
+
+/**
+ * Generate a chat title using LLM based on conversation context
+ */
+export async function generateChatTitle(userMessage: string, assistantResponse: string): Promise<string> {
+  try {
+    const llmService = await getLLMService();
+
+    // Check if model is loaded
+    if (!llmService.isModelLoaded()) {
+      console.log('No LLM model loaded, using default title');
+      return `Chat about ${userMessage.substring(0, 30)}...`;
+    }
+
+    // Create a prompt to generate a short title
+    const titlePrompt = `Generate a very short title (3-5 words maximum) for this conversation. Only respond with the title, nothing else.
+
+User: ${userMessage}
+Assistant: ${assistantResponse}
+
+Title:`;
+
+    // Generate title without streaming
+    const title = await llmService.generateResponse(titlePrompt);
+
+    // Clean up the title - remove quotes, trim, limit length
+    const cleanTitle = title
+      .replace(/^["']|["']$/g, '')  // Remove surrounding quotes
+      .trim()
+      .split('\n')[0]  // Take only first line
+      .substring(0, 50);  // Limit to 50 characters
+
+    return cleanTitle || `Chat about ${userMessage.substring(0, 30)}...`;
+  } catch (error) {
+    console.error('Failed to generate chat title:', error);
+    return `Chat about ${userMessage.substring(0, 30)}...`;
+  }
 }
 
 /**
@@ -125,29 +225,38 @@ export class ChatController {
           role: 'user',
         });
 
-        // Generate and save assistant response
-        const assistantResponse = generateLoremIpsum();
-        const assistantMessage = await chatService.createMessage({
-          chatId,
-          content: assistantResponse,
-          role: 'assistant',
-        });
-
         // Get the sender window
         const senderWindow = BrowserWindow.fromWebContents(event.sender);
 
-        // Stream the assistant response
-        await streamMessage(senderWindow, assistantResponse, chatId, assistantMessage.id);
+        // Create a placeholder assistant message
+        const assistantMessage = await chatService.createMessage({
+          chatId,
+          content: '',
+          role: 'assistant',
+        });
+
+        // Generate assistant response with LLM (or fallback to Lorem Ipsum)
+        const assistantResponse = await generateLLMResponse(
+          senderWindow,
+          content,
+          chatId,
+          assistantMessage.id
+        );
+
+        // Update the assistant message with the full response
+        await chatService.updateMessage(assistantMessage.id, assistantResponse);
 
         // Check if we should auto-name the chat
         const shouldAutoName = await chatService.shouldAutoNameChat(chatId);
         if (shouldAutoName) {
-          await chatService.updateChatName(chatId, 'Generated Name');
+          // Generate a title using the LLM
+          const generatedTitle = await generateChatTitle(content, assistantResponse);
+          await chatService.updateChatName(chatId, generatedTitle);
         }
 
         return {
           userMessage,
-          assistantMessage,
+          assistantMessage: { ...assistantMessage, content: assistantResponse },
           autoNamed: shouldAutoName,
         };
       } catch (error) {

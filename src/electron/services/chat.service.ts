@@ -261,6 +261,22 @@ export class ChatService {
     }
   }
 
+  async updateMessage(messageId: number, content: string): Promise<MessageRecord> {
+    await this.ensureInitialized();
+
+    try {
+      const message = await this.prisma.message.update({
+        where: { id: messageId },
+        data: { content },
+      });
+
+      return message as MessageRecord;
+    } catch (error) {
+      console.error('Failed to update message:', error);
+      throw error;
+    }
+  }
+
   async shouldAutoNameChat(chatId: number): Promise<boolean> {
     await this.ensureInitialized();
 

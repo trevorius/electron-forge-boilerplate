@@ -1,0 +1,70 @@
+{
+  "models": [
+    {
+      "id": "llama-3.2-1b-instruct",
+      "name": "Llama 3.2 1B Instruct",
+      "license": "Apache 2.0",
+      "description": "Small, fast model for basic chat tasks",
+      "size": "1.3GB",
+      "url": "https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "filename": "Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    },
+    {
+      "id": "llama-3.2-3b-instruct",
+      "name": "Llama 3.2 3B Instruct",
+      "license": "Apache 2.0",
+      "description": "Balanced model with good performance and speed",
+      "size": "2.0GB",
+      "url": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "filename": "Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    },
+    {
+      "id": "phi-3-mini-instruct",
+      "name": "Phi-3 Mini Instruct",
+      "license": "MIT",
+      "description": "Microsoft's efficient small language model",
+      "size": "2.3GB",
+      "url": "https://huggingface.co/bartowski/Phi-3-mini-128k-instruct-GGUF/resolve/main/Phi-3-mini-128k-instruct-Q4_K_M.gguf",
+      "filename": "Phi-3-mini-128k-instruct-Q4_K_M.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    },
+    {
+      "id": "gemma-2-2b-instruct",
+      "name": "Gemma 2 2B Instruct",
+      "license": "Apache 2.0",
+      "description": "Google's efficient instruction-tuned model",
+      "size": "1.6GB",
+      "url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf",
+      "filename": "gemma-2-2b-it-Q4_K_M.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    },
+    {
+      "id": "qwen-2.5-1.5b-instruct",
+      "name": "Qwen 2.5 1.5B Instruct",
+      "license": "Apache 2.0",
+      "description": "Alibaba's efficient multilingual model",
+      "size": "1.0GB",
+      "url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "filename": "qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    },
+    {
+      "id": "gpt-oss-20b",
+      "name": "GPT-OSS 20B",
+      "license": "Apache 2.0",
+      "description": "Open-source 20B parameter model from OpenAI",
+      "size": "1.0GB",
+      "url": "https://huggingface.co/OpenAI/gpt-oss-20b-GGUF/resolve/main/gpt-oss-20b-q4_k_m.gguf",
+      "filename": "gpt-oss-20b-q4_k_m.gguf",
+      "recommendedContext": 10000,
+      "type": "instruct"
+    }
+  ]
+}

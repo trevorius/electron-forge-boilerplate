@@ -1,10 +1,12 @@
-import { Gamepad2, Home, Info, LucideIcon, MessageSquare } from 'lucide-react';
+import { Gamepad2, Home, Info, LucideIcon, MessageSquare, Settings as SettingsIcon, Brain } from 'lucide-react';
 import React from 'react';
 import Tetris from './components/game/Tetris';
 import TicTacToe from './components/game/TicTacToe';
 import About from './components/layout/About';
 import Game from './components/layout/Game';
 import ChatPage from './pages/Chat';
+import Settings from './pages/Settings';
+import LLMSettings from './pages/Settings/LLMSettings';
 
 export interface Route {
   path: string;
@@ -61,6 +63,22 @@ export const routes: Route[] = [
     title: 'nav.chat',
     icon: MessageSquare,
     inNavbar: true
+  },
+  {
+    path: '/settings',
+    component: Settings,
+    title: 'nav.settings',
+    icon: SettingsIcon,
+    inNavbar: true,
+    children: [
+      {
+        path: '/settings/llm',
+        component: LLMSettings,
+        title: 'nav.settings_menu.llm',
+        icon: Brain,
+        inNavbar: false
+      }
+    ]
   }
 ];
 

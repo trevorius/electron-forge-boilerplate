@@ -41,11 +41,40 @@ apiFiles.forEach(apiFile => {
   if (apiMatch) {
     const apiName = apiMatch[1];
 
-    // Extract the full API object definition
-    const apiObjMatch = content.match(new RegExp(`export const ${apiName} = (\\{[\\s\\S]*?\\});`, 'm'));
-    if (apiObjMatch) {
-      combinedApis += `const ${apiName} = ${apiObjMatch[1]};\n\n`;
-      apiSpreads.push(`...${apiName}`);
+    // Extract the full API object definition by counting braces
+    const startIndex = content.indexOf(`export const ${apiName} = {`);
+    if (startIndex !== -1) {
+      let braceCount = 0;
+      let inString = false;
+      let stringChar = '';
+      let i = startIndex + `export const ${apiName} = `.length;
+
+      for (; i < content.length; i++) {
+        const char = content[i];
+        const prevChar = i > 0 ? content[i - 1] : '';
+
+        // Handle string literals
+        if ((char === '"' || char === "'" || char === '`') && prevChar !== '\\') {
+          if (!inString) {
+            inString = true;
+            stringChar = char;
+          } else if (char === stringChar) {
+            inString = false;
+            stringChar = '';
+          }
+        }
+
+        if (!inString) {
+          if (char === '{') braceCount++;
+          if (char === '}') braceCount--;
+          if (braceCount === 0 && char === '}') {
+            const objContent = content.substring(startIndex + `export const ${apiName} = `.length, i + 1);
+            combinedApis += `const ${apiName} = ${objContent};\n\n`;
+            apiSpreads.push(`...${apiName}`);
+            break;
+          }
+        }
+      }
     }
   }
 });

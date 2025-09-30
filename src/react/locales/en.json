@@ -94,5 +94,33 @@
   "conversations": "Conversations",
   "loading": "Loading",
   "noChats": "No chats yet. Start a new conversation!",
-  "deleteChat": "Delete chat"
+  "deleteChat": "Delete chat",
+  "nav.settings": "Settings",
+  "nav.settings_menu": {
+    "llm": "Language Models"
+  },
+  "settings": {
+    "title": "Settings",
+    "select_submenu": "Select a settings category from the menu",
+    "llm": {
+      "title": "Language Model Settings",
+      "description": "Configure and manage AI language models for chat",
+      "current_model": "Active Model",
+      "unload": "Unload Model",
+      "loading": "Loading...",
+      "custom_model": "Load Custom Model",
+      "custom_model_description": "Select a GGUF model file from your computer",
+      "select_file": "Select File",
+      "available_models": "Available Models",
+      "download": "Download",
+      "downloading": "Downloading",
+      "load": "Load",
+      "loaded": "Loaded",
+      "models_folder": "Models Folder",
+      "models_folder_description": "Choose where to store downloaded models",
+      "change_folder": "Change Folder",
+      "scan_folder": "Scan Folder",
+      "scan_folder_description": "Scan for GGUF models in the selected folder"
+    }
+  }
 }
