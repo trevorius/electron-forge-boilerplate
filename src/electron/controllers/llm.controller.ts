@@ -3,6 +3,7 @@ import type { ModelInfo, LLMConfig } from '../services/llm.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
+import { initializeLLMService, logScanFolderError, logCleanupError } from './llm.controller.helpers';
 
 let llmServicePromise: Promise<any> | null = null;
 
@@ -11,13 +12,7 @@ async function getLLMService() {
     llmServicePromise = (async () => {
       const { getLLMService: getService } = await import('../services/llm.service');
       const service = getService();
-      try {
-        await service.initialize();
-        console.log('LLM service initialized successfully');
-      } catch (error) {
-        console.error('Failed to initialize LLM service:', error);
-        // Continue anyway - the service will try to initialize on first use
-      }
+      await initializeLLMService(service);
       return service;
     })();
   }
@@ -157,7 +152,7 @@ export class LLMController {
             fs.unlinkSync(filePath);
           }
         } catch (cleanupError) {
-          console.error('Failed to clean up partial download:', cleanupError);
+          logCleanupError(cleanupError as Error);
         }
         throw error;
       }
@@ -268,7 +263,7 @@ export class LLMController {
         const scanPath = folderPath || llmService.getModelsDirectory();
         return llmService.scanFolderForModels(scanPath);
       } catch (error) {
-        console.error('Failed to scan folder:', error);
+        logScanFolderError(error as Error);
         throw error;
       }
     });

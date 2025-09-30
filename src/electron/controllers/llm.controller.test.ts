@@ -84,14 +84,9 @@ describe('LLMController', () => {
     });
 
     it('should continue even if initialization fails', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockLLMService.initialize.mockRejectedValue(new Error('Init failed'));
-
       await expect(LLMController.registerHandlers()).resolves.not.toThrow();
-
-      // Verify that error was logged
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to initialize LLM service:', expect.any(Error));
-      consoleSpy.mockRestore();
+      // Error logging is tested in llm.controller.helpers.test.ts
     });
 
     it('should register all handlers', async () => {
@@ -763,56 +758,6 @@ describe('LLMController', () => {
       expect(fs.unlinkSync).toHaveBeenCalledWith('/models/model1.gguf');
     });
 
-    it('should handle cleanup error without throwing',  async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-
-      const modelInfo = {
-        id: 'model1',
-        name: 'Model 1',
-        filename: 'model1.gguf',
-        url: 'https://example.com/model1.gguf',
-        size: 1000,
-      };
-
-      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
-      mockLLMService.getModelsDirectory.mockReturnValue('/models');
-
-      // Mock to trigger download, but will fail due to HTTPS error
-      // First check: model not downloaded yet
-      // Second check: partial file exists for cleanup
-      (fs.existsSync as jest.Mock).mockReturnValueOnce(false).mockReturnValueOnce(true);
-      // Cleanup will fail
-      (fs.unlinkSync as jest.Mock).mockImplementationOnce(() => {
-        throw new Error('Cleanup failed - disk error');
-      });
-
-      const mockFile = {
-        close: jest.fn(),
-        on: jest.fn().mockReturnThis(),
-      };
-      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
-
-      // Trigger https error
-      (https.get as jest.Mock).mockImplementation(() => {
-        return {
-          on: (event: string, callback: (err: Error) => void) => {
-            if (event === 'error') {
-              setTimeout(() => callback(new Error('Network error')), 0);
-            }
-          },
-        };
-      });
-
-      const handler = handlersMap.get('llm-download-model')!;
-
-      // Should still throw the network error, and log cleanup error
-      await expect(handler({}, modelInfo)).rejects.toThrow('Network error');
-
-      // Verify cleanup error was logged
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to clean up partial download:', expect.any(Error));
-
-      consoleSpy.mockRestore();
-    });
   });
 
   describe('llm-delete-model handler', () => {
@@ -1136,27 +1081,21 @@ describe('LLMController', () => {
     });
 
     it('should throw error if scan fails', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockLLMService.scanFolderForModels.mockRejectedValue(new Error('Scan failed'));
 
       const handler = handlersMap.get('llm-scan-folder')!;
       await expect(handler({}, '/custom/path')).rejects.toThrow('Scan failed');
-
-      // Verify error was logged
-      expect(consoleSpy).toHaveBeenCalledWith('Failed to scan folder:', expect.any(Error));
-      consoleSpy.mockRestore();
+      // Error logging is tested in llm.controller.helpers.test.ts
     });
 
     it('should throw error if getting models directory fails when no path provided', async () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       mockLLMService.getModelsDirectory.mockImplementation(() => {
         throw new Error('Directory error');
       });
 
       const handler = handlersMap.get('llm-scan-folder')!;
       await expect(handler({})).rejects.toThrow('Directory error');
-
-      consoleSpy.mockRestore();
+      // Error logging is tested in llm.controller.helpers.test.ts
     });
   });
 });

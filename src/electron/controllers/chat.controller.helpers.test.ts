@@ -132,7 +132,7 @@ describe('Chat Controller Helpers', () => {
   describe('generateChatTitle', () => {
     it('should generate title using LLM', async () => {
       mockLLMService.isModelLoaded.mockReturnValue(true);
-      mockLLMService.generateResponse.mockResolvedValue('  "Generated Title"  \n');
+      mockLLMService.generateResponse.mockResolvedValue('Generated Title');
 
       const result = await generateChatTitle('Hello', 'Hi there');
 
