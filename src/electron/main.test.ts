@@ -1060,4 +1060,38 @@ describe('main.ts', () => {
 		shouldReturnMainWindowStatusValue = originalValues.shouldReturnMainWindowStatusValue;
 	});
 
+	it('should handle open-external IPC with valid and invalid URLs', async () => {
+		// Import main to register handlers
+		await import('./main');
+
+		// Get shell from mocks
+		const { shell } = await import('electron');
+
+		// Wait a bit for the handlers to be registered
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Get the open-external handler
+		const handler = ipcHandlers['open-external'];
+		expect(handler).toBeDefined();
+
+		// Test with valid URL
+		await handler({}, 'https://example.com');
+		expect(shell.openExternal).toHaveBeenCalledWith('https://example.com');
+
+		// Clear previous calls
+		(shell.openExternal as jest.Mock).mockClear();
+
+		// Test with null - should not call openExternal
+		await handler({}, null);
+		expect(shell.openExternal).not.toHaveBeenCalled();
+
+		// Test with undefined - should not call openExternal
+		await handler({}, undefined);
+		expect(shell.openExternal).not.toHaveBeenCalled();
+
+		// Test with non-string - should not call openExternal
+		await handler({}, 123);
+		expect(shell.openExternal).not.toHaveBeenCalled();
+	});
+
 });

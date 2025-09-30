@@ -185,4 +185,28 @@ describe('ModelContext', () => {
       expect(screen.getByTestId('no-attribution')).toBeInTheDocument();
     });
   });
+
+  it('should use default attribution text when not provided', async () => {
+    mockLlmIsLoaded.mockResolvedValue(true);
+    mockLlmGetCurrentModel.mockResolvedValue('/models/llama.gguf');
+    mockLlmListAvailable.mockResolvedValue([
+      {
+        path: '/models/llama.gguf',
+        requiresAttribution: true,
+        // No attributionText provided
+      }
+    ]);
+
+    await act(async () => {
+      render(
+        <ModelProvider>
+          <TestComponent />
+        </ModelProvider>
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('attribution-text')).toHaveTextContent('Built with Llama');
+    });
+  });
 });
