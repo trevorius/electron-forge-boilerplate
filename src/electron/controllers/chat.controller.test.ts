@@ -12,6 +12,7 @@ jest.mock('../services/chat.service', () => ({
     updateChatName: jest.fn(),
     deleteChat: jest.fn(),
     createMessage: jest.fn(),
+    updateMessage: jest.fn(),
     getMessages: jest.fn(),
     getMessageCount: jest.fn(),
     shouldAutoNameChat: jest.fn(),
@@ -296,7 +297,7 @@ describe('ChatController', () => {
       const handler = handlersMap.get('chat-send-message')!;
       const result = await handler(mockEvent, 1, 'Hello');
 
-      expect(chatService.updateChatName).toHaveBeenCalledWith(1, 'Generated Name');
+      expect(chatService.updateChatName).toHaveBeenCalledWith(1, 'Chat about Hello...');
       expect(result.autoNamed).toBe(true);
     });
 

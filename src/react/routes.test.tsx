@@ -7,7 +7,9 @@ jest.mock('lucide-react', () => ({
   Home: jest.fn(() => null),
   Info: jest.fn(() => null),
   Gamepad2: jest.fn(() => null),
-  MessageSquare: jest.fn(() => null)
+  MessageSquare: jest.fn(() => null),
+  Settings: jest.fn(() => null),
+  Brain: jest.fn(() => null)
 }));
 
 // Mock the components

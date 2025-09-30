@@ -31,6 +31,7 @@ jest.mock('../generated/prisma', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       count: jest.fn(),
+      update: jest.fn(),
     },
   };
 
@@ -319,6 +320,38 @@ describe('ChatService', () => {
           role: 'user',
         })
       ).rejects.toThrow('Creation failed');
+    });
+  });
+
+  describe('updateMessage', () => {
+    beforeEach(async () => {
+      mockPrisma.$queryRaw.mockResolvedValue([{ 1: 1 }]);
+      await chatService.initialize();
+    });
+
+    it('should update a message', async () => {
+      const mockUpdatedMessage = {
+        id: 1,
+        chatId: 1,
+        content: 'Updated content',
+        role: 'user' as const,
+        createdAt: new Date(),
+      };
+      mockPrisma.message.update.mockResolvedValue(mockUpdatedMessage);
+
+      const result = await chatService.updateMessage(1, 'Updated content');
+
+      expect(mockPrisma.message.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { content: 'Updated content' },
+      });
+      expect(result).toEqual(mockUpdatedMessage);
+    });
+
+    it('should throw error if message update fails', async () => {
+      mockPrisma.message.update.mockRejectedValue(new Error('Update failed'));
+
+      await expect(chatService.updateMessage(1, 'Updated content')).rejects.toThrow('Update failed');
     });
   });
 
