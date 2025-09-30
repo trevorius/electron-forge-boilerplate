@@ -73,6 +73,12 @@ jest.mock('./components/common/Navbar', () => {
   };
 });
 
+// Mock the ModelContext
+jest.mock('./contexts/ModelContext', () => ({
+  ModelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useModel: () => ({ currentModelInfo: null })
+}));
+
 const renderApp = () => {
   return render(<App />);
 };

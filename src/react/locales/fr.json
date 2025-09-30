@@ -19,6 +19,11 @@
     "games": "Jeux",
     "about": "À propos",
     "branding": "Jeux Electron",
+    "settings": "Paramètres",
+    "settings_menu": {
+      "llm": "Modèles de langage",
+      "llm_description": "Télécharger et gérer les modèles de langage AI pour le chat"
+    },
     "games_menu": {
       "tetris": "Tetris",
       "tictactoe": "Morpion",

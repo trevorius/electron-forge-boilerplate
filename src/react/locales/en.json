@@ -19,6 +19,11 @@
     "games": "Games",
     "about": "About",
     "branding": "Electron Games",
+    "settings": "Settings",
+    "settings_menu": {
+      "llm": "Language Models",
+      "llm_description": "Download and manage AI language models for chat"
+    },
     "games_menu": {
       "tetris": "Tetris",
       "tictactoe": "Tic Tac Toe",
