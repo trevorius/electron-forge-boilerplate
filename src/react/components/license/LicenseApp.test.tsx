@@ -385,4 +385,39 @@ describe('LicenseApp', () => {
     expect(mockHelpers.createHeaderClasses).toHaveBeenCalledWith(expect.any(String));
     expect(mockHelpers.createCloseButtonClasses).toHaveBeenCalledWith(expect.any(String));
   });
+
+  it('should render React component content (non-string license)', async () => {
+    const ReactComponent = () => <div>React License Content</div>;
+    mockHelpers.createLicenses.mockReturnValue([
+      { id: 'llama', name: 'Llama License', content: <ReactComponent /> }
+    ]);
+    mockHelpers.getCurrentLicense.mockReturnValue(
+      { id: 'llama', name: 'Llama License', content: <ReactComponent /> }
+    );
+
+    render(<LicenseApp />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('React License Content')).toBeInTheDocument();
+  });
+
+  it('should render string content (regular license)', async () => {
+    mockHelpers.createLicenses.mockReturnValue([
+      { id: 'main', name: 'Main License', content: 'Plain text license content' }
+    ]);
+    mockHelpers.getCurrentLicense.mockReturnValue(
+      { id: 'main', name: 'Main License', content: 'Plain text license content' }
+    );
+
+    render(<LicenseApp />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+    });
+
+    expect(screen.getByText('Plain text license content')).toBeInTheDocument();
+  });
 });

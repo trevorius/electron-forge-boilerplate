@@ -8,6 +8,9 @@ interface ModelInfo {
   id: string;
   name: string;
   license: string;
+  licenseId?: string;
+  requiresAttribution?: boolean;
+  attributionText?: string;
   description: string;
   size: string;
   url: string;
@@ -206,10 +209,20 @@ const LLMSettings: React.FC = () => {
         <Card className="p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
           <div className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <div>
+            <div className="flex-1">
               <p className="font-medium">{t('settings.llm.current_model')}</p>
               <p className="text-sm text-muted-foreground">{currentModel}</p>
             </div>
+            {(() => {
+              const loadedModel = [...models, ...scannedModels].find(m => m.path === currentModel);
+              return loadedModel?.requiresAttribution && (
+                <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-md">
+                  <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
+                    {loadedModel.attributionText}
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         </Card>
       )}

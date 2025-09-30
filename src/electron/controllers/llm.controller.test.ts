@@ -47,6 +47,9 @@ jest.mock('fs', () => ({
   existsSync: jest.fn(),
   unlinkSync: jest.fn(),
   createWriteStream: jest.fn(),
+  writeFileSync: jest.fn(),
+  readFileSync: jest.fn(),
+  appendFileSync: jest.fn(),
 }));
 
 // Mock https
@@ -865,6 +868,292 @@ describe('LLMController', () => {
       const handler = handlersMap.get('llm-download-model')!;
       await expect(handler({}, modelInfo)).rejects.toThrow('Network error');
       expect(fs.unlinkSync).toHaveBeenCalledWith('/models/model1.gguf');
+    });
+
+    it('should create NOTICE file for Llama models', async () => {
+      const modelInfo = {
+        id: 'llama-3.2-1b',
+        name: 'Llama 3.2 1B',
+        filename: 'llama-3.2-1b.gguf',
+        url: 'https://example.com/llama.gguf',
+        license: 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+        requiresAttribution: true,
+        attributionText: 'Built with Llama',
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(false).mockReturnValueOnce(false); // file doesn't exist, NOTICE doesn't exist
+
+      const mockFile = {
+        on: jest.fn((event, callback) => {
+          if (event === 'finish') {
+            setTimeout(callback, 10);
+          }
+          return mockFile;
+        }),
+        close: jest.fn(),
+      };
+
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '1000' },
+        on: jest.fn(),
+        pipe: jest.fn((file) => {
+          setTimeout(() => {
+            const finishCallback = mockFile.on.mock.calls.find((call: any) => call[0] === 'finish')?.[1];
+            if (finishCallback) finishCallback();
+          }, 10);
+        }),
+      };
+
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        path.join('/models', 'NOTICE'),
+        expect.stringContaining('Llama 3.2 is licensed under the Llama 3.2 Community License'),
+        'utf-8'
+      );
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        path.join('/models', 'NOTICE'),
+        expect.stringContaining(modelInfo.name),
+        'utf-8'
+      );
+    });
+
+    it('should append to existing NOTICE file for additional Llama models', async () => {
+      const modelInfo = {
+        id: 'llama-3.2-3b',
+        name: 'Llama 3.2 3B',
+        filename: 'llama-3.2-3b.gguf',
+        url: 'https://example.com/llama.gguf',
+        license: 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+        requiresAttribution: true,
+        attributionText: 'Built with Llama',
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(false).mockReturnValueOnce(true); // file doesn't exist, NOTICE exists
+
+      const existingNotice = 'Existing NOTICE content\n- Llama 3.2 1B (llama-3.2-1b.gguf)\n';
+      (fs.readFileSync as jest.Mock).mockReturnValue(existingNotice);
+
+      const mockFile = {
+        on: jest.fn((event, callback) => {
+          if (event === 'finish') {
+            setTimeout(callback, 10);
+          }
+          return mockFile;
+        }),
+        close: jest.fn(),
+      };
+
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '1000' },
+        on: jest.fn(),
+        pipe: jest.fn((file) => {
+          setTimeout(() => {
+            const finishCallback = mockFile.on.mock.calls.find((call: any) => call[0] === 'finish')?.[1];
+            if (finishCallback) finishCallback();
+          }, 10);
+        }),
+      };
+
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      expect(fs.appendFileSync).toHaveBeenCalledWith(
+        path.join('/models', 'NOTICE'),
+        expect.stringContaining(modelInfo.name)
+      );
+    });
+
+    it('should not duplicate models in NOTICE file', async () => {
+      const modelInfo = {
+        id: 'llama-3.2-1b',
+        name: 'Llama 3.2 1B',
+        filename: 'llama-3.2-1b.gguf',
+        url: 'https://example.com/llama.gguf',
+        license: 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+        requiresAttribution: true,
+        attributionText: 'Built with Llama',
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(false).mockReturnValueOnce(true); // file doesn't exist, NOTICE exists
+
+      const existingNotice = 'Existing content\n- Llama 3.2 1B (llama-3.2-1b.gguf)\n';
+      (fs.readFileSync as jest.Mock).mockReturnValue(existingNotice);
+
+      const mockFile = {
+        on: jest.fn((event, callback) => {
+          if (event === 'finish') {
+            setTimeout(callback, 10);
+          }
+          return mockFile;
+        }),
+        close: jest.fn(),
+      };
+
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '1000' },
+        on: jest.fn(),
+        pipe: jest.fn((file) => {
+          setTimeout(() => {
+            const finishCallback = mockFile.on.mock.calls.find((call: any) => call[0] === 'finish')?.[1];
+            if (finishCallback) finishCallback();
+          }, 10);
+        }),
+      };
+
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      // Should NOT append since model already exists
+      expect(fs.appendFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should not create NOTICE file for non-Llama models', async () => {
+      const modelInfo = {
+        id: 'other-model',
+        name: 'Other Model',
+        filename: 'other.gguf',
+        url: 'https://example.com/other.gguf',
+        license: 'MIT',
+        requiresAttribution: false,
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValue(false);
+
+      const mockFile = {
+        on: jest.fn((event, callback) => {
+          if (event === 'finish') {
+            setTimeout(callback, 10);
+          }
+          return mockFile;
+        }),
+        close: jest.fn(),
+      };
+
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '1000' },
+        on: jest.fn(),
+        pipe: jest.fn((file) => {
+          setTimeout(() => {
+            const finishCallback = mockFile.on.mock.calls.find((call: any) => call[0] === 'finish')?.[1];
+            if (finishCallback) finishCallback();
+          }, 10);
+        }),
+      };
+
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+      expect(fs.appendFileSync).not.toHaveBeenCalled();
+    });
+
+    it('should handle NOTICE file creation error gracefully', async () => {
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const modelInfo = {
+        id: 'llama-3.2-1b',
+        name: 'Llama 3.2 1B',
+        filename: 'llama-3.2-1b.gguf',
+        url: 'https://example.com/llama.gguf',
+        license: 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+        requiresAttribution: true,
+        attributionText: 'Built with Llama',
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValueOnce(false).mockReturnValueOnce(false);
+      (fs.writeFileSync as jest.Mock).mockImplementation(() => {
+        throw new Error('Write failed');
+      });
+
+      const mockFile = {
+        on: jest.fn((event, callback) => {
+          if (event === 'finish') {
+            setTimeout(callback, 10);
+          }
+          return mockFile;
+        }),
+        close: jest.fn(),
+      };
+
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '1000' },
+        on: jest.fn(),
+        pipe: jest.fn((file) => {
+          setTimeout(() => {
+            const finishCallback = mockFile.on.mock.calls.find((call: any) => call[0] === 'finish')?.[1];
+            if (finishCallback) finishCallback();
+          }, 10);
+        }),
+      };
+
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+
+      // Should not throw even if NOTICE creation fails
+      await expect(handler({}, modelInfo)).resolves.not.toThrow();
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to create NOTICE file:', expect.any(Error));
+
+      consoleErrorSpy.mockRestore();
     });
 
   });
