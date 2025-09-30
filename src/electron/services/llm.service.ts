@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { app } from 'electron';
+import { getModelPathIfExists, getGpuModeDescription, getErrorMessage } from './llm.service.helpers';
 
 // Dynamic import types
 type Llama = any;
@@ -177,7 +178,7 @@ export class LLMService {
       return {
         ...model,
         installed: fs.existsSync(modelPath),
-        path: fs.existsSync(modelPath) ? modelPath : undefined,
+        path: getModelPathIfExists(modelPath),
       };
     });
   }
@@ -260,7 +261,7 @@ export class LLMService {
             adjustments.push(`context: ${contextSize} (reduced from ${originalContextSize})`);
           }
           if (gpuLayers !== originalGpuLayers) {
-            adjustments.push(`mode: ${strategy.useGpu ? 'GPU' : 'CPU-only'}`);
+            adjustments.push(`mode: ${getGpuModeDescription(strategy.useGpu)}`);
           }
 
           if (adjustments.length > 0) {
@@ -271,7 +272,7 @@ export class LLMService {
 
           return; // Success, exit the function
         } catch (error: any) {
-          const errorMessage = error?.message || String(error);
+          const errorMessage = getErrorMessage(error);
           console.error(`Failed to load model with context size ${contextSize}, GPU layers ${gpuLayers}:`, errorMessage);
           lastError = error;
 
@@ -321,7 +322,7 @@ export class LLMService {
     this.session = null;
     this.currentModelPath = null;
 
-    const errorMessage = lastError?.message || String(lastError);
+    const errorMessage = getErrorMessage(lastError);
     throw new Error(
       `Failed to load model: Unable to load with any combination of settings. ` +
       `Tried context sizes from ${originalContextSize} down to ${minContextSize} with both GPU and CPU. ` +

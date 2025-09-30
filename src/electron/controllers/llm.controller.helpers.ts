@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 /**
  * Helper functions for LLM Controller
  * These are extracted for testability
@@ -31,4 +34,24 @@ export function logScanFolderError(error: Error): void {
  */
 export function logCleanupError(error: Error): void {
   console.error('Failed to clean up partial download:', error);
+}
+
+/**
+ * Clean up a partial download file
+ * Handles all errors gracefully by logging them
+ */
+export async function cleanupPartialDownload(
+  getLLMServiceFn: () => Promise<any>,
+  filename: string
+): Promise<void> {
+  try {
+    const llmService = await getLLMServiceFn();
+    const modelsDir = llmService.getModelsDirectory();
+    const filePath = path.join(modelsDir, filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (cleanupError) {
+    logCleanupError(cleanupError as Error);
+  }
 }

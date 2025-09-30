@@ -12,6 +12,7 @@ import {
   handleWindowAction,
   handleWindowMaximizeToggle,
   handleWindowShow,
+  logLLMInitializationError,
   shouldCloseWindow,
   shouldCreateNewWindow,
   shouldFocusExistingWindow,
@@ -176,7 +177,7 @@ app.whenReady().then(async () => {
 		await LLMController.registerHandlers();
 		console.log('LLM service and handlers initialized');
 	} catch (error) {
-		console.error('Failed to initialize LLM service:', error);
+		logLLMInitializationError(error as Error);
 	}
 
 	createWindow();

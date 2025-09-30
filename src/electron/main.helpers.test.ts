@@ -11,6 +11,7 @@ import {
   handleWindowAction,
   handleWindowMaximizeToggle,
   handleWindowShow,
+  logLLMInitializationError,
   shouldCloseWindow,
   shouldCreateNewWindow,
   shouldExecuteJavaScript,
@@ -501,6 +502,19 @@ describe('main.helpers', () => {
 			const result = await getLocaleOrDefault(mockWindow);
 
 			expect(result).toBe('en');
+		});
+	});
+
+	describe('logLLMInitializationError', () => {
+		it('should log LLM initialization error', () => {
+			const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+			const testError = new Error('Init failed');
+
+			logLLMInitializationError(testError);
+
+			expect(consoleSpy).toHaveBeenCalledWith('Failed to initialize LLM service:', testError);
+
+			consoleSpy.mockRestore();
 		});
 	});
 });

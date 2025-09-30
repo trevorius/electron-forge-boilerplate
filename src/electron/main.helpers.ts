@@ -195,3 +195,7 @@ export async function getLocaleOrDefault(window: any): Promise<string> {
 	}
 	return 'en';
 }
+
+export function logLLMInitializationError(error: Error): void {
+	console.error('Failed to initialize LLM service:', error);
+}

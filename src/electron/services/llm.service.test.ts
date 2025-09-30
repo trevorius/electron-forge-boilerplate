@@ -318,7 +318,8 @@ describe('LLMService', () => {
         if (callCount === 1) return false; // config file (for getCustomModelsPath)
         if (callCount === 2) return true;  // models dir
         if (callCount === 3) return false; // config file again (for getCustomModelsPath)
-        if (callCount === 4) return true;  // model1 exists
+        if (callCount === 4) return true;  // model1 installed check
+        if (callCount === 5) return true;  // model1 path check
         return true; // default
       });
 
@@ -326,6 +327,32 @@ describe('LLMService', () => {
 
       expect(result[0].installed).toBe(true);
       expect(result[0].path).toBeDefined();
+    });
+
+    it('should mark models as not installed if they do not exist', async () => {
+      process.env.NODE_ENV = 'development'; // Use dev mode to simplify the test
+
+      (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify({
+        models: [
+          { id: 'model1', filename: 'model1.gguf', name: 'Model 1' }
+        ]
+      }));
+
+      let callCount = 0;
+      (fs.existsSync as jest.Mock).mockClear().mockImplementation((filePath: string) => {
+        callCount++;
+        if (callCount === 1) return false; // config file (for getCustomModelsPath)
+        if (callCount === 2) return true;  // models dir
+        if (callCount === 3) return false; // config file again (for getCustomModelsPath)
+        if (callCount === 4) return false; // model1 installed check
+        if (callCount === 5) return false; // model1 path check
+        return true; // default
+      });
+
+      const result = await service.listAvailableModels();
+
+      expect(result[0].installed).toBe(false);
+      expect(result[0].path).toBeUndefined();
     });
   });
 

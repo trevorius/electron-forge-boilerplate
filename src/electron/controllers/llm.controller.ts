@@ -3,7 +3,7 @@ import type { ModelInfo, LLMConfig } from '../services/llm.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
-import { initializeLLMService, logScanFolderError, logCleanupError } from './llm.controller.helpers';
+import { initializeLLMService, logScanFolderError, cleanupPartialDownload } from './llm.controller.helpers';
 
 let llmServicePromise: Promise<any> | null = null;
 
@@ -144,16 +144,7 @@ export class LLMController {
       } catch (error) {
         console.error('Failed to download model:', error);
         // Clean up partial download
-        try {
-          const llmService = await getLLMService();
-          const modelsDir = llmService.getModelsDirectory();
-          const filePath = path.join(modelsDir, modelInfo.filename);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
-        } catch (cleanupError) {
-          logCleanupError(cleanupError as Error);
-        }
+        await cleanupPartialDownload(getLLMService, modelInfo.filename);
         throw error;
       }
     });

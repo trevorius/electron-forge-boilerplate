@@ -427,6 +427,115 @@ describe('LLMController', () => {
       expect(fs.createWriteStream).toHaveBeenCalledWith('/models/model1.gguf');
     });
 
+    it('should handle download without content-length header', async () => {
+      const modelInfo = {
+        id: 'model1',
+        name: 'Model 1',
+        filename: 'model1.gguf',
+        url: 'https://example.com/model1.gguf',
+        size: 1000,
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValue(false);
+
+      const mockFile = {
+        close: jest.fn(),
+        on: jest.fn(),
+      };
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      // Response without content-length header
+      const mockResponse = {
+        statusCode: 200,
+        headers: {}, // No content-length
+        on: jest.fn(),
+        pipe: jest.fn(),
+      };
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      mockFile.on.mockImplementation((event, callback) => {
+        if (event === 'finish') {
+          setTimeout(callback, 0);
+        }
+        return mockFile;
+      });
+
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      expect(fs.createWriteStream).toHaveBeenCalledWith('/models/model1.gguf');
+    });
+
+    it('should handle download with zero total bytes', async () => {
+      const modelInfo = {
+        id: 'model1',
+        name: 'Model 1',
+        filename: 'model1.gguf',
+        url: 'https://example.com/model1.gguf',
+        size: 1000,
+      };
+
+      mockLLMService.ensureModelsDirectory.mockResolvedValue(undefined);
+      mockLLMService.getModelsDirectory.mockReturnValue('/models');
+      (fs.existsSync as jest.Mock).mockReturnValue(false);
+
+      const mockFile = {
+        close: jest.fn(),
+        on: jest.fn(),
+      };
+      (fs.createWriteStream as jest.Mock).mockReturnValue(mockFile);
+
+      // Response with content-length = 0
+      const mockResponse = {
+        statusCode: 200,
+        headers: { 'content-length': '0' },
+        on: jest.fn(),
+        pipe: jest.fn(),
+      };
+
+      let dataCallback: (chunk: Buffer) => void;
+      (https.get as jest.Mock).mockImplementation((url, callback) => {
+        callback(mockResponse);
+        return { on: jest.fn() };
+      });
+
+      mockResponse.on.mockImplementation((event, callback) => {
+        if (event === 'data') {
+          dataCallback = callback;
+          // Trigger data event even with 0 content-length
+          setTimeout(() => callback(Buffer.alloc(100)), 0);
+        }
+        return mockResponse;
+      });
+
+      mockFile.on.mockImplementation((event, callback) => {
+        if (event === 'finish') {
+          setTimeout(callback, 10);
+        }
+        return mockFile;
+      });
+
+      const mockWindow = {
+        webContents: {
+          send: jest.fn(),
+        },
+      };
+      (BrowserWindow.getAllWindows as jest.Mock).mockReturnValue([mockWindow]);
+
+      const handler = handlersMap.get('llm-download-model')!;
+      await handler({}, modelInfo);
+
+      // Progress should not be sent when totalBytes is 0
+      expect(mockWindow.webContents.send).not.toHaveBeenCalledWith('llm-download-progress', expect.anything());
+    });
+
     it('should throw error if model already downloaded', async () => {
       const modelInfo = {
         id: 'model1',

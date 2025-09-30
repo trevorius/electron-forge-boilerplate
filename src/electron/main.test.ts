@@ -961,4 +961,103 @@ describe('main.ts', () => {
 		shouldReturnMainWindowStatusValue = originalValues.shouldReturnMainWindowStatusValue;
 	});
 
+	it('should handle LLM controller initialization error', async () => {
+		// Mock console.error to verify it's called
+		const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+		// Reset the mock variables to safe defaults
+		const originalValues = {
+			shouldShowWindowValue,
+			shouldSendWindowEventValue,
+			shouldCloseWindowValue,
+			shouldReturnMainWindowStatusValue
+		};
+
+		// Reset to safe values
+		shouldShowWindowValue = false;
+		shouldSendWindowEventValue = true;
+		shouldCloseWindowValue = true;
+		shouldReturnMainWindowStatusValue = true;
+
+		// Reset modules
+		jest.resetModules();
+		mainWindowInstance = null;
+		licenseWindowInstance = null;
+
+		// Re-setup mocks
+		jest.doMock('electron', () => ({
+			app: mockApp,
+			BrowserWindow: mockBrowserWindow,
+			Menu: mockMenu,
+			ipcMain: mockIpcMain,
+			screen: mockScreen,
+			shell: mockShell
+		}));
+
+		jest.doMock('path', () => mockPath);
+
+		jest.doMock('./main.helpers', () => {
+			const actual = jest.requireActual('./main.helpers');
+			return {
+				...actual,
+				shouldShowWindow: jest.fn(() => shouldShowWindowValue),
+				shouldSendWindowEvent: jest.fn(() => shouldSendWindowEventValue),
+				shouldCloseWindow: jest.fn(() => shouldCloseWindowValue),
+				shouldReturnMainWindowStatus: jest.fn(() => shouldReturnMainWindowStatusValue)
+			};
+		});
+
+		// Mock high score and chat services to work normally
+		jest.doMock('./controllers/highScore.controller', () => ({
+			HighScoreController: {
+				registerHandlers: jest.fn(),
+			},
+		}));
+
+		jest.doMock('./services/highScore.service', () => ({
+			highScoreService: {
+				initialize: jest.fn().mockResolvedValue(undefined),
+				close: jest.fn().mockResolvedValue(undefined),
+			},
+		}));
+
+		jest.doMock('./controllers/chat.controller', () => ({
+			ChatController: {
+				registerHandlers: jest.fn(),
+			},
+		}));
+
+		jest.doMock('./services/chat.service', () => ({
+			chatService: {
+				initialize: jest.fn().mockResolvedValue(undefined),
+				close: jest.fn().mockResolvedValue(undefined),
+			},
+		}));
+
+		// Mock LLM controller to throw an error
+		jest.doMock('./controllers/llm.controller', () => ({
+			LLMController: {
+				registerHandlers: jest.fn().mockRejectedValue(new Error('LLM initialization failed')),
+			},
+		}));
+
+		await import('./main');
+
+		// Wait for initialization
+		await new Promise(resolve => setTimeout(resolve, 10));
+
+		// Verify that console.error was called (via logLLMInitializationError helper)
+		expect(consoleSpy).toHaveBeenCalledWith(
+			'Failed to initialize LLM service:',
+			expect.any(Error)
+		);
+
+		// Cleanup
+		consoleSpy.mockRestore();
+		shouldShowWindowValue = originalValues.shouldShowWindowValue;
+		shouldSendWindowEventValue = originalValues.shouldSendWindowEventValue;
+		shouldCloseWindowValue = originalValues.shouldCloseWindowValue;
+		shouldReturnMainWindowStatusValue = originalValues.shouldReturnMainWindowStatusValue;
+	});
+
 });
