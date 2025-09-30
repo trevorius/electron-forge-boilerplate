@@ -657,4 +657,26 @@ describe('LLMSettings', () => {
     const loadedButtons = screen.getAllByText('settings.llm.loaded');
     expect(loadedButtons[0]).toBeDisabled();
   });
+
+  it('should show loaded state with correct variant for currently loaded model', async () => {
+    (window.electronAPI.llmIsLoaded as jest.Mock).mockResolvedValue(true);
+    (window.electronAPI.llmGetCurrentModel as jest.Mock).mockResolvedValue('/models/scanned.gguf');
+
+    await act(async () => {
+      render(<LLMSettings />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Scanned Model')).toBeInTheDocument();
+    });
+
+    // Find the button for scanned model which should show as loaded
+    const loadedButtons = screen.getAllByText('settings.llm.loaded');
+    expect(loadedButtons.length).toBeGreaterThan(0);
+
+    // Check the button has the default variant (not outline)
+    const button = loadedButtons[0].closest('button');
+    expect(button).toHaveAttribute('data-variant', 'default');
+    expect(button).toBeDisabled(); // Should be disabled when it's the current model
+  });
 });

@@ -110,6 +110,96 @@ describe('preload.ts', () => {
 		process.env.NODE_ENV = originalEnv;
 	});
 
+	it('should expose LLM API functions', async () => {
+		// Import preload to trigger execution
+		await import('./preload');
+
+		// Get the exposed electronAPI
+		const electronAPICall = mockContextBridge.exposeInMainWorld.mock.calls.find(
+			call => call[0] === 'electronAPI'
+		);
+		const electronAPI = electronAPICall![1];
+
+		// Verify LLM API functions are present
+		expect(electronAPI.llmListAvailable).toBeDefined();
+		expect(electronAPI.llmListInstalled).toBeDefined();
+		expect(electronAPI.llmSelectFromDisk).toBeDefined();
+		expect(electronAPI.llmLoadModel).toBeDefined();
+		expect(electronAPI.llmUnloadModel).toBeDefined();
+		expect(electronAPI.llmIsLoaded).toBeDefined();
+		expect(electronAPI.llmGetCurrentModel).toBeDefined();
+		expect(electronAPI.llmDownloadModel).toBeDefined();
+		expect(electronAPI.llmDeleteModel).toBeDefined();
+		expect(electronAPI.llmUpdateConfig).toBeDefined();
+		expect(electronAPI.llmGetConfig).toBeDefined();
+		expect(electronAPI.llmGenerateResponse).toBeDefined();
+		expect(electronAPI.llmOnDownloadProgress).toBeDefined();
+		expect(electronAPI.llmOnToken).toBeDefined();
+		expect(electronAPI.llmGetModelsDirectory).toBeDefined();
+		expect(electronAPI.llmSetModelsDirectory).toBeDefined();
+		expect(electronAPI.llmScanFolder).toBeDefined();
+
+		// Actually call one to execute the arrow function
+		mockIpcRenderer.invoke.mockResolvedValue([]);
+		await electronAPI.llmListAvailable();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-list-available');
+
+		await electronAPI.llmListInstalled();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-list-installed');
+
+		await electronAPI.llmSelectFromDisk();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-select-from-disk');
+
+		await electronAPI.llmLoadModel('/test/path');
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-load-model', '/test/path', undefined);
+
+		await electronAPI.llmUnloadModel();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-unload-model');
+
+		await electronAPI.llmIsLoaded();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-is-loaded');
+
+		await electronAPI.llmGetCurrentModel();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-get-current-model');
+
+		await electronAPI.llmDownloadModel({ id: 'test', name: 'Test', filename: 'test.gguf', url: 'http://test.com', size: 100 });
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-download-model', expect.any(Object));
+
+		await electronAPI.llmDeleteModel({ id: 'test', name: 'Test', filename: 'test.gguf', url: 'http://test.com', size: 100 });
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-delete-model', expect.any(Object));
+
+		await electronAPI.llmUpdateConfig({ temperature: 0.7 });
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-update-config', expect.any(Object));
+
+		await electronAPI.llmGetConfig();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-get-config');
+
+		await electronAPI.llmGenerateResponse('test prompt');
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-generate-response', 'test prompt');
+
+		// Test event listeners
+		const progressCallback = jest.fn();
+		const unsubProgress = electronAPI.llmOnDownloadProgress(progressCallback);
+		expect(mockIpcRenderer.on).toHaveBeenCalledWith('llm-download-progress', expect.any(Function));
+		unsubProgress();
+		expect(mockIpcRenderer.removeListener).toHaveBeenCalled();
+
+		const tokenCallback = jest.fn();
+		const unsubToken = electronAPI.llmOnToken(tokenCallback);
+		expect(mockIpcRenderer.on).toHaveBeenCalledWith('llm-token', expect.any(Function));
+		unsubToken();
+		expect(mockIpcRenderer.removeListener).toHaveBeenCalled();
+
+		await electronAPI.llmGetModelsDirectory();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-get-models-directory');
+
+		await electronAPI.llmSetModelsDirectory();
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-set-models-directory');
+
+		await electronAPI.llmScanFolder('/test/path');
+		expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('llm-scan-folder', '/test/path');
+	});
+
 	it('should properly type the exposed APIs', async () => {
 		// Import preload to trigger execution
 		await import('./preload');

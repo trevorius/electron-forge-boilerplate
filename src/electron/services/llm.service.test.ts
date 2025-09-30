@@ -479,6 +479,29 @@ describe('LLMService', () => {
 
       expect(mockModel.dispose).toHaveBeenCalled();
     });
+
+    it('should handle context dispose errors during cleanup', async () => {
+      (fs.existsSync as jest.Mock).mockReturnValue(true);
+
+      // Create a context that fails to dispose
+      const failingContext = {
+        dispose: jest.fn().mockRejectedValue(new Error('Dispose failed')),
+      };
+
+      mockModel.createContext
+        .mockResolvedValueOnce(failingContext)
+        .mockRejectedValueOnce(new Error('Second attempt failed'));
+
+      mockLlama.loadModel
+        .mockResolvedValueOnce(mockModel)
+        .mockRejectedValueOnce(new Error('Loading failed'));
+
+      // Should not throw even though context.dispose() fails
+      await expect(service.loadModel('/model.gguf')).rejects.toThrow();
+
+      // Verify that dispose was called and failed silently
+      expect(failingContext.dispose).toHaveBeenCalled();
+    });
   });
 
   describe('unloadModel', () => {
