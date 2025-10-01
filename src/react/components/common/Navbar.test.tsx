@@ -29,6 +29,16 @@ jest.mock('./WindowControls', () => {
   };
 });
 
+// Mock ThemeSelector
+jest.mock('./ThemeSelector', () => {
+  return {
+    __esModule: true,
+    default: function MockThemeSelector() {
+      return <div data-testid="mock-theme-selector">Theme Selector</div>;
+    }
+  };
+});
+
 // Mock NavigationMenu components
 jest.mock('../ui/navigation-menu', () => ({
   NavigationMenu: ({ children }: { children: React.ReactNode }) => (

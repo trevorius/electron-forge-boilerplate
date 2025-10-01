@@ -95,9 +95,6 @@ describe('About', () => {
     expect(aboutDiv).toBeInTheDocument();
     expect(aboutDiv).toHaveClass(
       'min-h-screen',
-      'bg-gradient-to-br',
-      'from-slate-900',
-      'to-slate-800',
       'flex',
       'items-center',
       'justify-center',
@@ -146,8 +143,7 @@ describe('About', () => {
       'w-full',
       'max-w-lg',
       'mx-auto',
-      'bg-white/95',
-      'dark:bg-slate-900/95',
+      'bg-card',
       'backdrop-blur'
     );
   });
@@ -160,8 +156,8 @@ describe('About', () => {
       'text-3xl',
       'font-bold',
       'bg-gradient-to-r',
-      'from-blue-500',
-      'to-purple-500',
+      'from-gradient-from',
+      'to-gradient-to',
       'bg-clip-text',
       'text-transparent'
     );

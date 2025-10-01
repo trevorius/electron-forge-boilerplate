@@ -23,7 +23,7 @@ const About: React.FC = () => {
           <div className="flex justify-end">
             <LanguageSelector />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gradient-from to-gradient-to bg-clip-text text-transparent">
             {t('about.title')}
           </CardTitle>
         </CardHeader>

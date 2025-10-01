@@ -21,6 +21,7 @@ export interface ModelInfo {
   type: string;
   installed?: boolean;
   path?: string;
+  requiresAttribution?: boolean;
 }
 
 export interface LLMConfig {
@@ -256,12 +257,12 @@ export class LLMService {
           this.config.gpuLayers = gpuLayers;
           this.currentModelPath = modelPath;
 
-          const adjustments = [];
+          const adjustments: string[] = [];
           if (contextSize < originalContextSize) {
             adjustments.push(`context: ${contextSize} (reduced from ${originalContextSize})`);
           }
           if (gpuLayers !== originalGpuLayers) {
-            adjustments.push(`mode: ${getGpuModeDescription(strategy.useGpu)}`);
+            adjustments.push(`GPU layers: ${gpuLayers} (adjusted from ${originalGpuLayers}), mode: ${getGpuModeDescription(strategy.useGpu)}`);
           }
 
           if (adjustments.length > 0) {
