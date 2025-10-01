@@ -13,6 +13,7 @@ import {
 } from '../ui/navigation-menu';
 import { cn } from '../../lib/utils';
 import LanguageSelector from './LanguageSelector';
+import ThemeSelector from './ThemeSelector';
 import WindowControls from './WindowControls';
 import { routes } from '../../routes';
 import { useModel } from '../../contexts/ModelContext';
@@ -125,7 +126,8 @@ const Navbar: React.FC = () => {
               </span>
             </div>
           )}
-          <div className="mr-2">
+          <div className="flex items-center gap-1 mr-2">
+            <ThemeSelector />
             <LanguageSelector />
           </div>
           <WindowControls />

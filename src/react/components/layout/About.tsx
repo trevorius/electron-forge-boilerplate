@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import LanguageSelector from '../common/LanguageSelector';
 import packageInfo from '../../../../package.json';
+import LanguageSelector from '../common/LanguageSelector';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 const About: React.FC = () => {
   const { t } = useTranslation();
@@ -17,7 +17,7 @@ const About: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-lg mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-end">

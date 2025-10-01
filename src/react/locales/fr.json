@@ -13,6 +13,9 @@
     "english": "Anglais",
     "french": "Français"
   },
+  "theme": {
+    "switch": "Basculer le thème"
+  },
   "nav": {
     "home": "Accueil",
     "chat": "Chat",
