@@ -1,9 +1,10 @@
 // LicenseApp helpers - Pure functions for business logic that can be easily tested
+import { Llama32CommunityLicenseAgreement } from './Llama32CommunityLicenseAgreement.tsx';
 
 export interface License {
   id: string;
   name: string;
-  content: string;
+  content: string | React.ReactNode;
 }
 
 export interface LocaleInitResult {
@@ -72,6 +73,11 @@ export const createLicenses = (
       name: t('license.main') || 'Main License',
       content: t('license.content')
     },
+    {
+      id: 'LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT',
+      name: t('LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT.name') || 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+      content: <Llama32CommunityLicenseAgreement t={t} />
+    }
     // Future licenses can be added here
   ];
 };

@@ -350,5 +350,55 @@ describe('ChatInterface.helpers', () => {
       expect(li).toHaveTextContent('Test list item');
       expect(li).toHaveClass('my-1');
     });
+
+    it('should render link component and call electronAPI.openExternal on click', () => {
+      const mockOpenExternal = jest.fn();
+      (window as any).electronAPI = { openExternal: mockOpenExternal };
+
+      const AComponent = markdownComponents.a;
+      const { container } = render(<AComponent href="https://example.com">Test link</AComponent>);
+
+      const link = container.querySelector('a');
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute('href', 'https://example.com');
+      expect(link).toHaveTextContent('Test link');
+
+      // Click the link
+      link?.click();
+      expect(mockOpenExternal).toHaveBeenCalledWith('https://example.com');
+    });
+
+    it('should handle link click without href', () => {
+      const mockOpenExternal = jest.fn();
+      (window as any).electronAPI = { openExternal: mockOpenExternal };
+
+      const AComponent = markdownComponents.a;
+      const { container } = render(<AComponent>Test link no href</AComponent>);
+
+      const link = container.querySelector('a');
+      expect(link).toBeInTheDocument();
+
+      // Click the link - should not call openExternal
+      link?.click();
+      expect(mockOpenExternal).not.toHaveBeenCalled();
+    });
+
+    it('should fallback to window.open when electronAPI fails', () => {
+      const mockWindowOpen = jest.fn();
+      window.open = mockWindowOpen;
+      (window as any).electronAPI = {
+        openExternal: jest.fn().mockImplementation(() => {
+          throw new Error('Failed');
+        })
+      };
+
+      const AComponent = markdownComponents.a;
+      const { container } = render(<AComponent href="https://example.com">Test link</AComponent>);
+
+      const link = container.querySelector('a');
+      link?.click();
+
+      expect(mockWindowOpen).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
+    });
   });
 });

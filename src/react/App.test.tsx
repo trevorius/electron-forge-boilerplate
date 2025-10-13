@@ -73,6 +73,12 @@ jest.mock('./components/common/Navbar', () => {
   };
 });
 
+// Mock the ModelContext
+jest.mock('./contexts/ModelContext', () => ({
+  ModelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useModel: () => ({ currentModelInfo: null })
+}));
+
 const renderApp = () => {
   return render(<App />);
 };
@@ -91,7 +97,7 @@ describe('App', () => {
 
     expect(screen.getByTestId('mock-navbar')).toBeInTheDocument();
     const container = screen.getByTestId('mock-navbar').parentElement;
-    expect(container).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
+    expect(container).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-gradient-to-br', 'from-slate-900', 'to-slate-700');
   });
 
   it('should render Game component on home route by default', () => {
@@ -106,7 +112,7 @@ describe('App', () => {
 
     const mainDiv = container.firstChild as HTMLElement;
     expect(mainDiv).toBeInTheDocument();
-    expect(mainDiv).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-background');
+    expect(mainDiv).toHaveClass('fixed', 'inset-0', 'flex', 'flex-col', 'bg-gradient-to-br', 'from-slate-900', 'to-slate-700');
 
     // Check for the content wrapper with flex and overflow
     const contentWrapper = mainDiv.querySelector('.flex-1');

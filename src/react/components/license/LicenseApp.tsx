@@ -115,14 +115,20 @@ const LicenseApp: React.FC = () => {
           )}
 
           {/* License content */}
-          <div className="flex-1 overflow-auto min-h-0 flex justify-center items-center">
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border min-h-7/8">
+          <div className="flex-1 overflow-auto min-h-0">
+            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-md border">
               <h3 className="text-lg font-semibold mb-3 text-slate-800 dark:text-slate-200">
                 {currentLicense.name}
               </h3>
-              <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed text-slate-700 dark:text-slate-300">
-                {currentLicense.content}
-              </pre>
+              {typeof currentLicense.content === 'string' ? (
+                <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed text-slate-700 dark:text-slate-300">
+                  {currentLicense.content}
+                </pre>
+              ) : (
+                <div className="text-sm prose prose-slate dark:prose-invert max-w-none">
+                  {currentLicense.content}
+                </div>
+              )}
             </div>
           </div>
 

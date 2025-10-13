@@ -1,16 +1,18 @@
 import { Route, HashRouter as Router, Routes } from 'react-router-dom';
 import styles from './App.module.css';
 import Navbar from './components/common/Navbar';
+import { ModelProvider } from './contexts/ModelContext';
 import { routes } from './routes';
 import './styles/globals.css';
 
 function App() {
   return (
     <Router>
-      <div className="fixed inset-0 flex flex-col bg-background" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-        <Navbar />
-        {/* Main content area with proper margin and scrolling */}
-        <div className={`flex-1 overflow-auto ${styles['main-container']}`} style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+      <ModelProvider>
+        <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-slate-900 to-slate-700" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+          <Navbar />
+          {/* Main content area with proper margin and scrolling */}
+          <div className={`flex-1 overflow-auto ${styles['main-container']}`} style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
           <Routes>
             {routes.map((route) => {
               const Component = route.component;
@@ -41,6 +43,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      </ModelProvider>
     </Router>
   );
 }

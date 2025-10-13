@@ -29,6 +29,16 @@ jest.mock('./WindowControls', () => {
   };
 });
 
+// Mock ThemeSelector
+jest.mock('./ThemeSelector', () => {
+  return {
+    __esModule: true,
+    default: function MockThemeSelector() {
+      return <div data-testid="mock-theme-selector">Theme Selector</div>;
+    }
+  };
+});
+
 // Mock NavigationMenu components
 jest.mock('../ui/navigation-menu', () => ({
   NavigationMenu: ({ children }: { children: React.ReactNode }) => (
@@ -67,6 +77,12 @@ jest.mock('lucide-react', () => ({
 // Mock cn utility
 jest.mock('../../lib/utils', () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(' ')
+}));
+
+// Mock ModelContext
+const mockUseModel = jest.fn();
+jest.mock('../../contexts/ModelContext', () => ({
+  useModel: () => mockUseModel()
 }));
 
 // Mock routes
@@ -131,6 +147,7 @@ const renderNavbarWithRouter = (initialEntries: string[] = ['/']) => {
 describe('Navbar', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseModel.mockReturnValue({ currentModelInfo: null });
     mockUseTranslation.mockReturnValue({
       t: (key: string) => {
         const translations: Record<string, string> = {
@@ -333,6 +350,39 @@ describe('Navbar', () => {
 
       // Should show Games as active for game subroutes
       expect(screen.getByText('Games')).toBeInTheDocument();
+    });
+  });
+
+  describe('Attribution Badge', () => {
+    it('should not show attribution badge when no model requires it', () => {
+      mockUseModel.mockReturnValue({ currentModelInfo: null });
+      renderNavbar();
+
+      expect(screen.queryByText('Built with Llama')).not.toBeInTheDocument();
+    });
+
+    it('should show attribution badge when model requires it', () => {
+      mockUseModel.mockReturnValue({
+        currentModelInfo: {
+          requiresAttribution: true,
+          attributionText: 'Built with Llama'
+        }
+      });
+      renderNavbar();
+
+      expect(screen.getByText('Built with Llama')).toBeInTheDocument();
+    });
+
+    it('should show custom attribution text', () => {
+      mockUseModel.mockReturnValue({
+        currentModelInfo: {
+          requiresAttribution: true,
+          attributionText: 'Custom Attribution'
+        }
+      });
+      renderNavbar();
+
+      expect(screen.getByText('Custom Attribution')).toBeInTheDocument();
     });
   });
 });

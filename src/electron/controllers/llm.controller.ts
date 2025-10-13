@@ -140,6 +140,11 @@ export class LLMController {
           });
         });
 
+        // If this is a Llama model, create/update NOTICE file
+        if (modelInfo.requiresAttribution) {
+          createOrUpdateNoticeFile(modelsDir, modelInfo);
+        }
+
         console.log('Model downloaded successfully:', filePath);
       } catch (error) {
         console.error('Failed to download model:', error);
@@ -317,4 +322,41 @@ function downloadFile(url: string, destPath: string, onProgress?: (progress: num
       reject(err);
     });
   });
+}
+
+// Helper function to create or update NOTICE file for Llama models
+function createOrUpdateNoticeFile(modelsDir: string, modelInfo: ModelInfo): void {
+  try {
+    const noticePath = path.join(modelsDir, 'NOTICE');
+    const noticeContent = `Llama 3.2 is licensed under the Llama 3.2 Community License, Copyright © Meta Platforms, Inc. All Rights Reserved.
+
+This directory contains models distributed under the Llama 3.2 Community License Agreement.
+For full license terms, visit: https://www.llama.com/llama3_2/license
+
+Downloaded Models:
+- ${modelInfo.name} (${modelInfo.filename})
+  License: ${modelInfo.license}
+  Downloaded: ${new Date().toISOString()}
+`;
+
+    // If NOTICE file exists, append to it; otherwise create it
+    if (fs.existsSync(noticePath)) {
+      const existingContent = fs.readFileSync(noticePath, 'utf-8');
+      // Check if this model is already listed
+      if (!existingContent.includes(modelInfo.filename)) {
+        const modelEntry = `- ${modelInfo.name} (${modelInfo.filename})
+  License: ${modelInfo.license}
+  Downloaded: ${new Date().toISOString()}
+`;
+        fs.appendFileSync(noticePath, modelEntry);
+      }
+    } else {
+      fs.writeFileSync(noticePath, noticeContent, 'utf-8');
+    }
+
+    console.log('NOTICE file created/updated:', noticePath);
+  } catch (error) {
+    console.error('Failed to create NOTICE file:', error);
+    // Don't throw - this shouldn't fail the download
+  }
 }

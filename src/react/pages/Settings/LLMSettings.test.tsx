@@ -679,4 +679,76 @@ describe('LLMSettings', () => {
     expect(button).toHaveAttribute('data-variant', 'default');
     expect(button).toBeDisabled(); // Should be disabled when it's the current model
   });
+
+  it('should display attribution badge for models with requiresAttribution', async () => {
+    const llamaModel = {
+      id: 'llama-3.2-1b',
+      name: 'Llama 3.2 1B',
+      license: 'LLAMA 3.2 COMMUNITY LICENSE AGREEMENT',
+      licenseId: 'LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT',
+      requiresAttribution: true,
+      attributionText: 'Built with Llama',
+      description: 'Llama model',
+      size: '1.3GB',
+      url: 'https://example.com/llama.gguf',
+      filename: 'llama.gguf',
+      recommendedContext: 10000,
+      type: 'instruct',
+      installed: true,
+      path: '/models/llama.gguf',
+    };
+
+    (window as any).electronAPI = {
+      llmListAvailable: jest.fn().mockResolvedValue([llamaModel]),
+      llmListInstalled: jest.fn().mockResolvedValue([llamaModel]),
+      llmIsLoaded: jest.fn().mockResolvedValue(true),
+      llmGetCurrentModel: jest.fn().mockResolvedValue('/models/llama.gguf'),
+      llmGetModelsDirectory: jest.fn().mockResolvedValue('/models'),
+      llmScanFolder: jest.fn().mockResolvedValue([]),
+      llmOnDownloadProgress: jest.fn().mockReturnValue(jest.fn()),
+    };
+
+    await act(async () => {
+      render(<LLMSettings />);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Built with Llama')).toBeInTheDocument();
+    });
+  });
+
+  it('should not display attribution badge for models without requiresAttribution', async () => {
+    const regularModel = {
+      id: 'model1',
+      name: 'Regular Model',
+      license: 'MIT',
+      description: 'Regular model',
+      size: '1GB',
+      url: 'https://example.com/model.gguf',
+      filename: 'model.gguf',
+      recommendedContext: 4096,
+      type: 'llama',
+      installed: true,
+      path: '/models/model.gguf',
+      requiresAttribution: false,
+    };
+
+    (window as any).electronAPI = {
+      llmListAvailable: jest.fn().mockResolvedValue([regularModel]),
+      llmListInstalled: jest.fn().mockResolvedValue([regularModel]),
+      llmIsLoaded: jest.fn().mockResolvedValue(true),
+      llmGetCurrentModel: jest.fn().mockResolvedValue('/models/model.gguf'),
+      llmGetModelsDirectory: jest.fn().mockResolvedValue('/models'),
+      llmScanFolder: jest.fn().mockResolvedValue([]),
+      llmOnDownloadProgress: jest.fn().mockReturnValue(jest.fn()),
+    };
+
+    await act(async () => {
+      render(<LLMSettings />);
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByText('Built with Llama')).not.toBeInTheDocument();
+    });
+  });
 });

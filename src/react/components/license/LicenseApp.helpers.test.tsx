@@ -18,6 +18,11 @@ import {
   createCloseButtonClasses
 } from './LicenseApp.helpers';
 
+// Mock the Llama component to avoid markdown issues
+jest.mock('./Llama32CommunityLicenseAgreement', () => ({
+  Llama32CommunityLicenseAgreement: ({ t }: { t: (key: string) => string }) => <div>Llama License Component</div>
+}));
+
 describe('LicenseApp.helpers', () => {
   describe('initializeLocale', () => {
     it('should successfully initialize locale with main app locale', async () => {
@@ -144,35 +149,55 @@ describe('LicenseApp.helpers', () => {
     it('should create licenses with translations', () => {
       const mockT = jest.fn()
         .mockReturnValueOnce('Main License Translated')
-        .mockReturnValueOnce('License content translated');
+        .mockReturnValueOnce('License content translated')
+        .mockReturnValueOnce('LLAMA 3.2 COMMUNITY LICENSE AGREEMENT Translated')
+        .mockReturnValueOnce('Llama license content');
 
       const result = createLicenses(mockT);
 
-      expect(result).toEqual([
-        {
-          id: 'main',
-          name: 'Main License Translated',
-          content: 'License content translated'
-        }
-      ]);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: 'main',
+        name: 'Main License Translated',
+        content: 'License content translated'
+      });
+      expect(result[1].id).toBe('LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT');
+      expect(result[1].name).toBe('LLAMA 3.2 COMMUNITY LICENSE AGREEMENT Translated');
+      expect(result[1].content).toBeDefined(); // React component
       expect(mockT).toHaveBeenCalledWith('license.main');
       expect(mockT).toHaveBeenCalledWith('license.content');
+      expect(mockT).toHaveBeenCalledWith('LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT.name');
     });
 
     it('should use fallback when translation returns empty', () => {
       const mockT = jest.fn()
         .mockReturnValueOnce('')
-        .mockReturnValueOnce('License content');
+        .mockReturnValueOnce('License content')
+        .mockReturnValueOnce('')
+        .mockReturnValueOnce('Llama content');
 
       const result = createLicenses(mockT);
 
-      expect(result).toEqual([
-        {
-          id: 'main',
-          name: 'Main License',
-          content: 'License content'
-        }
-      ]);
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: 'main',
+        name: 'Main License',
+        content: 'License content'
+      });
+      expect(result[1].id).toBe('LLAMA-3.2-COMMUNITY-LICENSE-AGREEMENT');
+      expect(result[1].name).toBe('LLAMA 3.2 COMMUNITY LICENSE AGREEMENT');
+    });
+
+    it('should include React component for Llama license', () => {
+      const mockT = jest.fn()
+        .mockReturnValue('Translated');
+
+      const result = createLicenses(mockT);
+
+      expect(result).toHaveLength(2);
+      // Check that Llama license content is a React element
+      expect(typeof result[1].content).toBe('object');
+      expect(result[1].content).not.toBe('string');
     });
   });
 
