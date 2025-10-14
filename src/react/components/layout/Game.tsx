@@ -14,9 +14,9 @@ const Game: React.FC = () => {
               Tic Tac Toe
             </Button>
           </Link>
-          <Link to="/game/tetris">
+          <Link to="/game/lineDestroyer">
             <Button className="bg-green-600 hover:bg-green-700 text-white py-3 text-lg w-full">
-              Tetris
+              LineDestroyer
             </Button>
           </Link>
         </div>

@@ -219,7 +219,7 @@ export const calculateMovementDelta = (direction: 'left' | 'right' | 'down'): Po
   return deltas[direction];
 };
 
-// Helper for piece placement when movement fails (extracted from Tetris.tsx lines 64-70)
+// Helper for piece placement when movement fails (extracted from LineDestroyer.tsx lines 64-70)
 export const handleFailedMovement = (
   direction: 'left' | 'right' | 'down',
   board: number[][],
@@ -234,12 +234,12 @@ export const handleFailedMovement = (
   return { shouldPlace: false };
 };
 
-// Helper for game control logic (extracted from Tetris.tsx lines 74, 88, 117)
+// Helper for game control logic (extracted from LineDestroyer.tsx lines 74, 88, 117)
 export const canPerformAction = (currentPiece: GamePiece | null, gameOver: boolean): boolean => {
   return !(!currentPiece || gameOver);
 };
 
-// Helper for game state operations (extracted from Tetris.tsx lines 100-110, 112-119)
+// Helper for game state operations (extracted from LineDestroyer.tsx lines 100-110, 112-119)
 export const createGameState = () => ({
   board: createEmptyBoard(),
   score: 0,
@@ -260,7 +260,7 @@ export const createResumeState = (gameOver: boolean) => ({
   isPlaying: !gameOver
 });
 
-// Helper for rendering board with boundary checks (extracted from Tetris.tsx line 198)
+// Helper for rendering board with boundary checks (extracted from LineDestroyer.tsx line 198)
 export const renderPieceOnBoard = (
   board: number[][],
   currentPiece: GamePiece | null

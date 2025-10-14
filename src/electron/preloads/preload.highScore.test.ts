@@ -18,7 +18,7 @@ describe('preload.highScore', () => {
   describe('databaseAPI', () => {
     describe('saveScore', () => {
       it('should call ipcRenderer.invoke with save-score', async () => {
-        const scoreData = { name: 'Player1', score: 1000, game: 'tetris' };
+        const scoreData = { name: 'Player1', score: 1000, game: 'lineDestroyer' };
         const mockResult = { id: 1, ...scoreData, createdAt: new Date() };
         mockIpcRenderer.invoke.mockResolvedValue(mockResult);
 
@@ -32,25 +32,25 @@ describe('preload.highScore', () => {
     describe('getHighScores', () => {
       it('should call ipcRenderer.invoke with get-high-scores', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await HighSCoresApi.getHighScores('tetris', 10);
+        const result = await HighSCoresApi.getHighScores('lineDestroyer', 10);
 
-        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', 10);
+        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'lineDestroyer', 10);
         expect(result).toEqual(mockScores);
       });
 
       it('should work without limit parameter', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
-        const result = await HighSCoresApi.getHighScores('tetris');
+        const result = await HighSCoresApi.getHighScores('lineDestroyer');
 
-        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', undefined);
+        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'lineDestroyer', undefined);
         expect(result).toEqual(mockScores);
       });
     });
@@ -58,7 +58,7 @@ describe('preload.highScore', () => {
     describe('getAllHighScores', () => {
       it('should call ipcRenderer.invoke with get-all-high-scores', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
           { id: 2, name: 'Player2', score: 900, game: 'pong', createdAt: new Date() },
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
@@ -71,7 +71,7 @@ describe('preload.highScore', () => {
 
       it('should work without limit parameter', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
         ];
         mockIpcRenderer.invoke.mockResolvedValue(mockScores);
 
@@ -86,9 +86,9 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with is-high-score', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(true);
 
-        const result = await HighSCoresApi.isHighScore('tetris', 1000);
+        const result = await HighSCoresApi.isHighScore('lineDestroyer', 1000);
 
-        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'tetris', 1000);
+        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'lineDestroyer', 1000);
         expect(result).toBe(true);
       });
     });
@@ -107,9 +107,9 @@ describe('preload.highScore', () => {
       it('should call ipcRenderer.invoke with clear-scores for specific game', async () => {
         mockIpcRenderer.invoke.mockResolvedValue(undefined);
 
-        await HighSCoresApi.clearScores('tetris');
+        await HighSCoresApi.clearScores('lineDestroyer');
 
-        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'tetris');
+        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'lineDestroyer');
       });
 
       it('should call ipcRenderer.invoke with clear-scores for all games', async () => {

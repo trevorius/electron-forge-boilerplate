@@ -501,14 +501,14 @@ private async checkDatabaseVersion(): Promise<void> {
 // Lazy load components
 import { lazy, Suspense } from 'react';
 
-const TetrisGame = lazy(() => import('./components/game/Tetris'));
+const LineDestroyerGame = lazy(() => import('./components/game/LineDestroyer'));
 
 // In routes
 {
-  path: '/game/tetris',
+  path: '/game/lineDestroyer',
   component: () => (
     <Suspense fallback={<div>Loading...</div>}>
-      <TetrisGame />
+      <LineDestroyerGame />
     </Suspense>
   )
 }

@@ -1,20 +1,20 @@
-# Tetris Game Developer Documentation
+# LineDestroyer Game Developer Documentation
 
-[back to README](/README.md#tetris)
+[back to README](/README.md#lineDestroyer)
 
 ## Overview
 
-This is a complete React-based Tetris implementation with TypeScript, featuring full game mechanics, comprehensive test coverage, and a clean separation of concerns between UI and game logic.
+This is a complete React-based LineDestroyer implementation with TypeScript, featuring full game mechanics, comprehensive test coverage, and a clean separation of concerns between UI and game logic.
 
 ## Architecture
 
 ### Core Files
 
-- **`Tetris.tsx`** - Main React component handling UI rendering and user interactions
-- **`Tetris.helpers.tsx`** - Pure game logic functions (board management, collision detection, line clearing)
-- **`Tetris.test.tsx`** - Integration tests for the component
-- **`Tetris.helpers.test.tsx`** - Unit tests for helper functions
-- **`Tetris.component.test.tsx`** - Mocked component tests for 100% coverage
+- **`LineDestroyer.tsx`** - Main React component handling UI rendering and user interactions
+- **`LineDestroyer.helpers.tsx`** - Pure game logic functions (board management, collision detection, line clearing)
+- **`LineDestroyer.test.tsx`** - Integration tests for the component
+- **`LineDestroyer.helpers.test.tsx`** - Unit tests for helper functions
+- **`LineDestroyer.component.test.tsx`** - Mocked component tests for 100% coverage
 
 ### Design Principles
 
@@ -23,13 +23,13 @@ This is a complete React-based Tetris implementation with TypeScript, featuring 
 3. **Comprehensive Testing**: Multiple test strategies for maximum coverage
 4. **Mock-Friendly**: Core functions can be mocked for isolated testing
 
-## Game Logic (Tetris.helpers.tsx)
+## Game Logic (LineDestroyer.helpers.tsx)
 
 ### Constants
 
 ```typescript
-BOARD_WIDTH = 10     // Standard Tetris board width
-BOARD_HEIGHT = 20    // Standard Tetris board height
+BOARD_WIDTH = 10     // Standard LineDestroyer board width
+BOARD_HEIGHT = 20    // Standard LineDestroyer board height
 ```
 
 ### Data Types
@@ -128,7 +128,7 @@ Removes complete horizontal lines and adds empty rows at top.
 - Test mode support via `window.testForceClearLines` flag
 - Line 164: Critical loop for adding empty rows after clearing
 
-## UI Component (Tetris.tsx)
+## UI Component (LineDestroyer.tsx)
 
 ### State Management
 
@@ -229,7 +229,7 @@ useEffect(() => {
 - **Functions**: 100%
 - **Lines**: 100%
 
-### Uncovered Areas (Tetris.tsx)
+### Uncovered Areas (LineDestroyer.tsx)
 
 - **Line 49**: Early returns in `movePiece()`
 - **Lines 64-124**: Collision handling in `movePiece()`
@@ -238,21 +238,21 @@ useEffect(() => {
 
 ### Test Files Overview
 
-#### `Tetris.helpers.test.tsx`
+#### `LineDestroyer.helpers.test.tsx`
 
 - **Unit tests** for pure game logic functions
 - Tests all boundary conditions and edge cases
 - Achieves 100% coverage of helper functions
 - Uses test flags for forcing specific code paths
 
-#### `Tetris.test.tsx`
+#### `LineDestroyer.test.tsx`
 
 - **Integration tests** for the full component
 - Tests user interactions and game flow
 - Real-world scenarios with actual game logic
 - Timer management with `jest.useFakeTimers()`
 
-#### `Tetris.component.test.tsx`
+#### `LineDestroyer.component.test.tsx`
 
 - **Mocked component tests** for 100% coverage
 - Isolates component logic from game logic
@@ -264,7 +264,7 @@ useEffect(() => {
 #### Helper Function Mocking
 
 ```typescript
-jest.mock('./Tetris.helpers', () => ({
+jest.mock('./LineDestroyer.helpers', () => ({
   createEmptyBoard: jest.fn(),
   getRandomTetromino: jest.fn(),
   isValidMove: jest.fn(),
@@ -287,7 +287,7 @@ jest.mock('./Tetris.helpers', () => ({
 
 #### Strategy 1: Enhanced Component Mocking
 
-Focus on uncovered lines in `Tetris.tsx`:
+Focus on uncovered lines in `LineDestroyer.tsx`:
 
 1. **Line 49 Coverage**: Test early returns when `currentPiece` is null or `gameOver` is true
 2. **Lines 64-124 Coverage**: Mock collision scenarios to trigger piece placement logic
@@ -326,7 +326,7 @@ Move complex logic to helper functions:
 
 ### Piece Generation
 
-- 7 standard Tetris pieces (I, O, T, S, Z, J, L)
+- 7 standard LineDestroyer pieces (I, O, T, S, Z, J, L)
 - Random selection with `Math.random()`
 - Preview next piece shown in UI
 
@@ -341,7 +341,7 @@ Move complex logic to helper functions:
 
 ### Adding New Features
 
-1. Add pure logic functions to `Tetris.helpers.tsx`
+1. Add pure logic functions to `LineDestroyer.helpers.tsx`
 2. Write unit tests first
 3. Update component to use new functions
 4. Add integration tests for UI interactions
@@ -395,4 +395,4 @@ window.testForceClearLines = true;   // Force line clearing
 
 ---
 
-*This documentation covers the complete Tetris implementation. For specific testing strategies to achieve 100% coverage, see the test files and coverage reports.*
+*This documentation covers the complete LineDestroyer implementation. For specific testing strategies to achieve 100% coverage, see the test files and coverage reports.*

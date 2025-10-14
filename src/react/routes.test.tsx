@@ -31,11 +31,11 @@ jest.mock('./components/layout/About', () => {
   };
 });
 
-jest.mock('./components/game/Tetris', () => {
+jest.mock('./components/game/LineDestroyer', () => {
   return {
     __esModule: true,
-    default: function MockTetris() {
-      return <div>Tetris Component</div>;
+    default: function MockLineDestroyer() {
+      return <div>LineDestroyer Component</div>;
     }
   };
 });

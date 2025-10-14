@@ -56,7 +56,7 @@ When React components contain logic that's difficult to test directly, extract i
 
 ```typescript
 // ❌ Difficult to test in component
-const Tetris: React.FC = () => {
+const LineDestroyer: React.FC = () => {
   const [gameState, setGameState] = useState(() => {
     // Complex initialization logic embedded in component
     const initialBoard = Array(20).fill(null).map(() => Array(10).fill(0));
@@ -81,7 +81,7 @@ const Tetris: React.FC = () => {
 
 ```typescript
 // ✅ Testable helper functions
-// Tetris.helpers.ts
+// LineDestroyer.helpers.ts
 export const createInitialGameState = (): GameState => {
   const initialBoard = Array(20).fill(null).map(() => Array(10).fill(0));
   const piece = generateRandomPiece();
@@ -99,8 +99,8 @@ export const rotatePieceIfValid = (gameState: GameState): GameState => {
   return gameState;
 };
 
-// Tetris.tsx
-const Tetris: React.FC = () => {
+// LineDestroyer.tsx
+const LineDestroyer: React.FC = () => {
   const [gameState, setGameState] = useState(createInitialGameState);
 
   const rotatePiece = () => {
@@ -116,8 +116,8 @@ const Tetris: React.FC = () => {
 Helper functions achieve 100% coverage easily because they are pure functions:
 
 ```typescript
-// Tetris.helpers.test.ts
-describe('Tetris Helpers', () => {
+// LineDestroyer.helpers.test.ts
+describe('LineDestroyer Helpers', () => {
   describe('createInitialGameState', () => {
     test('creates board with correct dimensions', () => {
       const state = createInitialGameState();
@@ -171,10 +171,10 @@ src/
 ├── react/
 │   ├── components/
 │   │   ├── game/
-│   │   │   ├── Tetris.tsx
-│   │   │   ├── Tetris.helpers.ts
-│   │   │   ├── Tetris.test.tsx
-│   │   │   └── Tetris.helpers.test.ts
+│   │   │   ├── LineDestroyer.tsx
+│   │   │   ├── LineDestroyer.helpers.ts
+│   │   │   ├── LineDestroyer.test.tsx
+│   │   │   └── LineDestroyer.helpers.test.ts
 │   │   └── common/
 │   │       ├── Navigation.tsx
 │   │       └── Navigation.test.tsx
@@ -273,7 +273,7 @@ describe('Boundary Values', () => {
     const result = await service.saveScore({
       name: 'Player',
       score: maxScore,
-      game: 'tetris'
+      game: 'lineDestroyer'
     });
     expect(result.score).toBe(maxScore);
   });
@@ -285,9 +285,9 @@ describe('Boundary Values', () => {
   });
 
   test('handles zero limit request', async () => {
-    const result = await service.getHighScores('tetris', 0);
+    const result = await service.getHighScores('lineDestroyer', 0);
     expect(mockPrismaInstance.score.findMany).toHaveBeenCalledWith({
-      where: { game: 'tetris' },
+      where: { game: 'lineDestroyer' },
       orderBy: { score: 'desc' },
       take: 0,
     });
@@ -410,20 +410,20 @@ Use helper functions to enable focused testing:
 
 ```typescript
 // Test component behavior through helpers
-describe('Tetris Component', () => {
+describe('LineDestroyer Component', () => {
   test('renders game board correctly', () => {
-    renderWithProviders(<Tetris />);
-    expect(screen.getByTestId('tetris-board')).toBeInTheDocument();
+    renderWithProviders(<LineDestroyer />);
+    expect(screen.getByTestId('lineDestroyer-board')).toBeInTheDocument();
   });
 
   test('displays current score', () => {
-    renderWithProviders(<Tetris />);
+    renderWithProviders(<LineDestroyer />);
     expect(screen.getByText(/score:/i)).toBeInTheDocument();
   });
 });
 
 // Test game logic through helpers
-describe('Tetris Game Logic', () => {
+describe('LineDestroyer Game Logic', () => {
   test('line clearing logic', () => {
     const boardWithFullLine = createBoardWithFullLine();
     const result = clearFullLines(boardWithFullLine);
@@ -440,8 +440,8 @@ Test user interactions and their effects:
 ```typescript
 describe('User Interactions', () => {
   test('handles piece rotation on key press', async () => {
-    renderWithProviders(<Tetris />);
-    const gameArea = screen.getByTestId('tetris-board');
+    renderWithProviders(<LineDestroyer />);
+    const gameArea = screen.getByTestId('lineDestroyer-board');
 
     fireEvent.keyDown(gameArea, { key: 'ArrowUp' });
 
@@ -454,7 +454,7 @@ describe('User Interactions', () => {
   });
 
   test('handles game pause', async () => {
-    renderWithProviders(<Tetris />);
+    renderWithProviders(<LineDestroyer />);
 
     fireEvent.keyDown(document, { key: ' ' });
 
@@ -473,7 +473,7 @@ Test every method and all execution paths:
 describe('HighScoreService Complete Coverage', () => {
   // Test successful operations
   test('successful score save', async () => {
-    const scoreData = { name: 'Player', score: 1000, game: 'tetris' };
+    const scoreData = { name: 'Player', score: 1000, game: 'lineDestroyer' };
     const mockResult = { id: 1, ...scoreData, createdAt: new Date() };
 
     mockPrismaInstance.score.create.mockResolvedValue(mockResult);
@@ -484,7 +484,7 @@ describe('HighScoreService Complete Coverage', () => {
 
   // Test error conditions
   test('score save failure', async () => {
-    const scoreData = { name: 'Player', score: 1000, game: 'tetris' };
+    const scoreData = { name: 'Player', score: 1000, game: 'lineDestroyer' };
     const error = new Error('Database error');
 
     mockPrismaInstance.score.create.mockRejectedValue(error);
@@ -494,7 +494,7 @@ describe('HighScoreService Complete Coverage', () => {
 
   // Test edge cases
   test('handles empty name', async () => {
-    const scoreData = { name: '', score: 1000, game: 'tetris' };
+    const scoreData = { name: '', score: 1000, game: 'lineDestroyer' };
 
     await expect(service.saveScore(scoreData)).rejects.toThrow();
   });
@@ -549,7 +549,7 @@ describe('IPC Handler Coverage', () => {
     expect(saveScoreHandler).toBeDefined();
 
     // Test successful case
-    const scoreData = { name: 'Player', score: 1000, game: 'tetris' };
+    const scoreData = { name: 'Player', score: 1000, game: 'lineDestroyer' };
     mockHighScoreService.saveScore.mockResolvedValue(scoreData);
 
     const result = await saveScoreHandler({}, scoreData);
@@ -653,24 +653,24 @@ const isHighScore = async (game: string, score: number): Promise<boolean> => {
 describe('isHighScore branches', () => {
   test('returns true when less than 10 scores exist', async () => {
     mockPrismaInstance.score.findMany.mockResolvedValue([mockScore]);
-    expect(await service.isHighScore('tetris', 100)).toBe(true);
+    expect(await service.isHighScore('lineDestroyer', 100)).toBe(true);
   });
 
   test('returns true when score beats lowest', async () => {
     const tenScores = Array(10).fill(mockScore);
     mockPrismaInstance.score.findMany.mockResolvedValue(tenScores);
-    expect(await service.isHighScore('tetris', 1001)).toBe(true);
+    expect(await service.isHighScore('lineDestroyer', 1001)).toBe(true);
   });
 
   test('returns false when score does not beat lowest', async () => {
     const tenScores = Array(10).fill(mockScore);
     mockPrismaInstance.score.findMany.mockResolvedValue(tenScores);
-    expect(await service.isHighScore('tetris', 500)).toBe(false);
+    expect(await service.isHighScore('lineDestroyer', 500)).toBe(false);
   });
 
   test('returns false on error', async () => {
     mockPrismaInstance.score.findMany.mockRejectedValue(new Error('DB Error'));
-    expect(await service.isHighScore('tetris', 1000)).toBe(false);
+    expect(await service.isHighScore('lineDestroyer', 1000)).toBe(false);
   });
 });
 ```

@@ -64,9 +64,9 @@ export interface Route {
   inNavbar: true,
   children: [
     {
-      path: '/game/tetris',
-      component: Tetris,
-      title: 'nav.games_menu.tetris',
+      path: '/game/lineDestroyer',
+      component: LineDestroyer,
+      title: 'nav.games_menu.lineDestroyer',
       icon: Gamepad2,
       inNavbar: false
     }
@@ -100,8 +100,8 @@ src/react/components/
 │   └── WindowControls.tsx
 ├── game/                # Game-specific components
 │   ├── HighScores.tsx
-│   ├── Tetris.tsx
-│   ├── Tetris.helpers.tsx
+│   ├── LineDestroyer.tsx
+│   ├── LineDestroyer.helpers.tsx
 │   └── TicTacToe.tsx
 ├── layout/              # Layout and page components
 │   ├── About.tsx
@@ -266,7 +266,7 @@ All route titles use i18n keys for multi-language support:
   "home": "Home",
   "games": "Games",
   "games_menu": {
-    "tetris": "Tetris",
+    "lineDestroyer": "LineDestroyer",
     "tictactoe": "Tic Tac Toe"
   },
   "about": "About",
@@ -278,7 +278,7 @@ All route titles use i18n keys for multi-language support:
   "home": "Accueil",
   "games": "Jeux",
   "games_menu": {
-    "tetris": "Tetris",
+    "lineDestroyer": "LineDestroyer",
     "tictactoe": "Morpion"
   },
   "about": "À propos",
@@ -317,7 +317,7 @@ export default ComponentName;
 ### 2. Route Organization
 
 - **Layout Components**: Use for top-level pages (`/about`, `/settings`)
-- **Game Components**: Use for interactive games (`/game/tetris`)
+- **Game Components**: Use for interactive games (`/game/lineDestroyer`)
 - **Nested Routes**: Group related functionality under parent routes
 
 ### 3. Icon Selection
@@ -352,17 +352,17 @@ import {
 // Example of lazy loading for performance
 import { lazy, Suspense } from 'react';
 
-const Tetris = lazy(() => import('./components/game/Tetris'));
+const LineDestroyer = lazy(() => import('./components/game/LineDestroyer'));
 
 // In route definition
 {
-  path: '/game/tetris',
+  path: '/game/lineDestroyer',
   component: () => (
     <Suspense fallback={<div>Loading...</div>}>
-      <Tetris />
+      <LineDestroyer />
     </Suspense>
   ),
-  title: 'nav.games_menu.tetris',
+  title: 'nav.games_menu.lineDestroyer',
   icon: Gamepad2,
   inNavbar: false
 }

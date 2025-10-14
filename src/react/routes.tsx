@@ -1,6 +1,6 @@
 import { Brain, Gamepad2, Home, Info, LucideIcon, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
 import React from 'react';
-import Tetris from './components/game/Tetris';
+import LineDestroyer from './components/game/LineDestroyer';
 import TicTacToe from './components/game/TicTacToe';
 import About from './components/layout/About';
 import Game from './components/layout/Game';
@@ -35,9 +35,9 @@ export const routes: Route[] = [
     inNavbar: true,
     children: [
       {
-        path: '/game/tetris',
-        component: Tetris,
-        title: 'nav.games_menu.tetris',
+        path: '/game/lineDestroyer',
+        component: LineDestroyer,
+        title: 'nav.games_menu.lineDestroyer',
         icon: Gamepad2,
         inNavbar: false
       },

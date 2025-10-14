@@ -101,8 +101,8 @@ jest.mock('../../routes', () => ({
       inNavbar: true,
       children: [
         {
-          path: '/game/tetris',
-          title: 'nav.games_menu.tetris',
+          path: '/game/lineDestroyer',
+          title: 'nav.games_menu.lineDestroyer',
           icon: () => <div data-testid="gamepad-icon">Gamepad Icon</div>
         },
         {
@@ -155,9 +155,9 @@ describe('Navbar', () => {
           'nav.games': 'Games',
           'nav.about': 'About',
           'nav.branding': 'Electron Games',
-          'nav.games_menu.tetris': 'Tetris',
+          'nav.games_menu.lineDestroyer': 'LineDestroyer',
           'nav.games_menu.tictactoe': 'Tic Tac Toe',
-          'nav.games_menu.tetris_description': 'Classic block-stacking puzzle game',
+          'nav.games_menu.lineDestroyer_description': 'Classic block-stacking puzzle game',
           'nav.games_menu.tictactoe_description': 'Classic two-player strategy game'
         };
         return translations[key] || key;
@@ -346,7 +346,7 @@ describe('Navbar', () => {
     });
 
     it('should handle different game routes', () => {
-      renderNavbarWithRouter(['/game/tetris']);
+      renderNavbarWithRouter(['/game/lineDestroyer']);
 
       // Should show Games as active for game subroutes
       expect(screen.getByText('Games')).toBeInTheDocument();

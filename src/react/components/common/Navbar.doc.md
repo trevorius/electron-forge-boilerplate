@@ -61,7 +61,7 @@ interface WindowAPI {
 
 ### Navigation Structure
 - Home: Main game selection
-- Games: Dropdown with Tetris and Tic Tac Toe
+- Games: Dropdown with LineDestroyer and Tic Tac Toe
 - About: Application information
 - Language Selector: Internationalization
 - Window Controls: Platform-appropriate controls

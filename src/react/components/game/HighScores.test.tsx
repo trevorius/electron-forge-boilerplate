@@ -61,21 +61,21 @@ describe('HighScores', () => {
       id: 1,
       name: 'Player1',
       score: 1000,
-      game: 'tetris',
+      game: 'lineDestroyer',
       createdAt: new Date('2023-01-01'),
     },
     {
       id: 2,
       name: 'Player2',
       score: 900,
-      game: 'tetris',
+      game: 'lineDestroyer',
       createdAt: new Date('2023-01-02'),
     },
     {
       id: 3,
       name: 'Player3',
       score: 800,
-      game: 'tetris',
+      game: 'lineDestroyer',
       createdAt: new Date('2023-01-03'),
     },
   ];
@@ -83,7 +83,7 @@ describe('HighScores', () => {
   it('shows loading state initially', () => {
     mockElectronAPI.getHighScores.mockImplementation(() => new Promise(() => {}));
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
@@ -91,13 +91,13 @@ describe('HighScores', () => {
   it('loads and displays high scores for specific game', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
-      expect(screen.getByText('High Scores - tetris')).toBeInTheDocument();
+      expect(screen.getByText('High Scores - lineDestroyer')).toBeInTheDocument();
     });
 
-    expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('tetris', 10);
+    expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('lineDestroyer', 10);
     expect(screen.getByText('Player1')).toBeInTheDocument();
     expect(screen.getByText('1,000')).toBeInTheDocument();
   });
@@ -117,7 +117,7 @@ describe('HighScores', () => {
   it('shows error state when loading fails', async () => {
     mockElectronAPI.getHighScores.mockRejectedValue(new Error('Network error'));
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed to load high scores')).toBeInTheDocument();
@@ -131,7 +131,7 @@ describe('HighScores', () => {
       .mockRejectedValueOnce(new Error('Network error'))
       .mockResolvedValueOnce(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Failed to load high scores')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('HighScores', () => {
   it('shows no scores message when scores array is empty', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue([]);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('No high scores yet')).toBeInTheDocument();
@@ -159,7 +159,7 @@ describe('HighScores', () => {
     (window.confirm as jest.Mock).mockReturnValue(true);
     mockElectronAPI.clearScores.mockResolvedValue(undefined);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -168,7 +168,7 @@ describe('HighScores', () => {
     fireEvent.click(screen.getByText('Clear All'));
 
     await waitFor(() => {
-      expect(mockElectronAPI.clearScores).toHaveBeenCalledWith('tetris');
+      expect(mockElectronAPI.clearScores).toHaveBeenCalledWith('lineDestroyer');
     });
   });
 
@@ -176,7 +176,7 @@ describe('HighScores', () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
     (window.confirm as jest.Mock).mockReturnValue(false);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -192,7 +192,7 @@ describe('HighScores', () => {
     (window.confirm as jest.Mock).mockReturnValue(true);
     mockElectronAPI.clearScores.mockRejectedValue(new Error('Clear failed'));
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -210,7 +210,7 @@ describe('HighScores', () => {
     (window.confirm as jest.Mock).mockReturnValue(true);
     mockElectronAPI.deleteScore.mockResolvedValue(undefined);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -228,7 +228,7 @@ describe('HighScores', () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
     (window.confirm as jest.Mock).mockReturnValue(false);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -245,7 +245,7 @@ describe('HighScores', () => {
     (window.confirm as jest.Mock).mockReturnValue(true);
     mockElectronAPI.deleteScore.mockRejectedValue(new Error('Delete failed'));
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -262,7 +262,7 @@ describe('HighScores', () => {
   it('refreshes scores when refresh button is clicked', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('Player1')).toBeInTheDocument();
@@ -271,13 +271,13 @@ describe('HighScores', () => {
     mockElectronAPI.getHighScores.mockClear();
     fireEvent.click(screen.getByText('Refresh'));
 
-    expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('tetris', 10);
+    expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('lineDestroyer', 10);
   });
 
   it('displays ranking badges for top 3 scores', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('1 🥇')).toBeInTheDocument();
@@ -289,7 +289,7 @@ describe('HighScores', () => {
   it('applies correct styling for bronze medal (3rd place)', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       const bronzeElement = screen.getByText('3 🥉').closest('.grid');
@@ -300,7 +300,7 @@ describe('HighScores', () => {
   it('formats dates correctly', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       expect(screen.getByText('1/1/2023')).toBeInTheDocument();
@@ -310,10 +310,10 @@ describe('HighScores', () => {
   it('uses custom limit when provided', async () => {
     mockElectronAPI.getHighScores.mockResolvedValue(mockScores);
 
-    render(<HighScores game="tetris" limit={5} />);
+    render(<HighScores game="lineDestroyer" limit={5} />);
 
     await waitFor(() => {
-      expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('tetris', 5);
+      expect(mockElectronAPI.getHighScores).toHaveBeenCalledWith('lineDestroyer', 5);
     });
   });
 
@@ -324,14 +324,14 @@ describe('HighScores', () => {
         id: 4,
         name: 'Player4',
         score: 700,
-        game: 'tetris',
+        game: 'lineDestroyer',
         createdAt: new Date('2023-01-04'),
       },
     ];
 
     mockElectronAPI.getHighScores.mockResolvedValue(extendedMockScores);
 
-    render(<HighScores game="tetris" />);
+    render(<HighScores game="lineDestroyer" />);
 
     await waitFor(() => {
       // Test gold medal (index 0)

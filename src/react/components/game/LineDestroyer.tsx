@@ -28,12 +28,12 @@ import {
   shouldGameEnd,
   type GamePiece,
   type Tetromino
-} from './Tetris.helpers';
+} from './LineDestroyer.helpers';
 import HighScores from './HighScores';
 
 const CELL_SIZE = 30;
 
-const Tetris: React.FC = () => {
+const LineDestroyer: React.FC = () => {
   const { t } = useTranslation();
   const [board, setBoard] = useState<number[][]>(createEmptyBoard);
   const [currentPiece, setCurrentPiece] = useState<GamePiece | null>(null);
@@ -64,7 +64,7 @@ const Tetris: React.FC = () => {
 
       // Check if this is a high score
       try {
-        const isHighScore = await window.electronAPI.isHighScore('tetris', score);
+        const isHighScore = await window.electronAPI.isHighScore('lineDestroyer', score);
         if (isHighScore) {
           setShowHighScoreDialog(true);
         } else {
@@ -135,7 +135,7 @@ const Tetris: React.FC = () => {
       await window.electronAPI.saveScore({
         name: playerName.trim(),
         score: score,
-        game: 'tetris'
+        game: 'lineDestroyer'
       });
       setShowHighScoreDialog(false);
       setShowGameOverDialog(true);
@@ -280,7 +280,7 @@ const Tetris: React.FC = () => {
 
   return (
     <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col items-center justify-center space-y-4 p-4">
-      <h1 className="text-3xl font-bold text-white mb-4">{t('tetris.title')}</h1>
+      <h1 className="text-3xl font-bold text-white mb-4">{t('lineDestroyer.title')}</h1>
 
       <div className="flex space-x-8">
         <Card className="p-4 bg-gray-800 border-gray-600">
@@ -291,33 +291,33 @@ const Tetris: React.FC = () => {
 
         <div className="space-y-4">
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">{t('tetris.score')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('lineDestroyer.score')}</h3>
             <p className="text-2xl font-bold">{score}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">{t('tetris.level')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('lineDestroyer.level')}</h3>
             <p className="text-xl">{level}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">{t('tetris.lines')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('lineDestroyer.lines')}</h3>
             <p className="text-xl">{lines}</p>
           </Card>
 
           <Card className="p-4 bg-gray-800 border-gray-600 text-white">
-            <h3 className="text-lg font-semibold mb-2">{t('tetris.next')}</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('lineDestroyer.next')}</h3>
             <div className="flex flex-col items-center">
               {renderNextPiece()}
             </div>
           </Card>
           <Card className="p-4 bg-gray-800 border-gray-600 text-white text-sm">
-        <h3 className="font-semibold mb-2">{t('tetris.controls')}</h3>
-        <p>{t('tetris.controlMoveLeft')}</p>
-        <p>{t('tetris.controlSoftDrop')}</p>
-        <p>{t('tetris.controlRotate')}</p>
-        <p>{t('tetris.controlHardDrop')}</p>
-        <p>{t('tetris.controlPause')}</p>
+        <h3 className="font-semibold mb-2">{t('lineDestroyer.controls')}</h3>
+        <p>{t('lineDestroyer.controlMoveLeft')}</p>
+        <p>{t('lineDestroyer.controlSoftDrop')}</p>
+        <p>{t('lineDestroyer.controlRotate')}</p>
+        <p>{t('lineDestroyer.controlHardDrop')}</p>
+        <p>{t('lineDestroyer.controlPause')}</p>
       </Card>
         </div>
       </div>
@@ -325,25 +325,25 @@ const Tetris: React.FC = () => {
       <div className="flex space-x-2">
         {!isPlaying && !gameOver && (
           <Button onClick={startGame} className="bg-green-600 hover:bg-green-700">
-            {t('tetris.startGame')}
+            {t('lineDestroyer.startGame')}
           </Button>
         )}
 
         {!isPlaying && gameOver && (
           <Button onClick={startGame} className="bg-blue-600 hover:bg-blue-700">
-            {t('tetris.newGame')}
+            {t('lineDestroyer.newGame')}
           </Button>
         )}
 
         {isPlaying && (
           <Button onClick={pauseGame} className="bg-yellow-600 hover:bg-yellow-700">
-            {t('tetris.pause')}
+            {t('lineDestroyer.pause')}
           </Button>
         )}
 
         {!isPlaying && !gameOver && currentPiece && (
           <Button onClick={resumeGame} className="bg-green-600 hover:bg-green-700">
-            {t('tetris.resume')}
+            {t('lineDestroyer.resume')}
           </Button>
         )}
       </div>
@@ -351,11 +351,11 @@ const Tetris: React.FC = () => {
       <Dialog open={showGameOverDialog} onOpenChange={(open) => handleGameOverDialogChange(open, setShowGameOverDialog)}>
         <DialogContent className="bg-red-900 border-red-600 text-white text-center">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.gameOver')}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold mb-2">{t('lineDestroyer.gameOver')}</DialogTitle>
           </DialogHeader>
-          <p className="text-lg mb-4">{t('tetris.finalScore', { score })}</p>
+          <p className="text-lg mb-4">{t('lineDestroyer.finalScore', { score })}</p>
           <Button onClick={startGame} className="bg-blue-600 hover:bg-blue-700">
-            {t('tetris.newGame')}
+            {t('lineDestroyer.newGame')}
           </Button>
         </DialogContent>
       </Dialog>
@@ -363,12 +363,12 @@ const Tetris: React.FC = () => {
       <Dialog open={showHighScoreDialog} onOpenChange={highScoreDialogOnOpenChange}>
         <DialogContent className="bg-yellow-600 border-yellow-400 text-white text-center">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold mb-2">{t('tetris.newHighScore')}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold mb-2">{t('lineDestroyer.newHighScore')}</DialogTitle>
           </DialogHeader>
-          <p className="text-lg mb-4">{t('tetris.congratulations', { score })}</p>
+          <p className="text-lg mb-4">{t('lineDestroyer.congratulations', { score })}</p>
           <div className="mb-4">
             <label htmlFor="playerName" className="block text-sm font-medium mb-2">
-              {t('tetris.enterName')}
+              {t('lineDestroyer.enterName')}
             </label>
             <input
               id="playerName"
@@ -377,7 +377,7 @@ const Tetris: React.FC = () => {
               onChange={(e) => handlePlayerNameChange(e, setPlayerName)}
               onKeyPress={(e) => handlePlayerNameKeyPress(e, saveHighScore)}
               className="w-full px-3 py-2 text-black rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              placeholder={t('tetris.nameInputPlaceholder')}
+              placeholder={t('lineDestroyer.nameInputPlaceholder')}
               maxLength={20}
               autoFocus
             />
@@ -388,13 +388,13 @@ const Tetris: React.FC = () => {
               disabled={!playerName.trim()}
               className="bg-green-600 hover:bg-green-700 disabled:bg-gray-500"
             >
-              {t('tetris.saveScore')}
+              {t('lineDestroyer.saveScore')}
             </Button>
             <Button
               onClick={() => handleHighScoreSkip(setShowHighScoreDialog, setShowGameOverDialog, setPlayerName)}
               className="bg-gray-600 hover:bg-gray-700"
             >
-              {t('tetris.skip')}
+              {t('lineDestroyer.skip')}
             </Button>
           </div>
         </DialogContent>
@@ -402,11 +402,11 @@ const Tetris: React.FC = () => {
 
       {/* High Scores Section */}
       <div className="mt-8 w-full max-w-4xl">
-        <HighScores game="tetris" limit={10} />
+        <HighScores game="lineDestroyer" limit={10} />
       </div>
 
 </div>
   );
 };
 
-export default Tetris;
+export default LineDestroyer;

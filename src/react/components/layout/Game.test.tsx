@@ -19,27 +19,27 @@ describe('Game Component', () => {
 
     expect(screen.getByText('Choose a Game')).toBeInTheDocument();
     expect(screen.getByText('Tic Tac Toe')).toBeInTheDocument();
-    expect(screen.getByText('Tetris')).toBeInTheDocument();
+    expect(screen.getByText('LineDestroyer')).toBeInTheDocument();
   });
 
   test('has correct navigation links for games', () => {
     renderWithRouter(<Game />);
 
     const ticTacToeLink = screen.getByRole('link', { name: 'Tic Tac Toe' });
-    const tetrisLink = screen.getByRole('link', { name: 'Tetris' });
+    const lineDestroyerLink = screen.getByRole('link', { name: 'LineDestroyer' });
 
     expect(ticTacToeLink).toHaveAttribute('href', '/game/tictactoe');
-    expect(tetrisLink).toHaveAttribute('href', '/game/tetris');
+    expect(lineDestroyerLink).toHaveAttribute('href', '/game/lineDestroyer');
   });
 
   test('buttons have correct styling classes', () => {
     renderWithRouter(<Game />);
 
     const ticTacToeButton = screen.getByRole('button', { name: 'Tic Tac Toe' });
-    const tetrisButton = screen.getByRole('button', { name: 'Tetris' });
+    const lineDestroyerButton = screen.getByRole('button', { name: 'LineDestroyer' });
 
     expect(ticTacToeButton).toHaveClass('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'py-3', 'text-lg', 'w-full');
-    expect(tetrisButton).toHaveClass('bg-green-600', 'hover:bg-green-700', 'text-white', 'py-3', 'text-lg', 'w-full');
+    expect(lineDestroyerButton).toHaveClass('bg-green-600', 'hover:bg-green-700', 'text-white', 'py-3', 'text-lg', 'w-full');
   });
 
   test('applies correct styling classes to game selection container', () => {
