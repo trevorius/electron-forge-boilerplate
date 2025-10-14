@@ -29,9 +29,9 @@ jest.mock('./routes', () => ({
       icon: (): null => null,
       children: [
         {
-          path: '/game/tetris',
-          component: () => <div data-testid="mock-tetris">Tetris Page</div>,
-          title: 'nav.games_menu.tetris',
+          path: '/game/lineDestroyer',
+          component: () => <div data-testid="mock-lineDestroyer">LineDestroyer Page</div>,
+          title: 'nav.games_menu.lineDestroyer',
           icon: (): null => null
         }
       ]

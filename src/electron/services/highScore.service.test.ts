@@ -156,7 +156,7 @@ describe('HighScoreService', () => {
   });
 
   describe('saveScore', () => {
-    const scoreData = { name: 'Player1', score: 1000, game: 'tetris' };
+    const scoreData = { name: 'Player1', score: 1000, game: 'lineDestroyer' };
 
     it('should save score successfully', async () => {
       const mockScore = { id: 1, ...scoreData, createdAt: new Date() };
@@ -193,18 +193,18 @@ describe('HighScoreService', () => {
 
   describe('getHighScores', () => {
     const mockScores = [
-      { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
-      { id: 2, name: 'Player2', score: 900, game: 'tetris', createdAt: new Date() },
+      { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
+      { id: 2, name: 'Player2', score: 900, game: 'lineDestroyer', createdAt: new Date() },
     ];
 
     it('should get high scores for a game', async () => {
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockResolvedValue(mockScores);
 
-      const result = await service.getHighScores('tetris', 10);
+      const result = await service.getHighScores('lineDestroyer', 10);
 
       expect(mockPrismaInstance.score.findMany).toHaveBeenCalledWith({
-        where: { game: 'tetris' },
+        where: { game: 'lineDestroyer' },
         orderBy: { score: 'desc' },
         take: 10,
       });
@@ -215,10 +215,10 @@ describe('HighScoreService', () => {
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockResolvedValue(mockScores);
 
-      await service.getHighScores('tetris');
+      await service.getHighScores('lineDestroyer');
 
       expect(mockPrismaInstance.score.findMany).toHaveBeenCalledWith({
-        where: { game: 'tetris' },
+        where: { game: 'lineDestroyer' },
         orderBy: { score: 'desc' },
         take: 10,
       });
@@ -229,13 +229,13 @@ describe('HighScoreService', () => {
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockRejectedValue(error);
 
-      await expect(service.getHighScores('tetris')).rejects.toThrow('Fetch failed');
+      await expect(service.getHighScores('lineDestroyer')).rejects.toThrow('Fetch failed');
     });
   });
 
   describe('getAllHighScores', () => {
     const mockScores = [
-      { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+      { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
       { id: 2, name: 'Player2', score: 900, game: 'pong', createdAt: new Date() },
     ];
 
@@ -276,12 +276,12 @@ describe('HighScoreService', () => {
   describe('isHighScore', () => {
     it('should return true if less than 10 scores exist', async () => {
       const mockScores = [
-        { id: 1, name: 'Player1', score: 500, game: 'tetris', createdAt: new Date() },
+        { id: 1, name: 'Player1', score: 500, game: 'lineDestroyer', createdAt: new Date() },
       ];
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockResolvedValue(mockScores);
 
-      const result = await service.isHighScore('tetris', 600);
+      const result = await service.isHighScore('lineDestroyer', 600);
 
       expect(result).toBe(true);
     });
@@ -291,13 +291,13 @@ describe('HighScoreService', () => {
         id: i + 1,
         name: `Player${i + 1}`,
         score: 1000 - i * 100,
-        game: 'tetris',
+        game: 'lineDestroyer',
         createdAt: new Date(),
       }));
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockResolvedValue(mockScores);
 
-      const result = await service.isHighScore('tetris', 250);
+      const result = await service.isHighScore('lineDestroyer', 250);
 
       expect(result).toBe(true);
     });
@@ -307,13 +307,13 @@ describe('HighScoreService', () => {
         id: i + 1,
         name: `Player${i + 1}`,
         score: 1000 - i * 100,
-        game: 'tetris',
+        game: 'lineDestroyer',
         createdAt: new Date(),
       }));
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockResolvedValue(mockScores);
 
-      const result = await service.isHighScore('tetris', 50);
+      const result = await service.isHighScore('lineDestroyer', 50);
 
       expect(result).toBe(false);
     });
@@ -323,7 +323,7 @@ describe('HighScoreService', () => {
       service['initialized'] = true;
       mockPrismaInstance.score.findMany.mockRejectedValue(error);
 
-      const result = await service.isHighScore('tetris', 1000);
+      const result = await service.isHighScore('lineDestroyer', 1000);
 
       expect(result).toBe(false);
     });
@@ -355,10 +355,10 @@ describe('HighScoreService', () => {
       service['initialized'] = true;
       mockPrismaInstance.score.deleteMany.mockResolvedValue({});
 
-      await service.clearScores('tetris');
+      await service.clearScores('lineDestroyer');
 
       expect(mockPrismaInstance.score.deleteMany).toHaveBeenCalledWith({
-        where: { game: 'tetris' },
+        where: { game: 'lineDestroyer' },
       });
     });
 

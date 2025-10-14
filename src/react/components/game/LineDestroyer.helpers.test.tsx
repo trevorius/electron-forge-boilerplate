@@ -30,9 +30,9 @@ import {
   handleHighScoreSkip,
   GamePiece,
   Position
-} from './Tetris.helpers';
+} from './LineDestroyer.helpers';
 
-describe('Tetris Helper Functions', () => {
+describe('LineDestroyer Helper Functions', () => {
   describe('createEmptyBoard', () => {
     test('creates an empty board with correct dimensions', () => {
       const board = createEmptyBoard();

@@ -15,7 +15,7 @@ model Score {
   id        Int      @id @default(autoincrement())
   name      String
   score     Int
-  game      String   // "tetris", "tictactoe", etc.
+  game      String   // "lineDestroyer", "tictactoe", etc.
   createdAt DateTime @default(now())
 
   @@map("scores")

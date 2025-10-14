@@ -55,7 +55,7 @@ This approach has proven successful in achieving 99%+ coverage by moving untesta
 - **lucide-react**: icon library
 
 ### game architecture
-- **tetris**: complete implementation with helper functions for testability (`Tetris.tsx` + `Tetris.helpers.tsx`)
+- **lineDestroyer**: complete implementation with helper functions for testability (`LineDestroyer.tsx` + `LineDestroyer.helpers.tsx`)
 - **tictactoe**: simple game component demonstrating component structure
 
 ## documentation standards

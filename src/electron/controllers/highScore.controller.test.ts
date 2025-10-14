@@ -101,7 +101,7 @@ describe('HighScoreController', () => {
 
     describe('save-score handler', () => {
       it('should save score successfully', async () => {
-        const scoreData = { name: 'Player1', score: 1000, game: 'tetris' };
+        const scoreData = { name: 'Player1', score: 1000, game: 'lineDestroyer' };
         const mockScore = { id: 1, ...scoreData, createdAt: new Date() };
         mockHighScoreService.saveScore.mockResolvedValue(mockScore);
 
@@ -112,7 +112,7 @@ describe('HighScoreController', () => {
       });
 
       it('should throw error if save fails', async () => {
-        const scoreData = { name: 'Player1', score: 1000, game: 'tetris' };
+        const scoreData = { name: 'Player1', score: 1000, game: 'lineDestroyer' };
         const error = new Error('Save failed');
         mockHighScoreService.saveScore.mockRejectedValue(error);
 
@@ -123,13 +123,13 @@ describe('HighScoreController', () => {
     describe('get-high-scores handler', () => {
       it('should get high scores successfully', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
         ];
         mockHighScoreService.getHighScores.mockResolvedValue(mockScores);
 
-        const result = await getHighScoresHandler({}, 'tetris', 10);
+        const result = await getHighScoresHandler({}, 'lineDestroyer', 10);
 
-        expect(mockHighScoreService.getHighScores).toHaveBeenCalledWith('tetris', 10);
+        expect(mockHighScoreService.getHighScores).toHaveBeenCalledWith('lineDestroyer', 10);
         expect(result).toEqual(mockScores);
       });
 
@@ -137,14 +137,14 @@ describe('HighScoreController', () => {
         const error = new Error('Get failed');
         mockHighScoreService.getHighScores.mockRejectedValue(error);
 
-        await expect(getHighScoresHandler({}, 'tetris', 10)).rejects.toThrow('Get failed');
+        await expect(getHighScoresHandler({}, 'lineDestroyer', 10)).rejects.toThrow('Get failed');
       });
     });
 
     describe('get-all-high-scores handler', () => {
       it('should get all high scores successfully', async () => {
         const mockScores = [
-          { id: 1, name: 'Player1', score: 1000, game: 'tetris', createdAt: new Date() },
+          { id: 1, name: 'Player1', score: 1000, game: 'lineDestroyer', createdAt: new Date() },
         ];
         mockHighScoreService.getAllHighScores.mockResolvedValue(mockScores);
 
@@ -166,9 +166,9 @@ describe('HighScoreController', () => {
       it('should check high score successfully', async () => {
         mockHighScoreService.isHighScore.mockResolvedValue(true);
 
-        const result = await isHighScoreHandler({}, 'tetris', 1000);
+        const result = await isHighScoreHandler({}, 'lineDestroyer', 1000);
 
-        expect(mockHighScoreService.isHighScore).toHaveBeenCalledWith('tetris', 1000);
+        expect(mockHighScoreService.isHighScore).toHaveBeenCalledWith('lineDestroyer', 1000);
         expect(result).toBe(true);
       });
 
@@ -176,7 +176,7 @@ describe('HighScoreController', () => {
         const error = new Error('Check failed');
         mockHighScoreService.isHighScore.mockRejectedValue(error);
 
-        const result = await isHighScoreHandler({}, 'tetris', 1000);
+        const result = await isHighScoreHandler({}, 'lineDestroyer', 1000);
 
         expect(result).toBe(false);
       });
@@ -203,9 +203,9 @@ describe('HighScoreController', () => {
       it('should clear scores for specific game', async () => {
         mockHighScoreService.clearScores.mockResolvedValue(undefined);
 
-        await clearScoresHandler({}, 'tetris');
+        await clearScoresHandler({}, 'lineDestroyer');
 
-        expect(mockHighScoreService.clearScores).toHaveBeenCalledWith('tetris');
+        expect(mockHighScoreService.clearScores).toHaveBeenCalledWith('lineDestroyer');
       });
 
       it('should clear all scores when no game specified', async () => {
@@ -220,7 +220,7 @@ describe('HighScoreController', () => {
         const error = new Error('Clear failed');
         mockHighScoreService.clearScores.mockRejectedValue(error);
 
-        await expect(clearScoresHandler({}, 'tetris')).rejects.toThrow('Clear failed');
+        await expect(clearScoresHandler({}, 'lineDestroyer')).rejects.toThrow('Clear failed');
       });
     });
   });

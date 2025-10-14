@@ -374,7 +374,7 @@ describe('preload.ts', () => {
 		describe('conditional API tests', () => {
 			it('should test saveScore if available', async () => {
 				if ('saveScore' in electronAPI) {
-					const scoreData = { name: 'Player', score: 1000, game: 'tetris' };
+					const scoreData = { name: 'Player', score: 1000, game: 'lineDestroyer' };
 					await electronAPI.saveScore(scoreData);
 					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('save-score', scoreData);
 				}
@@ -382,8 +382,8 @@ describe('preload.ts', () => {
 
 			it('should test getHighScores if available', async () => {
 				if ('getHighScores' in electronAPI) {
-					await electronAPI.getHighScores('tetris', 10);
-					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'tetris', 10);
+					await electronAPI.getHighScores('lineDestroyer', 10);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('get-high-scores', 'lineDestroyer', 10);
 				}
 			});
 
@@ -396,8 +396,8 @@ describe('preload.ts', () => {
 
 			it('should test isHighScore if available', async () => {
 				if ('isHighScore' in electronAPI) {
-					await electronAPI.isHighScore('tetris', 1500);
-					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'tetris', 1500);
+					await electronAPI.isHighScore('lineDestroyer', 1500);
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('is-high-score', 'lineDestroyer', 1500);
 				}
 			});
 
@@ -410,8 +410,8 @@ describe('preload.ts', () => {
 
 			it('should test clearScores if available', async () => {
 				if ('clearScores' in electronAPI) {
-					await electronAPI.clearScores('tetris');
-					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'tetris');
+					await electronAPI.clearScores('lineDestroyer');
+					expect(mockIpcRenderer.invoke).toHaveBeenCalledWith('clear-scores', 'lineDestroyer');
 				}
 			});
 
