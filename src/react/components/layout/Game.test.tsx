@@ -48,9 +48,6 @@ describe('Game Component', () => {
 
     expect(gameContainer).toHaveClass(
       'min-h-full',
-      'bg-gradient-to-br',
-      'from-slate-900',
-      'to-slate-800',
       'flex',
       'items-center',
       'justify-center',

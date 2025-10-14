@@ -5,7 +5,7 @@ import { Card } from '../ui/card';
 
 const Game: React.FC = () => {
   return (
-    <div className="min-h-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+    <div className="min-h-full  flex items-center justify-center p-4">
       <Card className="p-8 bg-gray-800 border-gray-600 text-center">
         <h1 className="text-4xl font-bold text-white mb-8">Choose a Game</h1>
         <div className="flex flex-col space-y-4 w-64">

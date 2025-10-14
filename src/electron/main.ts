@@ -1,5 +1,8 @@
 import { BrowserWindow, Menu, app, ipcMain, screen, shell } from 'electron';
 import * as path from 'path';
+import { ChatController } from './controllers/chat.controller';
+import { HighScoreController } from './controllers/highScore.controller';
+import { LLMController } from './controllers/llm.controller';
 import {
   WindowDimensions,
   buildLicenseUrl,
@@ -23,11 +26,8 @@ import {
   shouldShowWindow,
   valueOrUndefined
 } from './main.helpers';
-import { highScoreService } from './services/highScore.service';
-import { HighScoreController } from './controllers/highScore.controller';
 import { chatService } from './services/chat.service';
-import { ChatController } from './controllers/chat.controller';
-import { LLMController } from './controllers/llm.controller';
+import { highScoreService } from './services/highScore.service';
 
 const isDev: boolean = process.env.NODE_ENV === 'development';
 
@@ -241,6 +241,12 @@ ipcMain.handle('get-main-app-locale', async () => {
 ipcMain.handle('close-license-window', () => {
 	if (shouldCloseWindow(licenseWindow)) {
 		licenseWindow!.close();
+	}
+});
+
+ipcMain.handle('open-external', (_event, url: string) => {
+	if (url && typeof url === 'string') {
+		shell.openExternal(url);
 	}
 });
 

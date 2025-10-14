@@ -165,4 +165,29 @@ export const markdownComponents = {
   ul: ({ children }: { children: React.ReactNode }) => <ul className="list-disc ml-4 space-y-1">{children}</ul>,
   ol: ({ children }: { children: React.ReactNode }) => <ol className="list-decimal ml-4 space-y-1">{children}</ol>,
   li: ({ children }: { children: React.ReactNode }) => <li className="my-1">{children}</li>,
+  a: ({ href, children }: { href?: string; children: React.ReactNode }) => {
+    const onClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!href) return;
+      event.preventDefault();
+      try {
+        // Use preload-exposed API to open links in the system browser
+        (window as any).electronAPI?.openExternal(href);
+      } catch {
+        // Fallback: attempt normal navigation in a new tab/window
+        window.open(href, '_blank', 'noopener,noreferrer');
+      }
+    };
+
+    return (
+      <a
+        href={href}
+        onClick={onClick}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline text-blue-400 hover:text-blue-300"
+      >
+        {children}
+      </a>
+    );
+  }
 };

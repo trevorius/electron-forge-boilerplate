@@ -1,5 +1,10 @@
 const React = require('react');
 
+// Simple cn implementation for mocking
+const cn = (...classes: (string | undefined | null | false)[]) => {
+  return classes.filter(Boolean).join(' ');
+};
+
 export const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>

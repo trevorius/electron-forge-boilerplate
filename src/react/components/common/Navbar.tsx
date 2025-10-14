@@ -13,12 +13,15 @@ import {
 } from '../ui/navigation-menu';
 import { cn } from '../../lib/utils';
 import LanguageSelector from './LanguageSelector';
+import ThemeSelector from './ThemeSelector';
 import WindowControls from './WindowControls';
 import { routes } from '../../routes';
+import { useModel } from '../../contexts/ModelContext';
 
 const Navbar: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { currentModelInfo } = useModel();
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -114,9 +117,17 @@ const Navbar: React.FC = () => {
           <div className="flex-1 h-12" style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}></div>
         </div>
 
-        {/* Right side - Language selector and window controls */}
+        {/* Right side - Attribution badge, Language selector and window controls */}
         <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-          <div className="mr-2">
+          {currentModelInfo?.requiresAttribution && (
+            <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-md mr-2">
+              <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">
+                {currentModelInfo.attributionText}
+              </span>
+            </div>
+          )}
+          <div className="flex items-center gap-1 mr-2">
+            <ThemeSelector />
             <LanguageSelector />
           </div>
           <WindowControls />

@@ -18,6 +18,8 @@ export const Circle = createMockIcon('Circle');
 export const Home = createMockIcon('Home');
 export const Info = createMockIcon('Info');
 export const Gamepad2 = createMockIcon('Gamepad2');
+export const Moon = createMockIcon('Moon');
+export const Sun = createMockIcon('Sun');
 export const LucideIcon = createMockIcon('LucideIcon');
 
 // Type export for LucideIcon

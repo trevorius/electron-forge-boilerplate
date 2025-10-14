@@ -50,6 +50,7 @@ electron-builder.yml
 *.pacman
 
 
+.wortrees/
 /src/electron/generated/prisma
 
 # Database files
