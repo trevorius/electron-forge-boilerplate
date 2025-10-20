@@ -1,17 +1,17 @@
-# CharWeaver
+# Electron React Boilerplate
 
-An intelligent character generation and chat application built with Electron, React, and AI. Create detailed character personas with custom attributes and engage in immersive conversations powered by local LLM integration. All characters and chat histories are persisted locally in a secure database.
+A modern, feature-rich Electron application boilerplate with React, TypeScript, ShadcnUI, and Tailwind CSS integration. This project provides a solid foundation for building cross-platform desktop applications with comprehensive testing and development workflows.
 
-- [CharWeaver](#charweaver)
+- [Electron React Boilerplate](#electron-react-boilerplate)
   - [🚀 Features](#-features)
-  - [🎭 How It Works](#-how-it-works)
   - [📦 Installation](#-installation)
   - [🛠️ Development](#️-development)
     - [Start Development Server](#start-development-server)
     - [Available Scripts](#available-scripts)
   - [🏗️ Project Structure](#️-project-structure)
-  - [💾 Database Architecture](#-database-architecture)
-  - [🤖 AI Integration](#-ai-integration)
+  - [🎮 Built-in Games](#-built-in-games)
+    - [Tetris](#tetris)
+    - [TicTacToe](#tictactoe)
   - [🧪 Testing](#-testing)
     - [Test Coverage Strategy](#test-coverage-strategy)
     - [Running Tests](#running-tests)
@@ -26,7 +26,6 @@ An intelligent character generation and chat application built with Electron, Re
   - [🛠️ Technology Stack](#️-technology-stack)
     - [Core Technologies](#core-technologies)
     - [UI \& Styling](#ui--styling)
-    - [Database \& AI](#database--ai)
     - [Development Tools](#development-tools)
   - [📝 Configuration Files](#-configuration-files)
   - [🤝 Contributing](#-contributing)
@@ -36,37 +35,26 @@ An intelligent character generation and chat application built with Electron, Re
 
 ## 🚀 Features
 
-- **🎭 Character Generation** - Create detailed character personas with customizable attributes and personalities
-- **💬 AI-Powered Chat** - Engage in immersive conversations with your generated characters using local LLM integration
-- **💾 Database Persistence** - All characters (personas) and chat histories are securely stored locally using Prisma ORM
-- **🏷️ Genre Organization** - Organize chats by character and genre for easy retrieval
-- **🌍 Multi-language Support** - Full internationalization with i18next (English, French)
-- **🎨 Modern UI** - Beautiful interface built with ShadcnUI and Tailwind CSS
-- **🔒 Privacy First** - All data stored locally, no cloud dependencies
-- **⚡ Fast & Responsive** - Built on Electron, React 19, and Vite for optimal performance
-- **🧪 Comprehensive Testing** - 100% test coverage target with Jest and React Testing Library
-
-## 🎭 How It Works
-
-1. **Define Your Character**: Specify attributes, personality traits, background, and other characteristics for your persona
-2. **Generate**: The system creates a complete character profile based on your specifications
-3. **Start Chatting**: Engage in conversations with your character, powered by local AI models
-4. **Save & Organize**: All characters and chat sessions are automatically saved and organized by genre
-5. **Resume Anytime**: Access your character library and continue previous conversations whenever you want
+- **Electron** - Cross-platform desktop app framework
+- **React 19** - Modern React with latest features
+- **TypeScript** - Type-safe development
+- **ShadcnUI** - Beautiful, accessible component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Vite** - Fast build tool and development server
+- **Jest** - Comprehensive testing framework
+- **i18next** - Internationalization support
+- **React Router** - Client-side routing
+- **Lucide Icons** - Beautiful icon library
 
 ## 📦 Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/trev-z-dev/char-weaver.git
-cd char-weaver
+git clone https://github.com/trev-z-dev/electron-boilerplate.git
+cd electron-boilerplate
 
 # Install dependencies
 npm install
-
-# Initialize database
-npx prisma generate
-npx prisma migrate dev
 ```
 
 ## 🛠️ Development
@@ -103,59 +91,46 @@ npm run dev:electron # Start Electron only (requires Vite server running)
 src/
 ├── electron/           # Electron main process files
 │   ├── main.js        # Main Electron process
-│   ├── preload.js     # Preload script (IPC bridge)
-│   ├── controllers/   # Backend controllers for business logic
-│   ├── services/      # Database and AI service layer
-│   └── generated/     # Auto-generated preload types
-├── react/             # React application
-│   ├── components/    # React components
-│   │   ├── character/ # Character creation and management
-│   │   ├── chat/      # Chat interface components
-│   │   ├── common/    # Shared components (Navbar, etc.)
-│   │   ├── layout/    # Layout components
-│   │   └── ui/        # ShadcnUI components
-│   ├── lib/           # Utility libraries
-│   ├── locales/       # i18n translation files
-│   ├── styles/        # Global styles
-│   ├── __mocks__/     # Jest mocks
-│   ├── App.tsx        # Main App component
-│   ├── routes.tsx     # Route definitions
-│   └── index.tsx      # React entry point
-├── prisma/            # Database schema and migrations
-│   └── schema.prisma  # Database models (Character, Chat, Message)
-└── llms.json          # LLM configuration
+│   └── preload.js     # Preload script
+└── react/             # React application
+    ├── components/    # React components
+    │   ├── common/    # Shared components
+    │   ├── game/      # Game components (TicTacToe, Tetris)
+    │   ├── layout/    # Layout components
+    │   └── ui/        # ShadcnUI components
+    ├── lib/           # Utility libraries
+    ├── locales/       # i18n translation files
+    ├── styles/        # Global styles
+    ├── __mocks__/     # Jest mocks
+    ├── App.tsx        # Main App component
+    ├── routes.tsx     # Route definitions
+    └── index.tsx      # React entry point
 ```
 
-## 💾 Database Architecture
+## 🎮 Built-in Games
 
-CharWeaver uses Prisma ORM with SQLite for local data persistence:
+This boilerplate includes two fully-featured games to demonstrate the capabilities:
 
-- **Characters (Personas)**: Store character definitions with attributes, personality traits, and metadata
-- **Chats**: Organize conversations by character and genre
-- **Messages**: Complete chat history with timestamps and context
-- **Automatic Initialization**: Database and tables are created automatically on first run
-- **Type Safety**: Full TypeScript integration with Prisma Client
+### Tetris
 
-See [Backend Architecture Guide](documentation/backend-architecture.doc.md) for detailed implementation patterns.
+- Complete Tetris implementation with scoring, levels, and line clearing
+- Comprehensive test coverage (99%+)
+- Documented architecture in [`Tetris.doc.md`](src/react/components/game/Tetris.doc.md)
+- Keyboard controls: Arrow keys for movement, Space for hard drop, P for pause
 
-## 🤖 AI Integration
+### TicTacToe
 
-CharWeaver integrates with local LLM models using node-llama-cpp:
-
-- **Local Processing**: All AI inference runs locally, ensuring privacy
-- **Character-Aware**: AI responses are contextual to the character's personality and attributes
-- **Persistent Context**: Chat history is maintained for coherent long-form conversations
-- **Configurable Models**: Support for multiple LLM models via llms.json configuration
-- **No API Keys Required**: Fully offline capability
+- Classic 3x3 grid game
+- Player vs Player gameplay
+- Win detection and game reset functionality
 
 ## 🧪 Testing
 
 The project maintains high test coverage standards:
 
-- **Coverage Target**: 100% (enforced in jest.config.js)
-- **Testing Strategy**: Unit tests, integration tests, helper function extraction, and mocked component tests
+- **Coverage Target**: 99%+
+- **Testing Strategy**: Unit tests, integration tests, and mocked component tests
 - **Framework**: Jest with React Testing Library
-- **Database Testing**: In-memory SQLite for isolated test environments
 
 ### Test Coverage Strategy
 
@@ -189,8 +164,6 @@ This section provides comprehensive guides for extending the application with ne
 |-------|-------------|------------|
 | [Routes and Pages](documentation/routes-and-pages.doc.md) | Complete guide for adding new routes and pages | Type-safe routing, component organization, navigation integration, i18n support |
 | [Backend Architecture](documentation/backend-architecture.doc.md) | Comprehensive backend development guide | Database layer, service architecture, controllers, preload scripts, IPC communication |
-| [Character System](documentation/character-system.doc.md) | Character generation and management patterns | Character creation, persona attributes, database persistence, character library |
-| [Chat System](documentation/chat-system.doc.md) | AI chat implementation guide | LLM integration, message handling, context management, chat history |
 | [Testing Strategies](documentation/testing-strategies.doc.md) | Advanced testing techniques for 100% coverage | Helper function extraction, edge case testing, mocking strategies, coverage analysis |
 | [Release Compilation](documentation/release-compilation.doc.md) | Complete build and distribution guide | Production builds, cross-platform packaging, release automation, security hardening |
 
@@ -255,13 +228,6 @@ npm run make
 - **Radix UI** - Accessible primitives
 - **Lucide React** - Icon library
 
-### Database & AI
-
-- **Prisma ORM** - Type-safe database client
-- **SQLite** - Local database engine
-- **node-llama-cpp** - Local LLM integration
-- **React Markdown** - Markdown rendering for chat
-
 ### Development Tools
 
 - **Jest 30** - Testing framework
@@ -273,11 +239,9 @@ npm run make
 
 - `package.json` - Project metadata and scripts
 - `vite.config.js` - Vite configuration
-- `jest.config.js` - Jest testing configuration (100% coverage enforced)
+- `jest.config.js` - Jest testing configuration
 - `tailwind.config.js` - Tailwind CSS configuration
 - `tsconfig.json` - TypeScript configuration
-- `prisma/schema.prisma` - Database schema definition
-- `llms.json` - LLM model configuration
 - `CLAUDE.md` - Project-specific development rules
 
 ## 🤝 Contributing
@@ -300,10 +264,8 @@ MIT License - see LICENSE file for details
 
 ## 🔗 Links
 
-- [Repository](https://github.com/trev-z-dev/char-weaver)
-- [Backend Architecture Guide](documentation/backend-architecture.doc.md)
-- [Character System Documentation](documentation/character-system.doc.md)
-- [Chat System Documentation](documentation/chat-system.doc.md)
-- [Prisma Documentation](https://www.prisma.io/docs)
+- [Repository](https://github.com/trev-z-dev/electron-boilerplate)
+- [Navbar Implementation Documentation](src/react/components/common/Navbar.doc.md)
+- [Tetris Game Documentation](src/react/components/game/Tetris.doc.md)
 - [ShadcnUI Documentation](https://ui.shadcn.com/)
 - [Electron Documentation](https://electronjs.org/)

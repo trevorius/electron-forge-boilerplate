@@ -19,9 +19,7 @@
 		"preview": "vite preview",
 		"test": "jest",
 		"test:watch": "jest --watch",
-		"test:coverage": "jest --coverage",
-		"audit": "npm audit",
-		"audit:prod": "npm audit --omit=dev"
+		"test:coverage": "jest --coverage"
 	},
 	"config": {
 		"forge": {
