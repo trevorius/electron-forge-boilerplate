@@ -1,6 +1,8 @@
 # Electron React Boilerplate
 
-A modern, feature-rich Electron application boilerplate with React, TypeScript, ShadcnUI, and Tailwind CSS integration. This project provides a solid foundation for building cross-platform desktop applications with comprehensive testing and development workflows.
+A modern, feature-rich Electron application boilerplate with React, TypeScript, ShadcnUI, and Tailwind CSS integration. This project provides a solid foundation for building cross-platform desktop applications with comprehensive testing, 100% jest coverage and development workflows.
+
+project integrates llama.cpp with options to download llama3.2 or upload your own llmGGUF.
 
 - [Electron React Boilerplate](#electron-react-boilerplate)
   - [🚀 Features](#-features)
@@ -10,7 +12,7 @@ A modern, feature-rich Electron application boilerplate with React, TypeScript, 
     - [Available Scripts](#available-scripts)
   - [🏗️ Project Structure](#️-project-structure)
   - [🎮 Built-in Games](#-built-in-games)
-    - [Tetris](#tetris)
+    - [lineDestroyer](#linedestroyer)
     - [TicTacToe](#tictactoe)
   - [🧪 Testing](#-testing)
     - [Test Coverage Strategy](#test-coverage-strategy)
@@ -95,7 +97,7 @@ src/
 └── react/             # React application
     ├── components/    # React components
     │   ├── common/    # Shared components
-    │   ├── game/      # Game components (TicTacToe, Tetris)
+    │   ├── game/      # Game components (TicTacToe, lineDestroyer)
     │   ├── layout/    # Layout components
     │   └── ui/        # ShadcnUI components
     ├── lib/           # Utility libraries
@@ -111,11 +113,11 @@ src/
 
 This boilerplate includes two fully-featured games to demonstrate the capabilities:
 
-### Tetris
+### lineDestroyer
 
-- Complete Tetris implementation with scoring, levels, and line clearing
+- Complete lineDestroyer implementation with scoring, levels, and line clearing
 - Comprehensive test coverage (99%+)
-- Documented architecture in [`Tetris.doc.md`](src/react/components/game/Tetris.doc.md)
+- Documented architecture in [`lineDestroyer.doc.md`](src/react/components/game/lineDestroyer.doc.md)
 - Keyboard controls: Arrow keys for movement, Space for hard drop, P for pause
 
 ### TicTacToe
@@ -266,6 +268,6 @@ MIT License - see LICENSE file for details
 
 - [Repository](https://github.com/trev-z-dev/electron-boilerplate)
 - [Navbar Implementation Documentation](src/react/components/common/Navbar.doc.md)
-- [Tetris Game Documentation](src/react/components/game/Tetris.doc.md)
+- [lineDestroyer Game Documentation](src/react/components/game/lineDestroyer.doc.md)
 - [ShadcnUI Documentation](https://ui.shadcn.com/)
 - [Electron Documentation](https://electronjs.org/)
